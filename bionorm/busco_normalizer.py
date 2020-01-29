@@ -8,7 +8,7 @@ import subprocess
 import gzip
 import click
 from ruamel.yaml import YAML
-from ..helper import check_file, return_filehandle, create_directories,\
+from .helper import check_file, return_filehandle, create_directories,\
                      change_directories, check_busco_dependencies, setup_logging
 
 

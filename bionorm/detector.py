@@ -5,7 +5,7 @@ import sys
 import gzip
 import click
 import logging
-from incongruency_detector.Detector import Detector
+from . import Detector
 
 
 @click.command()
@@ -16,8 +16,8 @@ from incongruency_detector.Detector import Detector
 @click.option('--no_nodes', is_flag=True,
               help='''Disable DSCensor Stats and Node Generation''')
 @click.option('--log_file', metavar = '<FILE>', 
-              default='./detect_incongruencies.log',
-              help='''File to write log to. (default:./detect_incongruencies.log)''')
+              default='./bionorm.log',
+              help='''File to write log to. (default:./bionorm.log)''')
 @click.option('--log_level', metavar = '<LOGLEVEL>', default='INFO',
               help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
 #@click.option('--normalize', is_flag=True,
@@ -48,7 +48,7 @@ def cli(target, no_busco, no_nodes, log_file, log_level):
                'readme_template': readme_template}
     for t in target:
         detector = Detector(t, **options)  # initializers
-        detector.detect_incongruencies()  # class method runs all deteciton methods
+        detector.detect_incongruencies()  # class method runs all detection methods
 
 if __name__ == '__main__':
     cli()
