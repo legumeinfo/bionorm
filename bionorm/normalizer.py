@@ -30,7 +30,7 @@ def cli():
         sys.exit(1)
     mode = sys.argv[1].lower()  # get mode
     sys.argv = [mode] + sys.argv[2:]  # makes usage for application correct
-    if mode == '--help' or mode =='-h':
+    if mode == '--help' or mode == '-h':
         print(cli.__doc__)
         sys.exit(1)
     if mode == 'index':  # determine file type and index
@@ -40,7 +40,7 @@ def cli():
         from . import prefix
         prefix.cli()
     if mode == 'readme':  # generate readmes from template and target
-        from .  import generate_readme
+        from . import generate_readme
         generate_readme.cli()
     if mode == 'extract_fasta':  # Extract FASTA features from GFF3
         from . import extract_fasta
@@ -48,6 +48,7 @@ def cli():
     if mode == 'busco':  # Run BUSCO with mode and lineage on target
         from . import busco_normalizer
         busco_normalizer.cli()
+
 
 if __name__ == '__main__':
     cli()

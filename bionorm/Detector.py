@@ -22,6 +22,7 @@ class Detector:
 
        https://github.com/LegumeFederation/datastore
     '''
+
     def __init__(self, target, **kwargs):
         '''Check for logger, check for gt'''
         subprocess.check_call('which gt', shell=True)  # check for gt in env
@@ -29,20 +30,21 @@ class Detector:
         self.checks = {}  # object that determines which checks are skipped
         self.checks['genome_main'] = kwargs.get('disable_genome_main', True)
         self.checks['gene_models_main'] = kwargs.get(
-                                            'disable_gene_models_main', True)
+            'disable_gene_models_main', True)
         self.checks['perform_gt'] = kwargs.get('disable_gt', True)
         self.checks['fasta_headers'] = kwargs.get(
-                                            'disable_fasta_headers', True)
+            'disable_fasta_headers', True)
         self.no_nodes = kwargs.get('no_nodes', False)
         self.canonical_types = ['genome_main',
                                 'protein_primaryTranscript',
                                 'protein',
-                                'gene_models_main', 
-                                'ADDMORESTUFF']  #  types for detector
-        self.canonical_parents = {'genome_main': None,
-                                  'gene_models_main': 'genome_main',
-                                  'protein_primaryTranscript' : 'gene_models_main',
-                                  'protein' : 'gene_models_main'}
+                                'gene_models_main',
+                                'ADDMORESTUFF']  # types for detector
+        self.canonical_parents = {
+            'genome_main': None,
+            'gene_models_main': 'genome_main',
+            'protein_primaryTranscript': 'gene_models_main',
+            'protein': 'gene_models_main'}
         self.rank = {'genome_main': 0, 'gene_models_main': 1, 'protein': 2,
                      'protein_primaryTranscript': 2}
         self.log_level = kwargs.get('log_level', 'INFO')
@@ -62,13 +64,13 @@ class Detector:
         self.get_target_type()  # sets self.target_name and self.target_type
         if not self.target_type:  # target type returned False not recognized
             logger.error('Target type not recognized for {}'.format(
-                                                                  self.target))
+                self.target))
             sys.exit(1)
-        #if not os.environ.get('BUSCO_ENV_FILE', None) and not kwargs.get('no_busco'):
+        # if not os.environ.get('BUSCO_ENV_FILE', None) and not kwargs.get('no_busco'):
         #    logger.error('''
         #        BUSCO_ENV_File Must Be set, please export
 #
-#                This is used to source an Environment for BUSCO as the BUSCO 
+#                This is used to source an Environment for BUSCO as the BUSCO
 #                Config Does Still Requires AUGUSTUS Environment variables be set
 #                ''')
         logger.info('Target type looks like {}'.format(self.target_type))
@@ -93,7 +95,8 @@ class Detector:
                 self.target_objects[t]['children'][set_primary]['type'] = 'protein_primaryTranscript'
                 self.target_objects[t]['children'][set_primary]['node_data']['canonical_type'] = 'protein_primaryTranscript'
             if count > 1 and not primary:
-                logger.error('Multiple protein files found for {} one must be renamed to primary'.format(t))
+                logger.error(
+                    'Multiple protein files found for {} one must be renamed to primary'.format(t))
                 sys.exit(1)
 #            for c in self.target_objects[t]['children']:
 #                logger.info('{}'.format(c))
@@ -124,7 +127,7 @@ class Detector:
         logger.debug(self.target_name)
         if target_name.endswith('.gz'):  # all datastore files end in .gz
             self.target_type = 'file'
-        elif(len(target_name.split('_')) == 2 and \
+        elif(len(target_name.split('_')) == 2 and
              len(target_name.split('.')) < 3):
             self.target_type = 'organism_dir'  # will always be Genus_species
         elif len(target_name.split('.')) >= 3:  # standard naming minimum
@@ -133,8 +136,8 @@ class Detector:
     def get_targets(self):
         '''Gets and discovers target files relation to other files
 
-           if the target is a directory, the program will discover 
-           
+           if the target is a directory, the program will discover
+
            all related files that can be checked
         '''
         logger = self.logger
@@ -146,13 +149,13 @@ class Detector:
         elif target_type == 'data_dir' or target_type == 'organism_dir':
             self.get_all_files()  # works for both data and organism
             return
-        #elif target_type == 'organism_dir':  # entire organism
+        # elif target_type == 'organism_dir':  # entire organism
         #    self.get_all_files()
         #    return
 
     def get_all_files(self):
         '''Walk down filetree and recursively return all files
-        
+
            These will be checked using add_target_object
         '''
         logger = self.logger
@@ -187,16 +190,18 @@ class Detector:
         target_attributes = self.target_name.split('.')
         if len(target_attributes) < 3 or self.target_name[0] == '_':
             logger.debug('File {} does not seem to have attributes'.format(
-                                                                      target))
+                target))
             return
         canonical_type = target_attributes[-3]  # check content type
         if canonical_type not in self.canonical_types:  # regject
             logger.debug('Type {} not recognized in {}.  Skipping'.format(
-                                                          canonical_type,
-                                                    self.canonical_types))
+                canonical_type,
+                self.canonical_types))
             return
         organism_dir_path = os.path.dirname(os.path.dirname(target))  # org dir
-        organism_dir = os.path.basename(os.path.dirname(os.path.dirname(target)))  # org dir
+        organism_dir = os.path.basename(
+            os.path.dirname(
+                os.path.dirname(target)))  # org dir
         target_dir = os.path.basename(os.path.dirname(target))
         genus = organism_dir.split('_')[0].lower()
         species = organism_dir.split('_')[1].lower()
@@ -208,71 +213,73 @@ class Detector:
         file_url = '{}/{}/{}/{}'.format(self.domain, organism_dir,
                                         target_dir, self.target_name)
         target_node_object = {
-               'filename' : self.target_name,
-               'filetype' : file_type,
-               'canonical_type' : canonical_type,
-               'url' : file_url,
-               'counts' : '',
-               'genus' : genus,
-               'species' : species,
-               'origin' : 'LIS',
-               'infraspecies' : target_attributes[1],
-               'derived_from' : [],
-               'child_of' : []}
+            'filename': self.target_name,
+            'filetype': file_type,
+            'canonical_type': canonical_type,
+            'url': file_url,
+            'counts': '',
+            'genus': genus,
+            'species': species,
+            'origin': 'LIS',
+            'infraspecies': target_attributes[1],
+            'derived_from': [],
+            'child_of': []}
         if len(target_attributes) > 7 and target_ref_type:  # check parent
             logger.debug('Target Derived from Some Reference Searching...')
-            ref_glob = '{}/{}*/*{}.*.gz'.format(organism_dir_path, 
-                                      '.'.join(target_attributes[1:3]),
-                                      target_ref_type)
+            ref_glob = '{}/{}*/*{}.*.gz'.format(organism_dir_path,
+                                                '.'.join(target_attributes[1:3]),
+                                                target_ref_type)
             if self.rank[canonical_type] > 1:  # feature has a subtype
-                ref_glob = '{}/{}*/*{}.*.gz'.format(organism_dir_path, 
-                                      '.'.join(target_attributes[1:4]),
-                                      target_ref_type)
+                ref_glob = '{}/{}*/*{}.*.gz'.format(organism_dir_path,
+                                                    '.'.join(target_attributes[1:4]),
+                                                    target_ref_type)
             my_reference = self.get_reference(ref_glob)
             if my_reference not in self.target_objects:  # new parent
                 parent_name = os.path.basename(my_reference)
                 file_type = self.get_target_file_type(parent_name)
-                organism_dir = os.path.basename(os.path.dirname(os.path.dirname(my_reference)))
+                organism_dir = os.path.basename(
+                    os.path.dirname(os.path.dirname(my_reference)))
                 ref_dir = os.path.basename(os.path.dirname(my_reference))
                 file_url = '{}/{}/{}/{}'.format(self.domain, organism_dir,
                                                 ref_dir, parent_name)
                 ref_node_object = {
-                    'filename' : parent_name,
-                    'filetype' : file_type,
-                    'canonical_type' : target_ref_type,
-                    'url' : file_url,
-                    'counts' : '',
-                    'genus' : genus,
-                    'species' : species,
-                    'origin' : 'LIS',
-                    'infraspecies' : target_attributes[1],
-                    'derived_from' : [],
-                    'child_of' : []}
+                    'filename': parent_name,
+                    'filetype': file_type,
+                    'canonical_type': target_ref_type,
+                    'url': file_url,
+                    'counts': '',
+                    'genus': genus,
+                    'species': species,
+                    'origin': 'LIS',
+                    'infraspecies': target_attributes[1],
+                    'derived_from': [],
+                    'child_of': []}
                 target_node_object['child_of'].append(parent_name)
                 target_node_object['derived_from'].append(parent_name)
-                self.target_objects[my_reference] = {'type': target_ref_type,
-                                                     'node_data' : ref_node_object,
-                                                     'readme': '',
-                                                     'children': {}}
+                self.target_objects[my_reference] = {
+                    'type': target_ref_type,
+                    'node_data': ref_node_object,
+                    'readme': '',
+                    'children': {}}
                 self.target_objects[my_reference]['children'][target] = {
-                                                    'node_data': target_node_object,
-                                                    'type': canonical_type}
+                    'node_data': target_node_object,
+                    'type': canonical_type}
             else:  # the parent is already in the data structure add child
                 if target not in self.target_objects[my_reference]['children']:
                     parent_name = os.path.basename(my_reference)
                     target_node_object['child_of'].append(parent_name)
                     target_node_object['derived_from'].append(parent_name)
                     self.target_objects[my_reference]['children'][target] = {
-                                                     'node_data': target_node_object,
-                                                     'type': canonical_type}
+                        'node_data': target_node_object,
+                        'type': canonical_type}
         else:  # target is a reference
             if target_ref_type:
                 logger.error('Reference was not found or file has <=7 fields')
                 sys.exit(1)
             logger.debug('Target has no Parent, it is a Reference')
-            if not target in self.target_objects:
+            if target not in self.target_objects:
                 self.target_objects[target] = {'type': canonical_type,
-                                               'node_data' : target_node_object,
+                                               'node_data': target_node_object,
                                                'children': {}}
 
     def get_reference(self, glob_target):
@@ -294,7 +301,7 @@ class Detector:
 
     def write_node_object(self):
         '''Write object node for loading into DSCensor
-        
+
            file name is object name from json
         '''
         my_name = self.write_me['filename']
@@ -313,7 +320,8 @@ class Detector:
         '''
         logger = self.logger  # set logging
         node_data = self.node_data  # get current targets nodes
-        busco_parse = re.compile('C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)')
+        busco_parse = re.compile(
+            r'C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)')
         output = '{}.busco'.format('.'.join(file_name.split('.')[:-2]))
         cmd = 'run_BUSCO.py --mode {} --lineage {}'.format(mode, 'lineage')
         outdir = './run_{}'.format(output)  # output from BUSCO
@@ -336,7 +344,7 @@ class Detector:
                     single = float(percentages.group(2))
                     duplicate = float(percentages.group(3))
                     missing = float(percentages.group(5))
-                    node_data['busco'] = {'total_buscos': total, #  node BUSCO
+                    node_data['busco'] = {'total_buscos': total,  # node BUSCO
                                           'complete_buscos': complete,
                                           'fragmented_buscos': frag,
                                           'single_copy_buscos': single,
@@ -345,7 +353,7 @@ class Detector:
 
     def detect_incongruencies(self):
         '''Detects all incongruencies in self.target_objects
-        
+
            report all incongruencies to self.output_prefix
 
            Probably refactor this at some point to use a self.dict
@@ -357,8 +365,9 @@ class Detector:
         logger = self.logger
         targets = self.target_objects  # get objects from class init
         no_nodes = self.no_nodes  # if true, no nodes for DSCensor written
-        for reference in sorted(targets, key=lambda k:self.rank[targets[k]['type']]):
-#            logger.info('HERE {}'.format(reference))
+        for reference in sorted(targets,
+                                key=lambda k: self.rank[targets[k]['type']]):
+            #            logger.info('HERE {}'.format(reference))
             if reference not in self.passed:
                 self.passed[reference] = 0
                 self.target = reference
@@ -366,7 +375,7 @@ class Detector:
                                      targets[reference]['type'])  # type ex genome_main
                 if not ref_method:  # if the target isnt in the hierarchy continue
                     logger.debug('Check for {} does not exist'.format(
-                                                    targets[reference]['type']))
+                        targets[reference]['type']))
                     continue
                 logger.debug(ref_method)
                 my_detector = ref_method(self, **self.options)
@@ -379,8 +388,10 @@ class Detector:
     #                    if not self.options.get('no_busco'):
     #                        self.run_busco('genome', file_name)
                     if not no_nodes:
-                        logger.info('Writing node object for {}'.format(reference))
-                        self.write_me = targets[reference]['node_data']  # dscensor node
+                        logger.info(
+                            'Writing node object for {}'.format(reference))
+                        # dscensor node
+                        self.write_me = targets[reference]['node_data']
                         self.write_node_object()  # write node for dscensor loading
                 logger.debug('{}'.format(targets[reference]))
             if self.target_objects[reference]['children']:  # process children
@@ -398,7 +409,7 @@ class Detector:
                                            children[c]['type'])  # exgene_models_main
                     if not child_method:
                         logger.warning('Check for {} does not exist'.format(
-                                                         children[c]['type']))
+                            children[c]['type']))
                         continue
                     logger.debug(child_method)
                     my_detector = child_method(self, **self.options)

@@ -9,7 +9,7 @@ import gzip
 import click
 from ruamel.yaml import YAML
 from ..helper import check_file, return_filehandle, create_directories,\
-                     check_subprocess_dependencies, setup_logging
+    check_subprocess_dependencies, setup_logging
 
 
 def index_fasta(fasta):
@@ -32,7 +32,8 @@ def index_gff3(gff3):
     cmd = 'tabix -p gff {}'.format(compressed_gff)  # tabix index command
     standard_outval = subprocess.call(cmd.split(' '))
     if standard_outval:
-        cmd = 'tabix --csi -p gff {}'.format(compressed_gff)  # tabix index command
+        # tabix index command
+        cmd = 'tabix --csi -p gff {}'.format(compressed_gff)
         subprocess.check_call(cmd, shell=True)
     return compressed_gff  # return new compressed and indexed gff
 
@@ -40,11 +41,16 @@ def index_gff3(gff3):
 @click.command()
 @click.option('--target', type=str,
               help='''TARGETS can be files or directories or both''')
-@click.option('--log_file', metavar = '<FILE>', 
-              default='./normalizer_index.log',
-              help='''File to write log to. (default:./normalizer_index.log)''')
-@click.option('--log_level', metavar = '<LOGLEVEL>', default='INFO',
-              help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
+@click.option(
+    '--log_file',
+    metavar='<FILE>',
+    default='./normalizer_index.log',
+    help='''File to write log to. (default:./normalizer_index.log)''')
+@click.option(
+    '--log_level',
+    metavar='<LOGLEVEL>',
+    default='INFO',
+    help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
 def cli(target, log_file, log_level):
     '''Determines what type of index to apply to input target'''
     check_subprocess_dependencies()
@@ -59,16 +65,18 @@ def cli(target, log_file, log_level):
     file_attributes = target.split('.')
     new_file = False
     if len(file_attributes) < 2:
-        error_message = '''Target {} does not have a type or attributes.  File must end in either gz, bgz, fasta, fna, fa, gff, or gff3.'''.format(target)
+        error_message = '''Target {} does not have a type or attributes.  File must end in either gz, bgz, fasta, fna, fa, gff, or gff3.'''.format(
+            target)
         logger.error(error_message)
         sys.exit(1)
     file_type = file_attributes[-1]
     if file_type == 'gz' or file_type == 'bgz':
         file_type = file_attributes[-2]
-        logger.error('Uncompress file for indexing.  Compression is done specifically for each index type')
+        logger.error(
+            'Uncompress file for indexing.  Compression is done specifically for each index type')
         sys.exit(1)
     if file_type not in file_types:
-        logger.error('File {} is not a type in {}'.format(target, 
+        logger.error('File {} is not a type in {}'.format(target,
                                                           file_types))
         sys.exit(1)
     if file_type in fasta:

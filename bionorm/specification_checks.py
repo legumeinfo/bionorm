@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from .helper import check_file, return_filehandle
 import os
 import sys
 import logging
@@ -10,8 +11,8 @@ import requests
 import json
 from glob import glob
 from os import path
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-from .helper import check_file, return_filehandle
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
 
 class genome_main:
 
@@ -51,11 +52,11 @@ class genome_main:
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
             logger.error('File must have 5 letter prefix, not {}'.format(
-                                                                    attr[0]))
+                attr[0]))
             return False
         if not attr[2].startswith('gnm'):  # should be gnm type
             logger.error('File should have gnm in field 3, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         gnm_v = attr[2].replace('gnm', '')
         try:
@@ -85,7 +86,8 @@ class genome_main:
         attr = os.path.basename(fasta).split('.')  # get attributes for naming
         true_header = '.'.join(attr[:3])
         fh = return_filehandle(fasta)  # get file handle, text/gz
-        re_header = re.compile("^>(\S+)\s*(.*)")  # grab header and description
+        # grab header and description
+        re_header = re.compile(r"^>(\S+)\s*(.*)")
         passed = True
         with fh as gopen:
             for line in gopen:
@@ -109,7 +111,7 @@ class genome_main:
                     if not hid.startswith(true_header):
                         logger.warning(('Inconsistency {} '.format(hid) +
                                         'Should be {}'.format(standard_header))
-                                      )
+                                       )
                         passed = False
         return passed
 
@@ -152,17 +154,17 @@ class gene_models_main:
         '''
         target = self.target
         logger = self.logger
-        attr = os.path.basename(target).split('.')  # split on delimiter 
+        attr = os.path.basename(target).split('.')  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error('File did not have 7 fields! {}'.format(attr))
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
             logger.error('File must have 5 letter prefix, not {}'.format(
-                                                                    attr[0]))
+                attr[0]))
             return False
         if not attr[2].startswith('gnm'):  # should be gnm type
             logger.error('File should have gnm in field 3, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         gnm_v = attr[2].replace('gnm', '')
         try:
@@ -175,7 +177,7 @@ class gene_models_main:
             return False
         if not attr[3].startswith('ann'):  # should be gnm type
             logger.error('File should have ann in field 4, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         ann_v = attr[3].replace('ann', '')
         try:
@@ -204,14 +206,14 @@ class gene_models_main:
         gff_name = os.path.basename(gff)
         gt_report = './{}_gt_gff3validator_report.txt'.format(gff_name)
         gt_cmd = '(gt gff3validator {} 2>&1) > {}'.format(gff,
-                                                         gt_report)
+                                                          gt_report)
         logger.debug(gt_cmd)
         exit_val = subprocess.call(gt_cmd, shell=True)  # get gt exit_val
         logger.debug(exit_val)
         if exit_val:
             return False
         return True
-    
+
     def check_seqid_attributes(self):
         '''Confirms that gff3 seqid exists in genome_main if provided
 
@@ -225,7 +227,8 @@ class gene_models_main:
         logger.debug(fasta_ids)
         fh = return_filehandle(gff)
         file_name = os.path.basename(gff)
-        true_id = '.'.join(file_name.split('.')[:4])  # ID should start with this string
+        # ID should start with this string
+        true_id = '.'.join(file_name.split('.')[:4])
         true_name = file_name.split('.')[0]  # maybe this should include infra
 #        get_id_name = re.compile("^ID=(.+?);.*Name=(.+?);")
         get_id = re.compile('ID=([^;]+)')
@@ -244,11 +247,11 @@ class gene_models_main:
                 logger.debug(line)
                 logger.debug(seqid)
                 if self.fasta_ids:  # if genome_main make sure seqids exist
-                    if not seqid in fasta_ids:  # fasta header check
+                    if seqid not in fasta_ids:  # fasta header check
                         logger.debug(seqid)
-                        if not seqid in seen:
+                        if seqid not in seen:
                             logger.error('{} not found in genome_main'.format(
-                                                                        seqid))
+                                seqid))
                             seen[seqid] = 1
                         passed = False
                 feature_type = columns[2]  # get type
@@ -259,10 +262,10 @@ class gene_models_main:
 #                if not get_id_name.match(attributes):  # check for ID and Name
                 if not get_id.search(attributes):  # check for ID and Name
                     logger.error('No ID and Name attributes. line {}'.format(
-                                                                        lines))
+                        lines))
                     passed = False
                 else:
-#                    groups = get_id_name.search(attributes).groups()
+                    #                    groups = get_id_name.search(attributes).groups()
                     feature_id = get_id.search(attributes).group(1)
                     logger.debug(feature_id)
 #                    if len(groups) != 2:  # should just be ID and Name
@@ -307,17 +310,17 @@ class protein:
         '''
         target = self.target
         logger = self.logger
-        attr = os.path.basename(target).split('.')  # split on delimiter 
+        attr = os.path.basename(target).split('.')  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error('File did not have 7 fields! {}'.format(attr))
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
             logger.error('File must have 5 letter prefix, not {}'.format(
-                                                                    attr[0]))
+                attr[0]))
             return False
         if not attr[2].startswith('gnm'):  # should be gnm type
             logger.error('File should have gnm in field 3, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         gnm_v = attr[2].replace('gnm', '')
         try:
@@ -330,7 +333,7 @@ class protein:
             return False
         if not attr[3].startswith('ann'):  # should be gnm type
             logger.error('File should have ann in field 4, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         ann_v = attr[3].replace('ann', '')
         try:
@@ -350,14 +353,13 @@ class protein:
         return True
 
 
-    
 class protein_primaryTranscript:
 
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
         self.logger = detector.logger
-    
+
     def run(self):
         '''Run Checks for protein_primaryTranscript'''
         logger = self.logger
@@ -377,17 +379,17 @@ class protein_primaryTranscript:
         '''
         target = self.target
         logger = self.logger
-        attr = os.path.basename(target).split('.')  # split on delimiter 
+        attr = os.path.basename(target).split('.')  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error('File did not have 7 fields! {}'.format(attr))
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
             logger.error('File must have 5 letter prefix, not {}'.format(
-                                                                    attr[0]))
+                attr[0]))
             return False
         if not attr[2].startswith('gnm'):  # should be gnm type
             logger.error('File should have gnm in field 3, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         gnm_v = attr[2].replace('gnm', '')
         try:
@@ -400,7 +402,7 @@ class protein_primaryTranscript:
             return False
         if not attr[3].startswith('ann'):  # should be gnm type
             logger.error('File should have ann in field 4, not {}'.format(
-                                                                     attr[2]))
+                attr[2]))
             return False
         ann_v = attr[3].replace('ann', '')
         try:
@@ -444,11 +446,11 @@ class readme_md:  # need to populate this correctly later
                 check_sum = fields[0]
                 filename = fields[1]
                 logger.debug('check_sum: {}, filename: {}'.format(
-                                                                  check_sum,
-                                                                  filename))
+                    check_sum,
+                    filename))
                 if not check_sum and filename:
                     logger.error('Could not find sum and name for {}'.format(
-                                                                        line))
+                        line))
                 if filename == os.path.basename(check_me):
                     logger.info('Checksum found for {}'.format(filename))
                     check_sum_target = check_sum
@@ -463,15 +465,15 @@ class readme_md:  # need to populate this correctly later
         logger.debug(target_sum)
         logger.debug(check_sum_target)
         if target_sum != check_sum_target:  # compare sums
-            logger.error(('Checksum for file {} {} '.format(check_me, 
-                                                           target_sum) + 
+            logger.error(('Checksum for file {} {} '.format(check_me,
+                                                            target_sum) +
                           'did not match {}'.format(check_sum_target)))
             sys.exit(1)
         logger.info('Checksums checked out, moving on...')
 
     def validate_doi(self, readme):
         '''Parse README.<key>.yml and get publication or dataset DOIs
-        
+
            Uses http://www.doi.org/factsheets/DOIProxy.html#rest-api
         '''
         logger = self.logger

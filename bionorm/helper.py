@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
+import sys
 import gzip
 import errno
 import logging
@@ -39,16 +40,16 @@ def setup_logging(log_file, log_level):
 
 def return_filehandle(open_me):
     '''return file handle for gz compressed or text file'''
-    magic_dict = { # headers for compression
-                  b'\x1f\x8b\x08': 'gz',
- #                 '\x42\x5a\x68': 'bz2',
- #                 '\x50\x4b\x03\x04': 'zip'
-                 }
+    magic_dict = {  # headers for compression
+        b'\x1f\x8b\x08': 'gz',
+        #                 '\x42\x5a\x68': 'bz2',
+        #                 '\x50\x4b\x03\x04': 'zip'
+    }
     max_bytes = max(len(t) for t in magic_dict)
     with open(open_me, 'rb') as f:
         s = f.read(max_bytes)
     for m in magic_dict:
-        if s.startswith(m): #check file header for match with m
+        if s.startswith(m):  # check file header for match with m
             t = magic_dict[m]
             if t == 'gz':
                 return gzip.open(open_me, 'rt')
@@ -86,6 +87,6 @@ def change_directories(dirpath):
 
 
 if __name__ == '__main__':
-    print('import me to use check_file and return_filehandle.' + 
+    print('import me to use check_file and return_filehandle.' +
           'This should be in a class probably')
     sys.exit(1)

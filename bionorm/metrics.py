@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import os, sys
+import os
+import sys
 import logging
 import gzip
-from .helper import return_filehandle 
+from .helper import return_filehandle
 
 
 def count_gff_features(gff):
@@ -27,6 +28,6 @@ def count_gff_features(gff):
 
 
 if __name__ == '__main__':
-    print('import me to use stast for genome_main and gene_models_main.' + 
+    print('import me to use stast for genome_main and gene_models_main.' +
           'This should be in a class probably... but its w/e for now')
     sys.exit(1)

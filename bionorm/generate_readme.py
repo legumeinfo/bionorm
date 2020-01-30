@@ -9,7 +9,7 @@ import gzip
 import click
 from ruamel.yaml import YAML, RoundTripDumper
 from ..helper import check_file, return_filehandle, create_directories,\
-                     check_subprocess_dependencies, setup_logging
+    check_subprocess_dependencies, setup_logging
 
 
 def read_yaml(template):
@@ -25,8 +25,8 @@ def generate_readme(template, attributes, logger):
     my_readme = '{}/README.{}.yaml'.format(attributes['target_dir'],
                                            attributes['key'])
     identifier = attributes['key']
-    sci_name = '{} {}'.format(attributes['genus'].capitalize(), 
-                                     attributes['species'].lower())
+    sci_name = '{} {}'.format(attributes['genus'].capitalize(),
+                              attributes['species'].lower())
     sci_name_abr = attributes['gensp'].lower()
     genotype = attributes['infra_id']
     my_yaml['identifier'] = identifier  # set key
@@ -44,11 +44,16 @@ def generate_readme(template, attributes, logger):
               help='''Formatted Directory from Previous Normalizer Steaps''')
 @click.option('--template', type=str,
               help='''YAML file to be used as the template for the README''')
-@click.option('--log_file', metavar = '<FILE>', 
-              default='./normalizer_index.log',
-              help='''File to write log to. (default:./normalizer_index.log)''')
-@click.option('--log_level', metavar = '<LOGLEVEL>', default='INFO',
-              help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
+@click.option(
+    '--log_file',
+    metavar='<FILE>',
+    default='./normalizer_index.log',
+    help='''File to write log to. (default:./normalizer_index.log)''')
+@click.option(
+    '--log_level',
+    metavar='<LOGLEVEL>',
+    default='INFO',
+    help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
 def cli(target, template, log_file, log_level):
     '''Determines what typae of index to apply to input target'''
     logger = setup_logging(log_file, log_level)
@@ -64,12 +69,16 @@ def cli(target, template, log_file, log_level):
     organism_attributes = organism_dir.split('_')  # Genus_species
     target_attributes = target_dir.split('.')
     if len(organism_attributes) != 2:
-        logger.error('Parent directory {} is not Genus_species'.format(organism_dir))
+        logger.error(
+            'Parent directory {} is not Genus_species'.format(organism_dir))
         sys.exit(1)
     if len(target_attributes) < 3:
-        logger.error('Target directory {} is not delimited correctly'.format(target_dir))
+        logger.error(
+            'Target directory {} is not delimited correctly'.format(target_dir))
         sys.exit(1)
-    gensp = '{}{}'.format(organism_attributes[0][:3], organism_attributes[1][:2])  # abbreviation in yaml README file
+    # abbreviation in yaml README file
+    gensp = '{}{}'.format(
+        organism_attributes[0][:3], organism_attributes[1][:2])
     attributes = {'genus': organism_attributes[0],
                   'species': organism_attributes[1],
                   'gensp': gensp,

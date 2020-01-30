@@ -10,7 +10,7 @@ import click
 from ruamel.yaml import YAML, RoundTripDumper
 from sequencetools.helpers import sequence_helpers
 from ..helper import check_file, return_filehandle, create_directories,\
-                     check_subprocess_dependencies, setup_logging
+    check_subprocess_dependencies, setup_logging
 
 
 def primary_transcript_check(peptides, logger):
@@ -25,7 +25,8 @@ def primary_transcript_check(peptides, logger):
     seq_handle = open(peptides, 'rt')
     longest = {}
     count = 0
-    primary = '{}.protein_primaryTranscript.faa'.format('.'.join(peptides.split('.')[:-2]))
+    primary = '{}.protein_primaryTranscript.faa'.format(
+        '.'.join(peptides.split('.')[:-2]))
     for record in sequence_helpers.get_seqio_fasta_record(seq_handle):
         count += 1
         my_record = '>{}\n{}'.format(record.id, record.seq)
@@ -60,15 +61,24 @@ def run_gffread(gff, reference, logger):
 
 
 @click.command()
-@click.option('--target', type=str,
-              help='''Formatted file from normalizer prefix MUST BE UNCOMPRESSED''')
-@click.option('--reference', type=str,
-              help='''FASTA file of sequences to read gff intervals normalizer prefix is a good start here too MUST BE UNCOMPRESSED''')
-@click.option('--log_file', metavar = '<FILE>', 
-              default='./normalizer_index.log',
-              help='''File to write log to. (default:./normalizer_index.log)''')
-@click.option('--log_level', metavar = '<LOGLEVEL>', default='INFO',
-              help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
+@click.option(
+    '--target',
+    type=str,
+    help='''Formatted file from normalizer prefix MUST BE UNCOMPRESSED''')
+@click.option(
+    '--reference',
+    type=str,
+    help='''FASTA file of sequences to read gff intervals normalizer prefix is a good start here too MUST BE UNCOMPRESSED''')
+@click.option(
+    '--log_file',
+    metavar='<FILE>',
+    default='./normalizer_index.log',
+    help='''File to write log to. (default:./normalizer_index.log)''')
+@click.option(
+    '--log_level',
+    metavar='<LOGLEVEL>',
+    default='INFO',
+    help='''Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)''')
 def cli(target, reference, log_file, log_level):
     '''Determines what typae of index to apply to input target'''
     logger = setup_logging(log_file, log_level)
@@ -82,6 +92,7 @@ def cli(target, reference, log_file, log_level):
         logger.error('GFFREAD cannot process compressed fasta as reference')
         sys.exit(1)
     if len(target_attributes) < 7:
-        logger.error('Target file {} is not delimited correctly'.format(target))
+        logger.error(
+            'Target file {} is not delimited correctly'.format(target))
         sys.exit(1)
     run_gffread(target, reference, logger)  # write readme template

@@ -46,12 +46,9 @@ A listing of commands is available via ``bionorm --help``.  Current available co
 
 ============================= ====================================================
 
-Examples
---------
-
 
 +-------------------+------------+------------+
-| Latest Release    | |pypi|     | |bionorm|    |
+| Latest Release    | |pypi|     | |bionorm|  |
 +-------------------+------------+            +
 | GitHub            | |repo|     |            |
 +-------------------+------------+            +
