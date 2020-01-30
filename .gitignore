@@ -57,10 +57,6 @@ venv/
 ################
 docs/_build/
 
-# version #
-###########
-bionorm/version.py
-
 # config directory #
 ##########################
 .bionorm

@@ -14,8 +14,11 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
+from pkg_resources import iter_entry_points
 # third-party imports
 import click
+from click_plugins import with_plugins
+
 
 # module defs
 from .common import get_user_context_obj, logger, config_obj,\
@@ -124,17 +127,6 @@ def init_user_context_obj(initial_obj=None):
                 ctx_dict['logLevel'] = 'default'
             for key in ['progress', 'first_n']:
                 ctx_dict[key] = _ctx().params[key]
-            #
-            # simplicity objects
-            #
-            ctx_dict['simplicity_objects'] = [globals()[key] for key in
-                                              globals().keys() if key.endswith('SIMPLICITY')
-                                              if isinstance(globals()[key], SimplicityObject)]
-            #
-            # simplicity objects in plugins
-            #
-            for entry_point in iter_entry_points('aakbar.simplicity_plugins'):
-                ctx_dict['simplicity_objects'].append(entry_point.load())
             # selected simplicity object
             try:
                 simplicity_object_label = config_obj.config_dict['simplicity_object_label']
@@ -173,7 +165,7 @@ def log_elapsed_time():
     return decorator
 
 
-@with_plugins(iter_entry_points('aakbar.cli_plugins'))
+@with_plugins(iter_entry_points('bionorm.cli_plugins'))
 @click.group(epilog=AUTHOR + ' <' + EMAIL + '>.  ' + COPYRIGHT)
 @click.option('--warnings_as_errors', '-e', is_flag=True, show_default=True,
               default=False, help='Warnings cause exceptions.')
@@ -192,10 +184,10 @@ def log_elapsed_time():
 @init_user_context_obj()
 def cli(warnings_as_errors, verbose, quiet,
         progress, first_n, no_log):
-    """aakbar -- amino-acid k-mer signature tools
+    """bionorm -- normalize and verify genomic data files
 
     If COMMAND is present, and --no_log was not invoked,
-    a log file named akbar-COMMAND.log
+    a log file named bionorm-COMMAND.log
     will be written in the ./logs/ directory.
     """
     if warnings_as_errors:
@@ -210,7 +202,7 @@ def test_logging():
     '''Log at different severity levels.
 
         Example:
-            aakbar test_logging
+            bionorm test_logging
     '''
     logger.debug('debug message')
     logger.info('info message')
@@ -229,15 +221,4 @@ def show_context_object():
 
 
 # import other functions
-from .config import show_config, define_set, label_set,\
-    define_summary, init_config_file, set_simplicity_type
-from .core import calculate_peptide_terms, filter_peptide_terms,\
-    intersect_peptide_terms, install_demo_scripts
-from .simplicity import set_simplicity_window, demo_simplicity, colorize_fasta, \
-    peptide_simplicity_mask, plot_mask_stats, \
-    NULL_SIMPLICITY, RUNLENGTH_SIMPLICITY, LETTERFREQ_SIMPLICITY, GENERIS_SIMPLICITY
-from .search import search_peptide_occurrances
-from .plot import conserved_signature_stats
-from .test import test_all
-
-SIMPLICITY_OBJECT = SimplicityObject
+from .config import show_config, init_config_file

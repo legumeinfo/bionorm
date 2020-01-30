@@ -62,7 +62,7 @@ A listing of commands is available via ``bionorm --help``.  Current available co
 +-------------------+------------+            +
 | Code Grade        | |codacy|   |            |
 +-------------------+------------+            +
-| Dependencies      | |pyup|     |            |
+| Dependencies      | |depend|   |            |
 +-------------------+------------+            +
 | Issues            | |issues|   |            |
 +-------------------+------------+------------+
@@ -103,7 +103,7 @@ A listing of commands is available via ``bionorm --help``.  Current available co
     :target:  https://github.com/ncgr/bionorm/issues
     :alt: Issues reported
 
-.. |pyup| image:: https://pyup.io/repos/github/ncgr/bionorm/shield.svg
-     :target: https://pyup.io/repos/github/ncgr/bionorm/
-     :alt: pyup.io dependencies
+.. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=ncgr/bionorm
+     :target:https://app.dependabot.com/accounts/ncgr/repos/236847525
+     :alt: dependabot dependencies
 
