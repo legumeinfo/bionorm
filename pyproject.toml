@@ -1,11 +1,43 @@
 [tool.poetry]
 name = "bionorm"
 version = "0.1.0"
-description = ""
-authors = ["Joel Berendzen <joel@ncgr.org>", "Connor Cameron <ctc@ncgr.org>"]
+description = "normalize and verify genomic data"
+authors = ["Connor Cameron <ctc@ncgr.org>"]
+maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
+license = "BSD 3-Clause"
+readme = "README.rst"
+homepage = "https://github.com/ncgr/ncgr"
+documentation = "https://bionorm.readthedocs.org"
+keywords = [
+    "science",
+    "biology",
+    "bioinformatics",
+    "genomics",
+    "data science",
+    "DNA",
+    "protein",
+    "sequences",
+    "FASTA",
+    "GFF",
+    "curation",
+    "wrangling"
+    ]
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Console',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Topic :: Scientific/Engineering :: Bio-Informatics'
+    ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 biopython = "^1.76"
 click = "^7.0"
 "ruamel.yaml" = "^0.16.6"

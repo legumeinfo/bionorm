@@ -4,22 +4,27 @@
 # standard library imports
 import locale
 import logging
+import sys
 from datetime import datetime
 from pathlib import Path
 
 # 3rd-party modules
 import click
-from importlib_metadata import version as VERSION
+from importlib_metadata import distribution
 
 #
 # global constants
 #
 PROGRAM_NAME = 'bionorm'
-AUTHOR = 'Joel Berendzen'
-EMAIL = 'joelb@ncgr.org'
+dist = distribution(PROGRAM_NAME).metadata
+print(dist)
+print(dist.keys())
+VERSION = dist['Version']
+
+AUTHOR = dist['Author']
+EMAIL = dist['Author-email']
+PROJECT_HOME = dist['Home-page']
 COPYRIGHT = 'Copyright (C) 2020. National Center for Genome Resources. All rights reserved.'
-PROJECT_HOME = 'https://github.com/ncgr/bionorm'
-DOCS_HOME = 'https://bionorm.readthedocs.org/en/stable'
 
 DEFAULT_FILE_LOGLEVEL = logging.DEBUG
 DEFAULT_STDERR_LOGLEVEL = logging.INFO
