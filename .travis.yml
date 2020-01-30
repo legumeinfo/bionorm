@@ -1,0 +1,31 @@
+sudo: false
+language: python
+python:
+   - "3.6"
+env:
+  global:
+  - secure: "<encrypted MYPYPI_USER=username>"
+  - secure: "<encrypted MYPYPI_PASS=p@ssword>"
+before_install:
+   - pip install poetry
+install:
+   - poetry install -v
+before_script:
+   - export COVERAGE_PROCESS_START="${PWD}/.coveragerc"
+   - coverage run -m bionorm
+script:
+   - poetry run coverage run pytest
+after_success:
+   - coverage combine
+   - cp /tmp/.coverage .
+   - bash <(curl -s https://codecov.io/bash) -X gcov
+before_deploy:
+- poetry config repositories.bionorm http://github.com/ncgr/bionorm
+- poetry config http-basic.bionorm $MYPYPI_USER $MYPYPI_PASS
+- poetry build -f sdist
+deploy:
+  provider: script
+  script: poetry publish -r mypypi
+  skip_cleanup: true
+  on:
+    tags: true

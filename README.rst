@@ -68,7 +68,7 @@ A listing of commands is available via ``bionorm --help``.  Current available co
 +-------------------+------------+------------+
 
 
-.. |akbar| image:: docs/normal.jpg
+.. |bionorm| image:: docs/normal.jpg
      :alt: Make me NORMAL, please!
 
 .. |pypi| image:: https://img.shields.io/pypi/v/bionorm.svg

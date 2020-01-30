@@ -10,6 +10,7 @@ biopython = "^1.76"
 click = "^7.0"
 "ruamel.yaml" = "^0.16.6"
 sequencetools = "^0.0.5"
+coverage = "^5.0.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
