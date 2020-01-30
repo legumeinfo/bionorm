@@ -91,8 +91,8 @@ A listing of commands is available via ``bionorm --help``.  Current available co
     :target:  https://travis-ci.org/ncgr/bionorm
     :alt: Travis CI
 
-.. |codacy| image:: https://api.codacy.com/project/badge/Grade/75ebc8405ee74953a555a51abe16d9fa
-    :target: https://www.codacy.com/manual/joelb123/bionorm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ncgr/bionorm&amp;utm_campaign=Badge_Grade
+.. |codacy| image:: https://api.codacy.com/project/badge/Grade/b23fc0c167fc4660bb649320e14dac7f
+    :target: https://www.codacy.com/gh/ncgr/bionorm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ncgr/bionorm&amp;utm_campaign=Badge_Grade
     :alt: Codacy.io grade
 
 .. |coverage| image:: https://codecov.io/gh/ncgr/bionorm/branch/master/graph/badge.svg
