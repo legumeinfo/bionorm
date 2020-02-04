@@ -267,8 +267,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools"]
 
 [metadata]
-content-hash = "534cab2887f74a1ba4066920219969e82e5e074ebadb396482202e5c3be1f0b5"
-python-versions = "^3.7"
+content-hash = "4da8ce8f5804f3885f65c24a1c00bfcaaf000d2f510474c8715ec8261f7fa22e"
+python-versions = "^3.6"
 
 [metadata.files]
 atomicwrites = [

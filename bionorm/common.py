@@ -10,26 +10,15 @@ from pathlib import Path
 
 # 3rd-party modules
 import click
-from importlib_metadata import distribution
 
 #
 # global constants
 #
 PROGRAM_NAME = 'bionorm'
-dist = distribution(PROGRAM_NAME).metadata
-print(dist)
-print(dist.keys())
-VERSION = dist['Version']
+VERSION = "0.1.blah"
 
-AUTHOR = dist['Author']
-EMAIL = dist['Author-email']
-PROJECT_HOME = dist['Home-page']
-COPYRIGHT = 'Copyright (C) 2020. National Center for Genome Resources. All rights reserved.'
-
-DEFAULT_FILE_LOGLEVEL = logging.DEBUG
-DEFAULT_STDERR_LOGLEVEL = logging.INFO
 DEFAULT_FIRST_N = 0  # only process this many records
-STARTTIME = datetime.now()
+
 CONFIG_FILE_ENVVAR = 'BIONORM_CONFIG_FILE_PATH'
 #
 # global logger object
