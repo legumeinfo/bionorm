@@ -76,3 +76,7 @@ tmp/
 # src directory (git installs)#
 ###############################
 src
+
+# coverage data #
+#################
+.coverage

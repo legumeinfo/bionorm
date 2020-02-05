@@ -48,6 +48,9 @@ click_plugins = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+pytest-cov = "^2.8.1"
+black = {version = "^19.10b0", allow-prereleases = true}
+sh = "^1.12.14"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

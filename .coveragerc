@@ -3,13 +3,11 @@
 ;
 [run]
 branch = False
-data_file = /tmp/.coverage
+data_file = .coverage
 parallel = True
 source = bionorm
 omit =
-    examples/*
     tests/*
-    version.py
 
 [report]
 exclude_lines =

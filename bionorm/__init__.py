@@ -11,7 +11,6 @@ import warnings
 from pkg_resources import iter_entry_points
 # third-party imports
 import click
-import coverage
 from pkg_resources import iter_entry_points
 from click_plugins import with_plugins
 
@@ -22,8 +21,6 @@ from .cli import Logging_CLI_Builder
 # global constants
 DEFAULT_FIRST_N = 0
 
-# start coverage
-coverage.process_startup()
 
 # define parser options
 parser_options = [{'args': ('--progress',),
