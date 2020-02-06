@@ -1,5 +1,5 @@
 bionorm
-======
+=======
 creating, searching, and analyzing phylogenetic signatures from genomes or reads of DNA.
 
 Prerequisites

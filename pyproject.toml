@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.1.1"
+version = "0.2"
 description = "normalize and verify genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -32,7 +32,6 @@ classifiers = [
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
     'Topic :: Scientific/Engineering :: Bio-Informatics'
     ]
 
@@ -54,6 +53,29 @@ sh = "^1.12.14"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"
+
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37', 'py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''
 
 [build-system]
 requires = ["poetry>=0.12"]

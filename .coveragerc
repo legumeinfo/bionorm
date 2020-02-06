@@ -5,7 +5,6 @@
 branch = False
 data_file = .coverage
 parallel = True
-source = bionorm
 omit =
     tests/*
 

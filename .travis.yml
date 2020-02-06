@@ -11,10 +11,8 @@ before_install:
 install:
   - poetry install -v
 script:
-  - poetry run pytest --cov=bionorm --cov-config=.coveragerc tests/
+  - poetry run pytest
 after_success:
-  - coverage combine
-  - cp /tmp/.coverage .
   - bash <(curl -s https://codecov.io/bash) -X gcov
 before_deploy:
   - poetry config http-basic.pypi $MYPYPI_USER $MYPYPI_PASS

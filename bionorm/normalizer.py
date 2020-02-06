@@ -5,7 +5,7 @@ import sys
 
 
 def cli():
-    '''Normalizer -- Normalize Files to Data Store Standards
+    """Normalizer -- Normalize Files to Data Store Standards
 
            The normalizer will detect the input file type.
            Currently recognizes case independent fasta, fna, fa, gff3, gff
@@ -24,31 +24,36 @@ def cli():
            checksums     (Generate md5s for all files in target dir)
 
        Please run `normalizer <TOOL> --help` for individual usage
-    '''
+    """
     if not len(sys.argv) > 1:
         print(cli.__doc__)
         sys.exit(1)
     mode = sys.argv[1].lower()  # get mode
     sys.argv = [mode] + sys.argv[2:]  # makes usage for application correct
-    if mode == '--help' or mode == '-h':
+    if mode == "--help" or mode == "-h":
         print(cli.__doc__)
         sys.exit(1)
-    if mode == 'index':  # determine file type and index
+    if mode == "index":  # determine file type and index
         from . import index
+
         index.cli()
-    if mode == 'prefix':  # determine file type and prefix, sorts gff3
+    if mode == "prefix":  # determine file type and prefix, sorts gff3
         from . import prefix
+
         prefix.cli()
-    if mode == 'readme':  # generate readmes from template and target
+    if mode == "readme":  # generate readmes from template and target
         from . import generate_readme
+
         generate_readme.cli()
-    if mode == 'extract_fasta':  # Extract FASTA features from GFF3
+    if mode == "extract_fasta":  # Extract FASTA features from GFF3
         from . import extract_fasta
+
         extract_fasta.cli()
-    if mode == 'busco':  # Run BUSCO with mode and lineage on target
+    if mode == "busco":  # Run BUSCO with mode and lineage on target
         from . import busco_normalizer
+
         busco_normalizer.cli()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
