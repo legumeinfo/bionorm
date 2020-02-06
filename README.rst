@@ -19,6 +19,7 @@ Developers
 bionorm uses the `poetry <https://python-poetry.org>` dependency manager.
 Install poetry in the usual way.  Get the version of python you intend
 to use as first in the path, and execute the command: ::
+
     curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
 Next, get the master branch from GitHub ::
