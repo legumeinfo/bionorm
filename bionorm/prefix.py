@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+# stdlib imports
 import os
 import sys
 import re
+
+# third-party imports
 import click
-import logging
-import subprocess
-from ruamel.yaml import YAML
-from ..helper import check_file, return_filehandle, create_directories, setup_logging
+
+# module imports
+from .helper import check_file, return_filehandle, create_directories, setup_logging
 
 
 def prefix_fasta(target, gnm, genus, species, infra_id, key, logger):

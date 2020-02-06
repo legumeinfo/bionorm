@@ -1,33 +1,36 @@
 bionorm
 =======
-creating, searching, and analyzing phylogenetic signatures from genomes or reads of DNA.
+normalize and validate genomic data files
 
 Prerequisites
 -------------
 Python 3.6 or greater is required.
 
-Run-time dependencies of bionorm are : ::
-
-    biopython, click, ruamel.yaml, and sequencetools.
-
-bionorm uses the poetry dependency manager
 
 Installation
 ------------
 This package is tested under Linux and MacOS using Python 3.7.
-install via pip (or pip3 under some distributions) : ::
+Install via pip, pipx, or pipenv in the usual way: ::
 
-     pip install bionorm
+     pipx install bionorm
 
-If you wish to develop bionorm,  download a `release <https://github.com/ncgr/bionorm/releases>`_
-and in the top-level directory: ::
+Developers
+----------
+bionorm uses the `poetry <https://python-poetry.org>` dependency manager.
+Install poetry in the usual way.  Get the version of python you intend
+to use as first in the path, and execute the command: ::
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
-	pip install --editable .
+Next, get the master branch from GitHub ::
 
-If you wish to have pip install directly from git, use this command: ::
+	git clone https://github.com/ncgr/bionorm.git
 
-	pip install git+https://github.com/ncgr/bionorm.git
+Change to the bionorm/ directory and install with poetry: ::
 
+	poetry install -v
+
+Run bionorm with poetry: ::
+    poetry run bionorm
 
 Usage
 -----
@@ -104,6 +107,6 @@ A listing of commands is available via ``bionorm --help``.  Current available co
     :alt: Issues reported
 
 .. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=ncgr/bionorm
-     :target:https://app.dependabot.com/accounts/ncgr/repos/236847525
+     :target: https://app.dependabot.com/accounts/ncgr/repos/236847525
      :alt: dependabot dependencies
 

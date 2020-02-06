@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -19,13 +19,7 @@ from ..helper import (
 
 
 def primary_transcript_check(peptides, logger):
-    """Decides if protein file form run_gffread is primary of not
-
-       if the file is not primary, it contains isoforms, the longest
-
-       is selected for each gene and a protein_primaryTranscript file
-
-       is produced.
+    """If the file is not of primary transcripts, selects the longest isoforms.
     """
     seq_handle = open(peptides, "rt")
     longest = {}
