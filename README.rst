@@ -1,11 +1,12 @@
 bionorm
 =======
-normalize and validate genomic data files
+``bionorm`` normalizes and validates genomic data files prior to further processing
+or inclusion in a data store such as that of the
+`Legume Federation <https://www.legumefederation.org/en/data-store/>`.
 
 Prerequisites
 -------------
 Python 3.6 or greater is required.
-
 
 Installation
 ------------
@@ -31,15 +32,34 @@ Change to the bionorm/ directory and install with poetry: ::
 	poetry install -v
 
 Run bionorm with poetry: ::
+
     poetry run bionorm
 
 Usage
 -----
 Installation puts a single script called ``bionorm`` in your path.  The usage format is::
 
-    bionorm [GLOBALOPTIONS] COMMAND [COMMANDOPTIONS] [ARGS]
+    bionorm [GLOBALOPTIONS] COMMAND [COMMANDOPTIONS][ARGS]
 
-A listing of commands is available via ``bionorm --help``.  Current available commands are:
+Global Options
+--------------
+The following options are global in scope and, if used, must be placed before
+COMMAND. Not all commands support every global option:
+
+============================= ====================================================
+    --verbose/-v              Log debugging info to stderr
+    --quiet/-q                Suppress logging to stderr
+    --no_log                  Suppress logging to file.
+    --progress                Show a progress bar.
+    --first_n                 Process only this many records. [default: all]
+    --warnings_as_errors/-e   Warnings cause exceptions.",
+============================= ====================================================
+
+Commands
+--------
+A listing of commands is available via ``bionorm --help``.  Each command has its own
+options, which may be listed with ``bionorm COMMAND --help``. The currently implemented
+commands are:
 
 ============================= ====================================================
   busco                       Perform BUSCO checks.
@@ -47,7 +67,6 @@ A listing of commands is available via ``bionorm --help``.  Current available co
   fasta                       Check for GFF/FASTA consistency.
   generate_readme             Generates a README file with details of genome.
   index                       Indexes FASTA file.
-
 ============================= ====================================================
 
 
