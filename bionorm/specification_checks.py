@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 
-from .helper import check_file, return_filehandle
-import os
-import sys
+# standard library imports
+import hashlib
+import json
 import logging
+import os
 import re
 import subprocess
-import hashlib
-import requests
-import json
+import sys
 from glob import glob
 from os import path
+
+# first-party imports
+import requests
+
+# module imports
+from .helper import check_file
+from .helper import return_filehandle
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
@@ -107,12 +113,7 @@ class genome_main:
                     self.detector.fasta_ids[hid] = 1
                     standard_header = true_header + "." + hid
                     if not hid.startswith(true_header):
-                        logger.warning(
-                            (
-                                "Inconsistency {} ".format(hid)
-                                + "Should be {}".format(standard_header)
-                            )
-                        )
+                        logger.warning(("Inconsistency {} ".format(hid) + "Should be {}".format(standard_header)))
                         passed = False
         return passed
 
@@ -268,10 +269,7 @@ class gene_models_main:
                     #                        passed = False
                     #                    (feature_id, feature_name) = groups
                     if not feature_id.startswith(true_id):  # check id
-                        logger.error(
-                            "gene feature id, should start with "
-                            + "{} line {}".format(true_id, lines)
-                        )
+                        logger.error("gene feature id, should start with " + "{} line {}".format(true_id, lines))
                         passed = False
         #                    if not feature_name.startswith(true_name):
         #                        logger.error('feature name, should start with ' +
@@ -450,10 +448,7 @@ class readme_md:  # need to populate this correctly later
         logger.debug(check_sum_target)
         if target_sum != check_sum_target:  # compare sums
             logger.error(
-                (
-                    "Checksum for file {} {} ".format(check_me, target_sum)
-                    + "did not match {}".format(check_sum_target)
-                )
+                ("Checksum for file {} {} ".format(check_me, target_sum) + "did not match {}".format(check_sum_target))
             )
             sys.exit(1)
         logger.info("Checksums checked out, moving on...")

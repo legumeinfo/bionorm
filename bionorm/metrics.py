@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+# standard library imports
+import gzip
+import logging
 import os
 import sys
-import logging
-import gzip
+
+# module imports
 from .helper import return_filehandle
 
 

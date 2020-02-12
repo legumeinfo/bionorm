@@ -17,8 +17,6 @@ try:
 except ModuleNotFoundError:
     from importlib_metadata import distribution
 
-# module defs
-from .common import DEFAULT_FIRST_N
 
 # global constants
 DEFAULT_FILE_LOGLEVEL = logging.DEBUG
@@ -55,13 +53,7 @@ def composed(self, *decs):
 
 def click_multi(func):
     return composed(
-        click.option(
-            "--progress",
-            is_flag=True,
-            show_default=True,
-            default=False,
-            help="Show a progress bar.",
-        )
+        click.option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.",)
         # click.option(*self.global_options_list[0]['args'],
         #             **self.global_options_list[0]['kwargs'])
     )(func)
@@ -126,9 +118,7 @@ class Logging_CLI_Builder(object):
         return decorator
 
     def init_dual_logger(
-        self,
-        file_log_level=DEFAULT_FILE_LOGLEVEL,
-        stderr_log_level=DEFAULT_STDERR_LOGLEVEL,
+        self, file_log_level=DEFAULT_FILE_LOGLEVEL, stderr_log_level=DEFAULT_STDERR_LOGLEVEL,
     ):
         """Decorator to log to stderr and to logfile at different levels
             """
@@ -162,8 +152,7 @@ class Logging_CLI_Builder(object):
                                 logfile_path.parent.mkdir(mode=0o755, parents=True)
                             except OSError:
                                 self.logger.error(
-                                    'Unable to create logfile directory "%s"',
-                                    logfile_path.parent,
+                                    'Unable to create logfile directory "%s"', logfile_path.parent,
                                 )
                                 raise OSError
                         else:
@@ -172,14 +161,11 @@ class Logging_CLI_Builder(object):
                                     logfile_path.unlink()
                                 except OSError:
                                     self.logger.error(
-                                        'Unable to remove existing logfile "%s"',
-                                        logfile_path,
+                                        'Unable to remove existing logfile "%s"', logfile_path,
                                     )
                                     raise OSError
                         logfileHandler = logging.FileHandler(str(logfile_path))
-                        logfileFormatter = logging.Formatter(
-                            "%(levelname)s: %(message)s"
-                        )
+                        logfileFormatter = logging.Formatter("%(levelname)s: %(message)s")
                         logfileHandler.setFormatter(logfileFormatter)
                         logfileHandler.setLevel(file_log_level)
                         self.logger.addHandler(logfileHandler)
@@ -200,9 +186,7 @@ class Logging_CLI_Builder(object):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
                 returnobj = f(*args, **kwargs)
-                self.logger.debug(
-                    "Elapsed time is %s", str(datetime.now() - STARTTIME)[:-7]
-                )
+                self.logger.debug("Elapsed time is %s", str(datetime.now() - STARTTIME)[:-7])
                 return returnobj
 
             return wrapper

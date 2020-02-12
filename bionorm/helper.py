@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-import os
-import sys
-import gzip
+# standard library imports
 import errno
+import gzip
 import logging
+import os
 import subprocess
+import sys
 
 
 def check_subprocess_dependencies():
@@ -86,8 +87,5 @@ def change_directories(dirpath):
 
 
 if __name__ == "__main__":
-    print(
-        "import me to use check_file and return_filehandle."
-        + "This should be in a class probably"
-    )
+    print("import me to use check_file and return_filehandle." + "This should be in a class probably")
     sys.exit(1)

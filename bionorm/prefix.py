@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 
+# standard library imports
 # stdlib imports
 import os
-import sys
 import re
+import sys
 
 # third-party imports
 import click
 
 # module imports
-from .helper import check_file, return_filehandle, create_directories, setup_logging
+from .helper import check_file
+from .helper import create_directories
+from .helper import return_filehandle
+from .helper import setup_logging
 
 
 def prefix_fasta(target, gnm, genus, species, infra_id, key, logger):
@@ -54,9 +58,7 @@ def prefix_fasta(target, gnm, genus, species, infra_id, key, logger):
                 new_fasta.write(line + "\n")
     new_fasta.close()
     if not check_file(fasta_file_path):
-        logger.error(
-            "Output file {} not found for normalize fasta".format(fasta_file_path)
-        )
+        logger.error("Output file {} not found for normalize fasta".format(fasta_file_path))
         sys.exit(1)  # new file not found return False
     return fasta_file_path
 
@@ -89,20 +91,14 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
                 hierarchy[p] = {"children": [feature_type], "parents": [], "rank": 0}
 
 
-def prefix_gff3(
-    target, gnm, ann, genus, species, infra_id, unique_key, logger, sort_only
-):
+def prefix_gff3(target, gnm, ann, genus, species, infra_id, unique_key, logger, sort_only):
     """Prefixes GFF3 file for datastore standard.  Sorts for Tabix Indexing"""
     prefix = "{}{}".format(genus[:3].lower(), species[:2].lower())  # gensp
     key = unique_key
     target = os.path.abspath(target)
-    new_file_raw = "{}.{}.{}.{}.{}.gene_models_main.gff3".format(
-        prefix, infra_id, gnm, ann, key
-    )
+    new_file_raw = "{}.{}.{}.{}.{}.gene_models_main.gff3".format(prefix, infra_id, gnm, ann, key)
     species_dir = "./{}_{}".format(genus.capitalize(), species)
-    new_file_dir = "{}/{}.{}.{}.{}".format(
-        species_dir, infra_id, gnm, ann, key
-    )  # setup for ds
+    new_file_dir = "{}/{}.{}.{}.{}".format(species_dir, infra_id, gnm, ann, key)  # setup for ds
     create_directories(new_file_dir)  # make genus species dir for output
     gff_file_path = os.path.abspath("{}/{}".format(new_file_dir, new_file_raw))
     new_gff = open(gff_file_path, "w")
@@ -157,9 +153,7 @@ def prefix_gff3(
     ranking = 1  # switch to stop ranking in while below
     while ranking:  # this is over-engineered for tabix indexing, but tis cool
         check = 0  # switch to indicate no features unranked
-        for t in sorted(
-            type_hierarchy, key=lambda k: type_hierarchy[k]["rank"], reverse=True
-        ):
+        for t in sorted(type_hierarchy, key=lambda k: type_hierarchy[k]["rank"], reverse=True):
             if type_hierarchy[t]["rank"]:  # rank !=0
                 for c in type_hierarchy[t]["children"]:
                     if not type_hierarchy[c]["rank"]:
@@ -208,23 +202,15 @@ def prefix_gff3(
 @click.option("--gnm", help="""Genome Version for Normalizer.""")
 @click.option("--ann", help="""Annotation Version for Normalizer.""")
 @click.option("--genus", metavar="<STRING>", help="""Genus of organism input file""")
+@click.option("--species", metavar="<STRING>", help="""Species of organism input file""")
 @click.option(
-    "--species", metavar="<STRING>", help="""Species of organism input file"""
+    "--infra_id", metavar="<STRING>", help="""Line or infraspecific identifier.  ex. A17_HM341""",
 )
 @click.option(
-    "--infra_id",
-    metavar="<STRING>",
-    help="""Line or infraspecific identifier.  ex. A17_HM341""",
+    "--unique_key", metavar="<STRING, len=4>", help="""4 Character unique idenfier (get from spreadsheet)""",
 )
 @click.option(
-    "--unique_key",
-    metavar="<STRING, len=4>",
-    help="""4 Character unique idenfier (get from spreadsheet)""",
-)
-@click.option(
-    "--sort_only",
-    is_flag=True,
-    help="""Performing sorting only (only applies to gff3 files)""",
+    "--sort_only", is_flag=True, help="""Performing sorting only (only applies to gff3 files)""",
 )
 @click.option(
     "--log_file",
@@ -239,16 +225,7 @@ def prefix_gff3(
     help="""Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)""",
 )
 def cli(
-    target,
-    gnm,
-    ann,
-    genus,
-    species,
-    infra_id,
-    unique_key,
-    sort_only,
-    log_file,
-    log_level,
+    target, gnm, ann, genus, species, infra_id, unique_key, sort_only, log_file, log_level,
 ):
     """Prefixing for Datastore standard.
 
@@ -267,9 +244,7 @@ def cli(
     gff3 = ["gff", "gff3"]
     logger = setup_logging(log_file, log_level)
     if not (target and gnm and genus and species and infra_id and unique_key):
-        logger.error(
-            "--target, --species, --genus, --gnm, --infra_id, and --unique_key are required"
-        )
+        logger.error("--target, --species, --genus, --gnm, --infra_id, and --unique_key are required")
         sys.exit(1)
     target = os.path.abspath(target)
     gnm = "gnm{}".format(gnm)  # format user provided argument for gnm
@@ -290,9 +265,7 @@ def cli(
         sys.exit(1)
     if file_type in fasta:
         logger.info("Target is a FASTA file prefixing...")
-        new_file = prefix_fasta(
-            target, gnm, genus, species, infra_id, unique_key, logger
-        )  # returns new file path
+        new_file = prefix_fasta(target, gnm, genus, species, infra_id, unique_key, logger)  # returns new file path
         logger.info("Prefixing done, final file: {}".format(new_file))
     if file_type in gff3:
         if sort_only:

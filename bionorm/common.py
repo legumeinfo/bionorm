@@ -5,10 +5,9 @@
 import locale
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 
-# 3rd-party modules
+# third-party imports
 import click
 
 #
@@ -16,9 +15,6 @@ import click
 #
 PROGRAM_NAME = "bionorm"
 VERSION = "0.1.blah"
-
-DEFAULT_FIRST_N = 0  # only process this many records
-
 CONFIG_FILE_ENVVAR = "BIONORM_CONFIG_FILE_PATH"
 #
 # global logger object
@@ -120,9 +116,7 @@ class PersistentConfigurationObject(object):
             try:
                 self.path.parent.mkdir(parents=True)
             except OSError:
-                logger.error(
-                    'Unable to create parent directory "%s".', self.path.parent
-                )
+                logger.error('Unable to create parent directory "%s".', self.path.parent)
                 sys.exit(1)
         if not self.path.parent.is_dir():
             logger.error('Path "%s" exists, but is not a directory.', self.path.parent)

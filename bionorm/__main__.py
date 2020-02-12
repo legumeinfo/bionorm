@@ -7,6 +7,7 @@ bionorm -- normalize and verity genomic data files
 # python3 -m bionorm
 # from the directory above this one.
 
+# module imports
 from .__init__ import cli
 
 if __name__ == "__main__":

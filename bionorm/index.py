@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 
-import os
-import sys
+# standard library imports
+import gzip
 import logging
+import os
 import re
 import subprocess
-import gzip
+import sys
+
+# third-party imports
 import click
 from ruamel.yaml import YAML
-from ..helper import (
-    check_file,
-    return_filehandle,
-    create_directories,
-    check_subprocess_dependencies,
-    setup_logging,
-)
+
+# module imports
+from ..helper import check_file
+from ..helper import check_subprocess_dependencies
+from ..helper import create_directories
+from ..helper import return_filehandle
+from ..helper import setup_logging
 
 
 def index_fasta(fasta):
@@ -44,9 +47,7 @@ def index_gff3(gff3):
 
 
 @click.command()
-@click.option(
-    "--target", type=str, help="""TARGETS can be files or directories or both"""
-)
+@click.option("--target", type=str, help="""TARGETS can be files or directories or both""")
 @click.option(
     "--log_file",
     metavar="<FILE>",
@@ -81,9 +82,7 @@ def cli(target, log_file, log_level):
     file_type = file_attributes[-1]
     if file_type == "gz" or file_type == "bgz":
         file_type = file_attributes[-2]
-        logger.error(
-            "Uncompress file for indexing.  Compression is done specifically for each index type"
-        )
+        logger.error("Uncompress file for indexing.  Compression is done specifically for each index type")
         sys.exit(1)
     if file_type not in file_types:
         logger.error("File {} is not a type in {}".format(target, file_types))

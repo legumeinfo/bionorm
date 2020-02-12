@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+# standard library imports
+import gzip
 import logging
+import os
 import re
 import subprocess
-import gzip
+import sys
+
+# third-party imports
 import click
-from ruamel.yaml import YAML, RoundTripDumper
+from ruamel.yaml import YAML
+from ruamel.yaml import RoundTripDumper
 from sequencetools.helpers import sequence_helpers
-from ..helper import (
-    check_file,
-    return_filehandle,
-    create_directories,
-    check_subprocess_dependencies,
-    setup_logging,
-)
+
+# module imports
+from ..helper import check_file
+from ..helper import check_subprocess_dependencies
+from ..helper import create_directories
+from ..helper import return_filehandle
+from ..helper import setup_logging
 
 
 def primary_transcript_check(peptides, logger):
@@ -24,9 +28,7 @@ def primary_transcript_check(peptides, logger):
     seq_handle = open(peptides, "rt")
     longest = {}
     count = 0
-    primary = "{}.protein_primaryTranscript.faa".format(
-        ".".join(peptides.split(".")[:-2])
-    )
+    primary = "{}.protein_primaryTranscript.faa".format(".".join(peptides.split(".")[:-2]))
     for record in sequence_helpers.get_seqio_fasta_record(seq_handle):
         count += 1
         my_record = ">{}\n{}".format(record.id, record.seq)
@@ -61,9 +63,7 @@ def run_gffread(gff, reference, logger):
 
 @click.command()
 @click.option(
-    "--target",
-    type=str,
-    help="""Formatted file from normalizer prefix MUST BE UNCOMPRESSED""",
+    "--target", type=str, help="""Formatted file from normalizer prefix MUST BE UNCOMPRESSED""",
 )
 @click.option(
     "--reference",
