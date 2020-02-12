@@ -2,7 +2,7 @@ bionorm
 =======
 ``bionorm`` normalizes and validates genomic data files prior to further processing
 or inclusion in a data store such as that of the
-`Legume Federation <https://www.legumefederation.org/en/data-store/>`.
+`Legume Federation <https://www.legumefederation.org/en/data-store/>`_.
 
 Prerequisites
 -------------
@@ -11,15 +11,15 @@ Python 3.6 or greater is required.
 Installation
 ------------
 This package is tested under Linux and MacOS using Python 3.7.
-Install via pip, pipx, or pipenv in the usual way: ::
+Install via pip or (better yet) `pipx <https://pipxproject.github.io/pipx/>`_: ::
 
      pipx install bionorm
 
 Developers
 ----------
-bionorm uses the `poetry <https://python-poetry.org>` dependency manager.
-Install poetry in the usual way.  Get the version of python you intend
-to use as first in the path, and execute the command: ::
+If you plan to develop ``bionorm``, you'll need to install
+the `poetry <https://python-poetry.org>`_ dependency manager.
+If you haven't previously installed ``poetry``, execute the command: ::
 
     curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
@@ -27,11 +27,11 @@ Next, get the master branch from GitHub ::
 
 	git clone https://github.com/ncgr/bionorm.git
 
-Change to the bionorm/ directory and install with poetry: ::
+Change to the ``bionorm/`` directory and install with poetry: ::
 
 	poetry install -v
 
-Run bionorm with poetry: ::
+Run ``bionorm`` with ``poetry``: ::
 
     poetry run bionorm
 
@@ -44,7 +44,7 @@ Installation puts a single script called ``bionorm`` in your path.  The usage fo
 Global Options
 --------------
 The following options are global in scope and, if used, must be placed before
-COMMAND. Not all commands support every global option:
+``COMMAND``. Not all commands support every global option:
 
 ============================= ====================================================
     --verbose/-v              Log debugging info to stderr
@@ -52,14 +52,14 @@ COMMAND. Not all commands support every global option:
     --no_log                  Suppress logging to file.
     --progress                Show a progress bar.
     --first_n                 Process only this many records. [default: all]
-    --warnings_as_errors/-e   Warnings cause exceptions.",
+    --warnings_as_errors/-e   Warnings cause exceptions.
 ============================= ====================================================
 
 Commands
 --------
-A listing of commands is available via ``bionorm --help``.  Each command has its own
-options, which may be listed with ``bionorm COMMAND --help``. The currently implemented
-commands are:
+A listing of commands is available via ``bionorm --help``.  Each command has its
+``COMMANDOPTIONS``, which may be listed with ``bionorm COMMAND --help``.
+The currently implemented commands are:
 
 ============================= ====================================================
   busco                       Perform BUSCO checks.
@@ -69,15 +69,14 @@ commands are:
   index                       Indexes FASTA file.
 ============================= ====================================================
 
-
+Project
+-------
 +-------------------+------------+------------+
 | Latest Release    | |pypi|     | |bionorm|  |
 +-------------------+------------+            +
 | GitHub            | |repo|     |            |
 +-------------------+------------+            +
 | License           | |license|  |            |
-+-------------------+------------+            +
-| Documentation     | |rtd|      |            |
 +-------------------+------------+            +
 | Travis Build      | |travis|   |            |
 +-------------------+------------+            +
@@ -89,7 +88,6 @@ commands are:
 +-------------------+------------+            +
 | Issues            | |issues|   |            |
 +-------------------+------------+------------+
-
 
 .. |bionorm| image:: docs/normal.jpg
      :alt: Make me NORMAL, please!
@@ -105,10 +103,6 @@ commands are:
 .. |license| image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
     :target: https://github.com/ncgr/bionorm/blob/master/LICENSE.txt
     :alt: License terms
-
-.. |rtd| image:: https://readthedocs.org/projects/bionorm/badge/?version=latest
-    :target: http://bionorm.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Server
 
 .. |travis| image:: https://img.shields.io/travis/ncgr/bionorm.svg
     :target:  https://travis-ci.org/ncgr/bionorm
@@ -129,4 +123,3 @@ commands are:
 .. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=ncgr/bionorm
      :target: https://app.dependabot.com/accounts/ncgr/repos/236847525
      :alt: dependabot dependencies
-
