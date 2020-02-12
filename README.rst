@@ -7,16 +7,16 @@ or inclusion in a data store such as that of the
 Prerequisites
 -------------
 Python 3.6 or greater is required.
-
-Installation
-------------
 This package is tested under Linux and MacOS using Python 3.7.
+
+Installation for Users
+----------------------
 Install via pip or (better yet) `pipx <https://pipxproject.github.io/pipx/>`_: ::
 
      pipx install bionorm
 
-Developers
-----------
+For Developers
+--------------
 If you plan to develop ``bionorm``, you'll need to install
 the `poetry <https://python-poetry.org>`_ dependency manager.
 If you haven't previously installed ``poetry``, execute the command: ::
@@ -47,8 +47,8 @@ The following options are global in scope and, if used, must be placed before
 ``COMMAND``. Not all commands support every global option:
 
 ============================= ====================================================
-    --verbose/-v              Log debugging info to stderr
-    --quiet/-q                Suppress logging to stderr
+    --verbose/-v              Log debugging info to stderr.
+    --quiet/-q                Suppress logging to stderr.
     --no_log                  Suppress logging to file.
     --progress                Show a progress bar.
     --first_n                 Process only this many records. [default: all]
@@ -57,20 +57,23 @@ The following options are global in scope and, if used, must be placed before
 
 Commands
 --------
-A listing of commands is available via ``bionorm --help``.  Each command has its
-``COMMANDOPTIONS``, which may be listed with ``bionorm COMMAND --help``.
+A listing of commands is available via ``bionorm --help``.
 The currently implemented commands are:
 
 ============================= ====================================================
+  prefix                      Prefixes IDs in FASTA and GFF files.
   busco                       Perform BUSCO checks.
   detector                    Detect/correct incongruencies among files.
   fasta                       Check for GFF/FASTA consistency.
   generate_readme             Generates a README file with details of genome.
   index                       Indexes FASTA file.
 ============================= ====================================================
+Each command has its ``COMMANDOPTIONS``, which may be listed with: ::
 
-Project
--------
+    ``bionorm COMMAND --help``.
+
+Project Status
+--------------
 +-------------------+------------+------------+
 | Latest Release    | |pypi|     | |bionorm|  |
 +-------------------+------------+            +
@@ -96,7 +99,7 @@ Project
     :target: https://pypi.python.org/pypi/bionorm
     :alt: Python package
 
-.. |repo| image:: https://img.shields.io/github/commits-since/ncgr/bionorm/0.1.svg
+.. |repo| image:: https://img.shields.io/github/commits-since/ncgr/bionorm/0.1.0.svg
     :target: https://github.com/ncgr/bionorm
     :alt: GitHub repository
 
