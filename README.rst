@@ -61,16 +61,18 @@ A listing of commands is available via ``bionorm --help``.
 The currently implemented commands are:
 
 ============================= ====================================================
-  prefix
+  prefix_fasta                Prefix FASTA files for data store standard.
+  prefix_gff                  Prefix and sort GFF3 file for data store standard.
   busco                       Perform BUSCO checks.
   detector                    Detect/correct incongruencies among files.
   fasta                       Check for GFF/FASTA consistency.
   generate_readme             Generates a README file with details of genome.
   index                       Indexes FASTA file.
 ============================= ====================================================
+
 Each command has its ``COMMANDOPTIONS``, which may be listed with: ::
 
-    ``bionorm COMMAND --help``.
+    bionorm COMMAND --help
 
 Project Status
 --------------
