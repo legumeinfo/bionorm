@@ -61,7 +61,7 @@ A listing of commands is available via ``bionorm --help``.
 The currently implemented commands are:
 
 ============================= ====================================================
-  prefix                      Prefixes IDs in FASTA and GFF files.
+  prefix
   busco                       Perform BUSCO checks.
   detector                    Detect/correct incongruencies among files.
   fasta                       Check for GFF/FASTA consistency.

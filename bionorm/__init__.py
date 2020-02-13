@@ -83,5 +83,6 @@ cli_builder.set_cli_func(cli)
 test_log = cli_builder.test_log_func()
 show_context = cli_builder.show_context_func()
 
-# import other functions
-from .config import show_config, init_config_file  # isort:skip
+# import other CLI functions
+from .prefix import prefix_fasta  # isort:skip
+from .prefix import prefix_gff  # isort:skip

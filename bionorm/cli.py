@@ -37,11 +37,6 @@ class CleanInfoFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-class Click_Multi(object):
-    def __init__(self, option_list):
-        self.option_list = option_list
-
-
 def composed(self, *decs):
     def deco(f):
         for dec in reversed(decs):
@@ -68,8 +63,6 @@ class Logging_CLI_Builder(object):
         self.logger = logger
         self.check_func = check_func
         self.global_options_list = global_options_list
-        click_multi = Click_Multi(global_options_list)
-        # self.multi_options = click_multi.click_multi
         dist = distribution(name).metadata
         self.version = dist["Version"]
         self.author = dist["Author"]
