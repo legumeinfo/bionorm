@@ -4,6 +4,7 @@
 import os
 import re
 import sys
+from pathlib import Path
 
 # third-party imports
 import click
@@ -15,42 +16,54 @@ from .helper import check_file
 from .helper import create_directories
 from .helper import return_filehandle
 
+# global constants
+GENUS_CODE_LEN = 3
+SPECIES_CODE_LEN = 2
+GFF_SPLIT_MAGIC = ["##gff-version", "3"]
+
+
+def organism_code(genus, species):
+    return f"{genus[:GENUS_CODE_LEN].lower()}{species[:SPECIES_CODE_LEN].lower()}"
+
+
+def get_species_dirname(genus, species):
+    return f"{genus.capitalize()}_{species}"
+
+
+def get_genome_dir(infra_id, genver=None, annver=None, key=None):
+    dirname = f"{infra_id}"
+    if genver is not None:
+        dirname += f".gnm{genver}"
+    if annver is not None:
+        dirname += f".ann{annver}"
+    if key is not None:
+        dirname += f".{key}"
+    return dirname
+
 
 @cli.command()
-@click.option("--target", help="""TARGETS can be files or directories or both""")
-@click.option("--gnm", help="""Genome Version for Normalizer.""")
-@click.option("--genus", metavar="<STRING>", help="""Genus of organism input file""")
-@click.option("--species", metavar="<STRING>", help="""Species of organism input file""")
-@click.option(
-    "--infra_id", metavar="<STRING>", help="""Line or infraspecific identifier.  ex. A17_HM341""",
-)
-@click.option(
-    "--key", metavar="<STRING, len=4>", help="""4-character unique identifier""",
-)
-def prefix_fasta(target, gnm, genus, species, infra_id, key):
-    """Prefix FASTA files for data store standard.
+@click.option("--genver", type=int, required=True, help="Genome version number.")
+@click.option("--genus", required=True, help="Genus name of organism.")
+@click.option("--species", required=True, help="Species name of organism.")
+@click.option("--infra_id", required=True, help="Infraspecies identifier. [e.g., 'A17_HM341']")
+@click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
+@click.argument("fastafile", type=click.Path(exists=True, readable=True, dir_okay=False))
+def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
+    """Prefix FASTA files to data store standards.
 
     \b
     Example:
-        bionorm prefix-fasta --gnm 5 --genus medicago \\
-                --species truncatula --infra_id jemalong_A17 --key FAKE \\
-                --target example_jemalong.fna
+        bionorm prefix-fasta --genver 5 --genus medicago --species truncatula \\
+                --infra_id jemalong_A17 --key FAKE example_jemalong.fna
     """
-    if not (target and gnm and genus and species and infra_id and key):
-        logger.error("--target, --species, --genus, --gnm, --infra_id, and --key are required")
-        sys.exit(1)
-    target = os.path.abspath(target)
-    gnm = "gnm{}".format(gnm)  # format user provided argument for gnm
     re_header = re.compile(r"^>(\S+)\s*(.*)")  # match header
-    prefix = "{}{}".format(genus[:3].lower(), species[:2].lower())  # gensp
-    new_file_raw = "{}.{}.{}.{}.genome_main.fna".format(prefix, infra_id, gnm, key)
-    species_dir = "./{}_{}".format(genus.capitalize(), species)
-    new_file_dir = "{}/{}.{}.{}".format(species_dir, infra_id, gnm, key)  # setup for ds
-    create_directories(new_file_dir)  # make genus species dir for output
-    fasta_file_path = os.path.abspath("{}/{}".format(new_file_dir, new_file_raw))
+    org_code = organism_code(genus, species)
+    new_file_dir = Path(".") / get_species_dirname(genus, species) / get_genome_dir(infra_id, genver=genver, key=key)
+    new_file_dir.mkdir(parents=True, exist_ok=True)
+    fasta_file_path = new_file_dir / f"{org_code}.{infra_id}.gnm{genver}.{key}.genome_main.fna"
     new_fasta = open(fasta_file_path, "w")
-    name_prefix = "{}.{}.{}".format(prefix, infra_id, gnm)
-    fh = return_filehandle(target)
+    name_prefix = f"{org_code}.{infra_id}.gnm{genver}"
+    fh = return_filehandle(fastafile)
     n_headers = 0
     with fh as gopen:
         for line in gopen:
@@ -61,7 +74,7 @@ def prefix_fasta(target, gnm, genus, species, infra_id, key):
                 logger.debug(parsed_header)
                 if isinstance(parsed_header, str):  # check tuple
                     hid = parsed_header
-                    new_header = ">{}.{}".format(name_prefix, hid)
+                    new_header = f">{name_prefix}.{hid}"
                     n_headers += 1
                     logger.debug(hid)
                 else:
@@ -81,13 +94,14 @@ def prefix_fasta(target, gnm, genus, species, infra_id, key):
                 new_fasta.write(line + "\n")
     new_fasta.close()
     if not n_headers:
-        logger.error("file %s contains no headers, are you sure it is a FASTA?", target)
+        logger.error("file %s contains no headers, are you sure it is a FASTA?", fastafile)
         os.remove(fasta_file_path)
         sys.exit(1)
     if not check_file(fasta_file_path):
         logger.error("Output file {} not found for normalize fasta".format(fasta_file_path))
         sys.exit(1)  # new file not found return False
-    logger.info("Prefixing FASTA done, final file: {}".format(fasta_file_path))
+    logger.debug("%d sequences in output file", n_headers)
+    logger.info(fasta_file_path)
     return fasta_file_path
 
 
@@ -120,45 +134,34 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 
 
 @cli.command()
-@click.option("--target", help="""TARGETS can be files or directories or both""")
-@click.option("--gnm", help="""Genome Version for Normalizer.""")
-@click.option("--ann", help="""Annotation Version for Normalizer.""")
-@click.option("--genus", metavar="<STRING>", help="""Genus of organism input file""")
-@click.option("--species", metavar="<STRING>", help="""Species of organism input file""")
-@click.option(
-    "--infra_id", metavar="<STRING>", help="""Line or infraspecific identifier.  ex. A17_HM341""",
-)
-@click.option(
-    "--key", metavar="<STRING, len=4>", help="""4 Character unique idenfier (get from spreadsheet)""",
-)
-@click.option(
-    "--sort_only", is_flag=True, help="""Performing sorting only.""",
-)
-def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
-    """Prefix and sort GFF3 file for data store standard.
+@click.option("--gnm", required=True, type=int, help="Genome version number.")
+@click.option("--ann", required=True, type=int, help="""Annotation version number.""")
+@click.option("--genus", required=True, help="Genus name of organism.")
+@click.option("--species", required=True, help="Species name of organism.")
+@click.option("--infra_id", required=True, help="Infraspecies identifier. [e.g., 'A17_HM341']")
+@click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
+@click.option("--sort_only", is_flag=True, help="Perform sorting only.", default=False)
+@click.argument("gff3file", type=click.Path(exists=True, readable=True, dir_okay=False))
+def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
+    """Prefix and sort GFF3 file to data store standards.
 
     \b
     Example:
         bionorm prefix-gff --gnm 5 --ann 1 --species truncatula --genus medicago \\
-                --infra_id jemalong_A17 --key FAKE --target example_jemalong.fna
+                --infra_id jemalong_A17 --key FAKE example_jemalong.fna
     """
-    if not (target and gnm and genus and species and infra_id and key and ann):
-        logger.error("--target, --species, --genus, --gnm, -ann, --infra_id, and --key are required")
-        sys.exit(1)
-    target = os.path.abspath(target)
-    gnm = "gnm{}".format(gnm)  # format user provided argument for gnm
-    ann = "ann{}".format(ann)  # format user provided argument for ann
+    gnm = "gnm{}".format(gnm)
+    ann = "ann{}".format(ann)
     if sort_only:
-        logger.info("sorting ONLY...")
+        logger.debug("sorting ONLY...")
     else:
-        logger.info("prefixing and sorting...")
-    prefix = "{}{}".format(genus[:3].lower(), species[:2].lower())  # gensp
-    target = os.path.abspath(target)
-    new_file_raw = "{}.{}.{}.{}.{}.gene_models_main.gff3".format(prefix, infra_id, gnm, ann, key)
-    species_dir = "./{}_{}".format(genus.capitalize(), species)
-    new_file_dir = "{}/{}.{}.{}.{}".format(species_dir, infra_id, gnm, ann, key)  # setup for ds
+        logger.debug("prefixing and sorting...")
+    org_code = organism_code(genus, species)
+    new_gff_name = f"{org_code}.{infra_id}.{gnm}.{ann}.{key}.gene_models_main.gff3"
+    species_dir = Path(".") / get_species_dirname(genus, species)
+    new_file_dir = species_dir / "{}.{}.{}.{}".format(infra_id, gnm, ann, key)
     create_directories(new_file_dir)  # make genus species dir for output
-    gff_file_path = os.path.abspath("{}/{}".format(new_file_dir, new_file_raw))
+    gff_file_path = new_file_dir / new_gff_name
     new_gff = open(gff_file_path, "w")
     get_id = re.compile("ID=([^;]+)")  # gff3 get id string
     get_name = re.compile("Name=([^;]+)")  # get name string
@@ -167,7 +170,7 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
     sub_tree = {}  # feature hierarchy sub tree
     type_hierarchy = {}  # type hierarchy for features, will be ranked
     prefix_name = False
-    fh = return_filehandle(target)  # get filehandle for target
+    fh = return_filehandle(gff3file)  # get filehandle for gff3file
     n_lines = 0
     with fh as gopen:
         for line in gopen:
@@ -175,8 +178,8 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
             if not line:
                 continue
             n_lines += 1
-            if n_lines == 1:
-                if not line.split() == ["##gff-version", "3"]:
+            if n_lines == 1:  # magic in first line
+                if not line.split() == GFF_SPLIT_MAGIC:
                     logger.error("File does not start with GFF3 magic, are you sure is is a GFF3?")
                     new_gff.close()
                     os.remove(gff_file_path)
@@ -187,7 +190,7 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
                     continue
                 if line.startswith("##sequence-region"):  # replace header
                     fields = re.split(r"\s+", line)
-                    ref_name = "{}.{}.{}.{}".format(prefix, infra_id, gnm, fields[1])
+                    ref_name = "{}.{}.{}.{}".format(org_code, infra_id, gnm, fields[1])
                     line = re.sub(fields[1], ref_name, line)
                 new_gff.write("{}\n".format(line))
                 continue
@@ -228,7 +231,7 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
                 check = 1
         if not check:  # escape loop when all features are ranked
             ranking = 0
-    feature_prefix = "{}.{}.{}.{}".format(prefix, infra_id, gnm, ann)
+    feature_prefix = "{}.{}.{}.{}".format(org_code, infra_id, gnm, ann)
     for l in sorted(
         gff3_lines, key=lambda x: (x[0], int(x[3]), type_rank(type_hierarchy, x[2]))
     ):  # rank by chromosome, start, type_rank and stop
@@ -236,7 +239,7 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
             l = "\t".join(l)
             new_gff.write("{}\n".format(l))
             continue
-        l[0] = "{}.{}.{}.{}".format(prefix, infra_id, gnm, l[0])  # rename
+        l[0] = "{}.{}.{}.{}".format(org_code, infra_id, gnm, l[0])  # rename
         l = "\t".join(l)
         feature_id = get_id.search(l)
         feature_name = get_name.search(l)
@@ -260,5 +263,5 @@ def prefix_gff(target, gnm, ann, genus, species, infra_id, key, sort_only):
     if not check_file(gff_file_path):  # check for output error if not found
         logger.error("Output file {} not found for normalize gff".format(gff_file_path))
         sys.exit(1)  # new file not found return False
-    logger.info("{} lines in output file {}".format(n_lines, gff_file_path))
+    logger.info(gff_file_path)
     return gff_file_path  # return path to new gff file

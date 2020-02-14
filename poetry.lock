@@ -184,7 +184,7 @@ version = "3.0.2"
 sortedcontainers = ">=2.0,<3.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "A Python utility / library to sort Python imports."
 name = "isort"
 optional = false
@@ -486,7 +486,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools"]
 
 [metadata]
-content-hash = "fa4f946a7c57495fffcc527fb575c64452e8310f3b63c181e8ba1021a396874c"
+content-hash = "9dacecfbea81df71ca22fec97898de7a625b49ef86d8800487e1efc3eaffd637"
 python-versions = "^3.6"
 
 [metadata.files]

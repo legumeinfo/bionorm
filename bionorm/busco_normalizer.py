@@ -1,24 +1,20 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # standard library imports
-import gzip
-import logging
 import os
-import re
 import subprocess
 import sys
 
 # third-party imports
 import click
-from ruamel.yaml import YAML
 
 # module imports
+from . import cli
+from .common import logger
 from .helper import change_directories
 from .helper import check_busco_dependencies
-from .helper import check_file
 from .helper import create_directories
 from .helper import return_filehandle
-from .helper import setup_logging
 
 
 def preprocess_input(target):
@@ -50,22 +46,9 @@ def run_busco(busco_target, output, temp_dir, threads, mode, lineage):
 @click.option("--lineage", type=str, help="""BUSCO lineage to compare target against""")
 @click.option("--mode", type=str, help="""BUSCO mode (genome, protein, transcript)""")
 @click.option("--threads", type=int, default=4, help="""Threads for BUSCO""")
-@click.option(
-    "--log_file",
-    metavar="<FILE>",
-    default="./normalizer_index.log",
-    help="""File to write log to. (default:./normalizer_index.log)""",
-)
-@click.option(
-    "--log_level",
-    metavar="<LOGLEVEL>",
-    default="INFO",
-    help="""Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)""",
-)
-def cli(target, lineage, mode, threads, log_file, log_level):
+def cli(target, lineage, mode, threads):
     """Determines what type of index to apply to input target"""
     check_busco_dependencies()
-    logger = setup_logging(log_file, log_level)
     if not (target and lineage):
         logger.error("--target, --lineage and arguments required")
         sys.exit(1)

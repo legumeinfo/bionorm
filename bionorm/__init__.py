@@ -86,3 +86,4 @@ show_context = cli_builder.show_context_func()
 # import other CLI functions
 from .prefix import prefix_fasta  # isort:skip
 from .prefix import prefix_gff  # isort:skip
+from .extract_fasta import extract_fasta  # isort:skip

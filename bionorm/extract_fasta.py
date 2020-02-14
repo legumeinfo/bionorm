@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 # standard library imports
-import gzip
-import logging
 import os
-import re
 import subprocess
 import sys
 
 # third-party imports
 import click
-from ruamel.yaml import YAML
-from ruamel.yaml import RoundTripDumper
 from sequencetools.helpers import sequence_helpers
 
 # module imports
-from ..helper import check_file
-from ..helper import check_subprocess_dependencies
-from ..helper import create_directories
-from ..helper import return_filehandle
-from ..helper import setup_logging
+from . import cli
+from .common import logger
+from .helper import check_subprocess_dependencies
 
 
 def primary_transcript_check(peptides, logger):
@@ -49,7 +42,7 @@ def primary_transcript_check(peptides, logger):
     return primary
 
 
-def run_gffread(gff, reference, logger):
+def run_gffread(gff, reference):
     """Reads gff3 file and writes mRNA, CDS and Peptides"""
     gff_dir = os.path.dirname(gff)
     gff_attributes = os.path.basename(gff).split(".")
@@ -58,33 +51,23 @@ def run_gffread(gff, reference, logger):
     pep = "{}/{}.protein.faa".format(gff_dir, ".".join(gff_attributes[:5]))
     cmd = "gffread {} -g {} -w {} -x {} -y {} -W".format(gff, reference, mrna, cds, pep)
     subprocess.check_call(cmd, shell=True)
-    primary_transcript_check(pep, logger)
+    primary_transcript_check(pep)
 
 
-@click.command()
+@cli.command()
 @click.option(
-    "--target", type=str, help="""Formatted file from normalizer prefix MUST BE UNCOMPRESSED""",
+    "--target", type=str, help="""GFF file from prefix_gff.""",
 )
 @click.option(
-    "--reference",
-    type=str,
-    help="""FASTA file of sequences to read gff intervals normalizer prefix is a good start here too MUST BE UNCOMPRESSED""",
+    "--reference", type=str, help="""FASTA file from prefix_fasta.""",
 )
-@click.option(
-    "--log_file",
-    metavar="<FILE>",
-    default="./normalizer_index.log",
-    help="""File to write log to. (default:./normalizer_index.log)""",
-)
-@click.option(
-    "--log_level",
-    metavar="<LOGLEVEL>",
-    default="INFO",
-    help="""Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)""",
-)
-def cli(target, reference, log_file, log_level):
-    """Determines what typae of index to apply to input target"""
-    logger = setup_logging(log_file, log_level)
+def extract_fasta(target, reference):
+    """Determines what type of index to apply to input target
+
+    \b
+    Example:
+        bionorm extract_fasta --target example_jemalong.gff3 --reference
+    """
     check_subprocess_dependencies()
     if not (target and reference):
         logger.error("--target and --reference arguments are required")
@@ -97,4 +80,4 @@ def cli(target, reference, log_file, log_level):
     if len(target_attributes) < 7:
         logger.error("Target file {} is not delimited correctly".format(target))
         sys.exit(1)
-    run_gffread(target, reference, logger)  # write readme template
+    run_gffread(target, reference)  # write readme template

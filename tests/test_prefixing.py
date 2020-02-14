@@ -75,7 +75,6 @@ def test_prefix_gff(tmp_path):
                     "jemalong_A17",
                     "--key",
                     "FAKE",
-                    "--target",
                     "example_jemalong.gff3",
                 ]
             )
@@ -102,7 +101,7 @@ def test_prefix_fasta(tmp_path):
             output = sh.bionorm(
                 [
                     "prefix-fasta",
-                    "--gnm",
+                    "--genver",
                     "5",
                     "--genus",
                     "medicago",
@@ -112,7 +111,6 @@ def test_prefix_fasta(tmp_path):
                     "jemalong_A17",
                     "--key",
                     "FAKE",
-                    "--target",
                     "example_jemalong.fna",
                 ]
             )
