@@ -1,33 +1,24 @@
-# stdlib imports
 # standard library imports
-import contextlib
-import os
-import shutil
 from pathlib import Path
 
 # third-party imports
 import pytest
 import sh
 
+# first-party imports
+from tests.download_files import DownloadTestFiles
+
 # global constants
 FASTA_FILE = "example_jemalong.fna"
 GFF_FILE = "example_jemalong.gff3"
 
-
-@contextlib.contextmanager
-def data_to_working_directory(tmp_path, copy_fasta=False, copy_gff=False):
-    """Copy data and change context to tmp_path directory."""
-    cwd = Path.cwd()
-    test_path = Path(__file__).parent
-    if copy_fasta:
-        shutil.copy2(test_path / FASTA_FILE, tmp_path / FASTA_FILE)
-    if copy_gff:
-        shutil.copy2(test_path / GFF_FILE, tmp_path / GFF_FILE)
-    os.chdir(tmp_path)
-    try:
-        yield
-    finally:
-        os.chdir(cwd)
+dlmanager = DownloadTestFiles(
+    download_url="http://generisbio.com/ncgr/",
+    files=[FASTA_FILE, GFF_FILE],
+    md5_check=True,
+    gzipped=True,
+    progressbar=False,
+)
 
 
 def linecount(filepath):
@@ -58,7 +49,7 @@ def fasta_count(filepath):
 
 def test_prefix_gff(tmp_path):
     print("testing command prefix-gff")
-    with data_to_working_directory(tmp_path, copy_gff=True):
+    with dlmanager.data_to_working_directory(tmp_path, [GFF_FILE]):
         try:
             output = sh.bionorm(
                 [
@@ -96,7 +87,7 @@ def test_prefix_gff(tmp_path):
 
 def test_prefix_fasta(tmp_path):
     print("testing command prefix-fasta")
-    with data_to_working_directory(tmp_path, copy_fasta=True):
+    with dlmanager.data_to_working_directory(tmp_path, [FASTA_FILE]):
         try:
             output = sh.bionorm(
                 [

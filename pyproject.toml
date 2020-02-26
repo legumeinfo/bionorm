@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.2.2"
+version = "0.2.3"
 description = "normalize and verify genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -41,9 +41,9 @@ biopython = "^1.76"
 click = "^7.0"
 "ruamel.yaml" = "^0.16.6"
 sequencetools = "^0.0.5"
-coverage = "^5.0.3"
 importlib_metadata = "^1.5.0"
 click_plugins = "^1.1.1"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -52,6 +52,9 @@ black = {version = "^19.10b0", allow-prereleases = true}
 sh = "^1.12.14"
 pre-commit = "^2.0.1"
 isort = "^4.3.21"
+progressbar2 = "^3.47.0"
+pydocstyle = "^5.0.2"
+requests_download = "^0.1.2"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

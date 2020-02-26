@@ -73,6 +73,10 @@ venv
 #################
 tmp/
 
+# downloaded test data #
+########################
+example_*
+
 # src directory (git installs)#
 ###############################
 src
