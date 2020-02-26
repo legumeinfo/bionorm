@@ -48,9 +48,7 @@ def generate_readme(template, attributes, logger):
 
 @click.command()
 @click.option("--target", type=str, help="""Formatted Directory from Previous Normalizer Steaps""")
-@click.option(
-    "--template", type=str, help="""YAML file to be used as the template for the README""",
-)
+@click.option("--template", type=str, help="""YAML file to be used as the template for the README""")
 @click.option(
     "--log_file",
     metavar="<FILE>",

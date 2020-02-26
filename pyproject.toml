@@ -55,6 +55,7 @@ isort = "^4.3.21"
 progressbar2 = "^3.47.0"
 pydocstyle = "^5.0.2"
 requests_download = "^0.1.2"
+virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

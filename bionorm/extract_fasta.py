@@ -55,12 +55,8 @@ def run_gffread(gff, reference):
 
 
 @cli.command()
-@click.option(
-    "--target", type=str, help="""GFF file from prefix_gff.""",
-)
-@click.option(
-    "--reference", type=str, help="""FASTA file from prefix_fasta.""",
-)
+@click.option("--target", type=str, help="""GFF file from prefix_gff.""")
+@click.option("--reference", type=str, help="""FASTA file from prefix_fasta.""")
 def extract_fasta(target, reference):
     """Determines what type of index to apply to input target
 

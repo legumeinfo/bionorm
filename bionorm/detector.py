@@ -47,12 +47,7 @@ class Detector:
             "protein_primaryTranscript": "gene_models_main",
             "protein": "gene_models_main",
         }
-        self.rank = {
-            "genome_main": 0,
-            "gene_models_main": 1,
-            "protein": 2,
-            "protein_primaryTranscript": 2,
-        }
+        self.rank = {"genome_main": 0, "gene_models_main": 1, "protein": 2, "protein_primaryTranscript": 2}
         self.log_level = kwargs.get("log_level", "INFO")
         self.log_file = kwargs.get("log_file", "./incongruencies.log")
         self.output_prefix = kwargs.get("output_prefix", "./incongruencies")
@@ -277,11 +272,7 @@ class Detector:
                 sys.exit(1)
             logger.debug("Target has no Parent, it is a Reference")
             if target not in self.target_objects:
-                self.target_objects[target] = {
-                    "type": canonical_type,
-                    "node_data": target_node_object,
-                    "children": {},
-                }
+                self.target_objects[target] = {"type": canonical_type, "node_data": target_node_object, "children": {}}
 
     def get_reference(self, glob_target):
         """Finds the FASTA reference for some prefix"""
@@ -373,7 +364,7 @@ class Detector:
                 self.passed[reference] = 0
                 self.target = reference
                 ref_method = getattr(
-                    specification_checks, targets[reference]["type"],  # reads checks from spec
+                    specification_checks, targets[reference]["type"]  # reads checks from spec
                 )  # type ex genome_main
                 if not ref_method:  # if the target isnt in the hierarchy continue
                     logger.debug("Check for {} does not exist".format(targets[reference]["type"]))
@@ -428,7 +419,7 @@ class Detector:
 @click.option("--no_busco", is_flag=True, help="""Disable BUSCO""")
 @click.option("--no_nodes", is_flag=True, help="""Disable DSCensor Stats and Node Generation""")
 @click.option(
-    "--log_file", metavar="<FILE>", default="./bionorm.log", help="""File to write log to. (default:./bionorm.log)""",
+    "--log_file", metavar="<FILE>", default="./bionorm.log", help="""File to write log to. (default:./bionorm.log)"""
 )
 @click.option(
     "--log_level",

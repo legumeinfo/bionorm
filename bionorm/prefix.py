@@ -205,10 +205,7 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
             if not feature_id:
                 continue
             feature_id = feature_id.group(1)
-            sub_tree[feature_id] = {
-                "type": fields[2],  # parent child
-                "parent_ids": parent_ids,
-            }
+            sub_tree[feature_id] = {"type": fields[2], "parent_ids": parent_ids}  # parent child
     for f in sub_tree:
         feature_type = sub_tree[f]["type"]
         parent_types = []

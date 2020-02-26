@@ -27,12 +27,12 @@ DEFAULT_FIRST_N = 0
 parser_options = [
     {
         "args": ("--progress",),
-        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Show a progress bar.",},
+        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Show a progress bar."},
     },
-    {"args": ("--first_n",), "kwargs": {"default": 0, help: "Process only this many records. [default: all]",},},
+    {"args": ("--first_n",), "kwargs": {"default": 0, help: "Process only this many records. [default: all]"}},
     {
         "args": ("--warnings_as_errors", "-e"),
-        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Warnings cause exceptions.",},
+        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Warnings cause exceptions."},
     },
 ]
 # define custom CLI check function, parameters must be keyworded
@@ -48,21 +48,13 @@ cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=pars
 # create CLI
 @with_plugins(iter_entry_points(PROGRAM_NAME + ".cli_plugins"))
 @click.group(epilog=cli_builder.author + " <" + cli_builder.email + ">.  " + cli_builder.copyright)
-@click.option(
-    "-v", "--verbose", is_flag=True, show_default=True, default=False, help="Log debugging info to stderr.",
-)
-@click.option(
-    "-q", "--quiet", is_flag=True, show_default=True, default=False, help="Suppress logging to stderr.",
-)
+@click.option("-v", "--verbose", is_flag=True, show_default=True, default=False, help="Log debugging info to stderr.")
+@click.option("-q", "--quiet", is_flag=True, show_default=True, default=False, help="Suppress logging to stderr.")
 @click.option("--log/--no_log", is_flag=True, show_default=True, default=True, help="Log to file.")
+@click.option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.")
+@click.option("--first_n", default=DEFAULT_FIRST_N, help="Process only this many records. [default: all]")
 @click.option(
-    "--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.",
-)
-@click.option(
-    "--first_n", default=DEFAULT_FIRST_N, help="Process only this many records. [default: all]",
-)
-@click.option(
-    "--warnings_as_errors", "-e", is_flag=True, show_default=True, default=False, help="Warnings cause exceptions.",
+    "--warnings_as_errors", "-e", is_flag=True, show_default=True, default=False, help="Warnings cause exceptions."
 )
 @click.version_option(version=cli_builder.version, prog_name=PROGRAM_NAME)
 @cli_builder.init_dual_logger()
