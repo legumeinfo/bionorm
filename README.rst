@@ -91,6 +91,8 @@ Project Status
 +-------------------+------------+            +
 | Dependencies      | |depend|   |            |
 +-------------------+------------+            +
+| Pre-commit        | |precommit||            |
++-------------------+------------+            +
 | Issues            | |issues|   |            |
 +-------------------+------------+------------+
 
@@ -121,9 +123,14 @@ Project Status
     :target: https://codecov.io/gh/ncgr/bionorm
     :alt: Codecov.io test coverage
 
+.. |precommit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+    :target: https://github.com/pre-commit/pre-commit
+    :alt: pre-commit
+
 .. |issues| image:: https://img.shields.io/github/issues/ncgr/bionorm.svg
     :target:  https://github.com/ncgr/bionorm/issues
     :alt: Issues reported
+
 
 .. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=ncgr/bionorm
      :target: https://app.dependabot.com/accounts/ncgr/repos/236847525
