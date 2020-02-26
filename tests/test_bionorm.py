@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # standard library imports
 import contextlib
 import os
