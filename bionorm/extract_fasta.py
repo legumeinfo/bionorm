@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+"""Extract rRNA, CDS, and protein sequences defined in GFF from genome sequence."""
 # standard library imports
 import os
 import subprocess
@@ -16,8 +16,7 @@ from .helper import check_subprocess_dependencies
 
 
 def primary_transcript_check(peptides, logger):
-    """If the file is not of primary transcripts, selects the longest isoforms.
-    """
+    """Select the longest isoforms as the primary transcripts."""
     seq_handle = open(peptides, "rt")
     longest = {}
     count = 0
@@ -43,7 +42,7 @@ def primary_transcript_check(peptides, logger):
 
 
 def run_gffread(gff, reference):
-    """Reads gff3 file and writes mRNA, CDS and Peptides"""
+    """Read gff3 file and write mRNA, CDS and peptides."""
     gff_dir = os.path.dirname(gff)
     gff_attributes = os.path.basename(gff).split(".")
     mrna = "{}/{}.mrna.fna".format(gff_dir, ".".join(gff_attributes[:5]))
@@ -58,7 +57,7 @@ def run_gffread(gff, reference):
 @click.option("--target", type=str, help="""GFF file from prefix_gff.""")
 @click.option("--reference", type=str, help="""FASTA file from prefix_fasta.""")
 def extract_fasta(target, reference):
-    """Determines what type of index to apply to input target
+    r"""Determine what type of index to apply to input target.
 
     \b
     Example:

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-bionorm -- normalize and verity genomic data files
-"""
+"""Bionorm -- normalize and verity genomic data files."""
 
 # This file makes it easier for developers to test in-place via the command
 # python3 -m bionorm

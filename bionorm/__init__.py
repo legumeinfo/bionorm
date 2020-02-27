@@ -62,7 +62,7 @@ cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=pars
 @cli_builder.init_dual_logger()
 @cli_builder.init_user_context_obj(extra_args=["progress", "first_n"])
 def cli(verbose, quiet, log, **kwargs):
-    """bionorm -- normalize and verify genomic data files.
+    """Bionorm -- normalize and verify genomic data files.
 
     If COMMAND is present, and --no_log was not invoked,
     a log file named bionorm-COMMAND.log

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Define prefixing commands."""
 
 # standard library imports
 import os
@@ -23,14 +24,17 @@ GFF_SPLIT_MAGIC = ["##gff-version", "3"]
 
 
 def organism_code(genus, species):
+    """Return code from genus and species."""
     return f"{genus[:GENUS_CODE_LEN].lower()}{species[:SPECIES_CODE_LEN].lower()}"
 
 
 def get_species_dirname(genus, species):
+    """Return directory name from genus and species."""
     return f"{genus.capitalize()}_{species}"
 
 
 def get_genome_dir(infra_id, genver=None, annver=None, key=None):
+    """Return the genome directory name from infra_id and optional arguments."""
     dirname = f"{infra_id}"
     if genver is not None:
         dirname += f".gnm{genver}"
@@ -49,7 +53,7 @@ def get_genome_dir(infra_id, genver=None, annver=None, key=None):
 @click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
 @click.argument("fastafile", type=click.Path(exists=True, readable=True, dir_okay=False))
 def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
-    """Prefix FASTA files to data store standards.
+    r"""Prefix FASTA files to data store standards.
 
     \b
     Example:
@@ -106,6 +110,7 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
 
 
 def type_rank(hierarchy, feature_type):
+    """Return rank or code 1000 if feature_type not found."""
     if feature_type in hierarchy:
         return hierarchy[feature_type]["rank"]
     else:
@@ -113,9 +118,9 @@ def type_rank(hierarchy, feature_type):
 
 
 def update_hierarchy(hierarchy, feature_type, parent_types):
-    """Breaks input gff3 line into attributes.
+    """Break input gff3 line into attributes.
 
-       Determines feature type hierarchy using type and attributes fields
+    Determines feature type hierarchy using type and attributes fields.
     """
     if not parent_types:  # this feature must be a root
         if feature_type not in hierarchy:  # add to hierarchy
@@ -143,7 +148,7 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 @click.option("--sort_only", is_flag=True, help="Perform sorting only.", default=False)
 @click.argument("gff3file", type=click.Path(exists=True, readable=True, dir_okay=False))
 def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
-    """Prefix and sort GFF3 file to data store standards.
+    r"""Prefix and sort GFF3 file to data store standards.
 
     \b
     Example:

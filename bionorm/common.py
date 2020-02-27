@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Global constants and common helper functions.
-"""
+"""Define global constants and common helper functions."""
+
 # standard library imports
 import locale
 import logging
@@ -31,7 +31,7 @@ for localename in ["en_US", "en_US.utf8", "English_United_States"]:
 # helper functions used in multiple places
 #
 def get_user_context_obj():
-    """Returns the user context, containing logging and configuration data.
+    """Return user context, containing logging and configuration data.
 
     :return: User context object (dict)
     """

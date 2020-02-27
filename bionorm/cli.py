@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Define a cli with dual logging to stderr and file
-"""
+"""Define a CLI with dual logging to stderr and file."""
 
 # standard library imports
 import functools
@@ -25,19 +24,22 @@ STARTTIME = datetime.now()
 
 
 class CleanInfoFormatter(logging.Formatter):
-    """very clean logging formatter for terminal output
-    """
+    """Define clean logging formatter for terminal output."""
 
     def __init__(self, fmt="%(levelname)s: %(message)s"):
+        """Init with simple default format."""
         logging.Formatter.__init__(self, fmt)
 
     def format(self, record):
+        """Return formatted message."""
         if record.levelno == logging.INFO:
             return record.getMessage()
         return logging.Formatter.format(self, record)
 
 
 def composed(self, *decs):
+    """Form composed decorator from arguments."""
+
     def deco(f):
         for dec in reversed(decs):
             f = dec(f)
@@ -47,18 +49,17 @@ def composed(self, *decs):
 
 
 def click_multi(func):
+    """Return composed options."""
     return composed(
         click.option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.")
-        # click.option(*self.global_options_list[0]['args'],
-        #             **self.global_options_list[0]['kwargs'])
     )(func)
 
 
 class Logging_CLI_Builder(object):
-    """creates a cli function
-    """
+    """Creates a group CLI function."""
 
     def __init__(self, name, logger, check_func=None, global_options_list=None):
+        """Gather info for CLI."""
         self.name = name
         self.logger = logger
         self.check_func = check_func
@@ -76,20 +77,19 @@ class Logging_CLI_Builder(object):
         self.cli_func = None
 
     def set_cli_func(self, cli_func):
+        """Declare the CLI function."""
         self.cli_func = cli_func
 
     def _ctx(self):
-        """private global context function"""
+        """Return private global context function."""
         return click.get_current_context
 
     def get_user_context_dict(self):
-        """Returns the user context dictionary.
-        """
+        """Return the user context dictionary."""
         return self._ctx()().obj
 
     def init_user_context_obj(self, extra_args=None):
-        """Decorator that puts global options into context dictionary
-        """
+        """Put global options into context dictionary."""
 
         def decorator(f):
             @functools.wraps(f)
@@ -111,8 +111,7 @@ class Logging_CLI_Builder(object):
         return decorator
 
     def init_dual_logger(self, file_log_level=DEFAULT_FILE_LOGLEVEL, stderr_log_level=DEFAULT_STDERR_LOGLEVEL):
-        """Decorator to log to stderr and to logfile at different levels
-            """
+        """Log to stderr and to logfile at different levels."""
 
         def decorator(f):
             @functools.wraps(f)
@@ -166,8 +165,7 @@ class Logging_CLI_Builder(object):
         return decorator
 
     def log_elapsed_time(self):
-        """Decorator to log the elapsed time for command
-        """
+        """Log the elapsed time for command."""
 
         def decorator(f):
             @functools.wraps(f)
@@ -181,21 +179,23 @@ class Logging_CLI_Builder(object):
         return decorator
 
     def test_log_func(self):
+        """Define the test_logging command."""
+
         @self.cli_func.command()
         @self.log_elapsed_time()
         def test_logging():
-            """Log at different severity levels.
-            """
+            """Log at different severity levels."""
             self.logger.debug("debug message")
             self.logger.info("info message")
             self.logger.warning("warning message")
             self.logger.error("error message")
 
     def show_context_func(self):
+        """Define the show_context_dict command."""
+
         @self.cli_func.command()
         def show_context_dict():
-            """Print the global context dictionary.
-            """
+            """Print the global context dictionary."""
             user_ctx = self.get_user_context_dict()
             self.logger.info("User context dictionary:")
             for key in user_ctx.keys():
