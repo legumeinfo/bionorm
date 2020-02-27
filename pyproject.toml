@@ -44,18 +44,17 @@ sequencetools = "^0.0.5"
 importlib_metadata = "^1.5.0"
 click_plugins = "^1.1.1"
 
-
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 pytest-cov = "^2.8.1"
 black = {version = "^19.10b0", allow-prereleases = true}
 sh = "^1.12.14"
 pre-commit = "^2.0.1"
-isort = "^4.3.21"
 progressbar2 = "^3.47.0"
 pydocstyle = "^5.0.2"
 requests_download = "^0.1.2"
 virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
+isort = {version = "^4.3.21", extras = ["pyproject"]}
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

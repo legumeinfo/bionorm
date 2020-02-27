@@ -35,8 +35,10 @@ parser_options = [
         "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Warnings cause exceptions."},
     },
 ]
-# define custom CLI check function, parameters must be keyworded
+
+
 def bionorm_check(warnings_as_errors=False, **others):
+    """CLI check function, parameters must be keyworded."""
     if warnings_as_errors:
         logger.warn("Runtime warnings (e.g., from pandas) will cause exceptions")
         warnings.filterwarnings("error")
@@ -60,11 +62,11 @@ cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=pars
 @cli_builder.init_dual_logger()
 @cli_builder.init_user_context_obj(extra_args=["progress", "first_n"])
 def cli(verbose, quiet, log, **kwargs):
-    """bionorm -- normalize and verify genomic data files
+    """bionorm -- normalize and verify genomic data files.
 
-        If COMMAND is present, and --no_log was not invoked,
-        a log file named bionorm-COMMAND.log
-        will be written in the ./logs/ directory.
+    If COMMAND is present, and --no_log was not invoked,
+    a log file named bionorm-COMMAND.log
+    will be written in the ./logs/ directory.
     """
     bionorm_check(**kwargs)
 

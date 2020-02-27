@@ -188,6 +188,11 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "4.3.21"
 
+[package.dependencies]
+[package.dependencies.toml]
+optional = true
+version = "*"
+
 [package.extras]
 pipfile = ["pipreqs", "requirementslib"]
 pyproject = ["toml"]
@@ -556,7 +561,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "2e1bd736766824415117cfcdb6517536da00484e7d81260c7b07151a365d79c4"
+content-hash = "889ad36d55650f6ea10331655fad025ba3c3669ba57ffc73ca16a5414b686e2d"
 python-versions = "^3.6"
 
 [metadata.files]
