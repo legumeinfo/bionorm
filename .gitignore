@@ -76,6 +76,7 @@ tmp/
 # downloaded test data #
 ########################
 example_*
+Medicago_truncatula/
 
 # src directory (git installs)#
 ###############################

@@ -53,7 +53,7 @@ def get_genome_dir(infra_id, genver=None, annver=None, key=None):
 @click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
 @click.argument("fastafile", type=click.Path(exists=True, readable=True, dir_okay=False))
 def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
-    r"""Prefix FASTA files to data store standards.
+    """Prefix FASTA files to data store standards.
 
     \b
     Example:
@@ -148,12 +148,12 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 @click.option("--sort_only", is_flag=True, help="Perform sorting only.", default=False)
 @click.argument("gff3file", type=click.Path(exists=True, readable=True, dir_okay=False))
 def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
-    r"""Prefix and sort GFF3 file to data store standards.
+    """Prefix and sort GFF3 file to data store standards.
 
     \b
     Example:
         bionorm prefix-gff --gnm 5 --ann 1 --species truncatula --genus medicago \\
-                --infra_id jemalong_A17 --key FAKE example_jemalong.fna
+                --infra_id jemalong_A17 --key FAKE example_jemalong.gff3
     """
     gnm = "gnm{}".format(gnm)
     ann = "ann{}".format(ann)

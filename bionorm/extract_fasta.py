@@ -15,7 +15,7 @@ from .common import logger
 from .helper import check_subprocess_dependencies
 
 
-def primary_transcript_check(peptides, logger):
+def primary_transcript_check(peptides):
     """Select the longest isoforms as the primary transcripts."""
     seq_handle = open(peptides, "rt")
     longest = {}
@@ -41,38 +41,39 @@ def primary_transcript_check(peptides, logger):
     return primary
 
 
-def run_gffread(gff, reference):
+def run_gffread(gff, fastapath):
     """Read gff3 file and write mRNA, CDS and peptides."""
     gff_dir = os.path.dirname(gff)
     gff_attributes = os.path.basename(gff).split(".")
     mrna = "{}/{}.mrna.fna".format(gff_dir, ".".join(gff_attributes[:5]))
     cds = "{}/{}.cds.fna".format(gff_dir, ".".join(gff_attributes[:5]))
     pep = "{}/{}.protein.faa".format(gff_dir, ".".join(gff_attributes[:5]))
-    cmd = "gffread {} -g {} -w {} -x {} -y {} -W".format(gff, reference, mrna, cds, pep)
+    cmd = "gffread {} -g {} -w {} -x {} -y {} -W".format(gff, fastapath, mrna, cds, pep)
+    # print("cmd=", cmd)
     subprocess.check_call(cmd, shell=True)
     primary_transcript_check(pep)
 
 
 @cli.command()
-@click.option("--target", type=str, help="""GFF file from prefix_gff.""")
-@click.option("--reference", type=str, help="""FASTA file from prefix_fasta.""")
-def extract_fasta(target, reference):
-    r"""Determine what type of index to apply to input target.
+@click.argument("gffpath", type=click.Path(exists=True, readable=True, dir_okay=False))
+@click.argument("fastapath", type=click.Path(exists=True, readable=True, dir_okay=False))
+def extract_fasta(gffpath, fastapath):
+    """Extract CDS, mrna, protein, and primary transcript files from gff and genome.
 
     \b
     Example:
-        bionorm extract_fasta --target example_jemalong.gff3 --reference
+        bionorm extract-fasta \\
+          Medicago_truncatula/jemalong_A17.gnm5.ann1.FAKE/medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3 \\
+          Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna
+
     """
     check_subprocess_dependencies()
-    if not (target and reference):
-        logger.error("--target and --reference arguments are required")
+    # gffpath = os.path.abspath(gffpath)  # get full path
+    gffpath_attributes = os.path.basename(gffpath).split(".")
+    if os.path.basename(fastapath).split(".")[-1] == "gz":
+        logger.error("GFFREAD cannot process compressed fasta as fastapath")
         sys.exit(1)
-    target = os.path.abspath(target)  # get full path
-    target_attributes = os.path.basename(target).split(".")
-    if os.path.basename(reference).split(".")[-1] == "gz":
-        logger.error("GFFREAD cannot process compressed fasta as reference")
+    if len(gffpath_attributes) < 7:
+        logger.error("Target file {} is not delimited correctly".format(gffpath))
         sys.exit(1)
-    if len(target_attributes) < 7:
-        logger.error("Target file {} is not delimited correctly".format(target))
-        sys.exit(1)
-    run_gffread(target, reference)  # write readme template
+    run_gffread(gffpath, fastapath)  # write readme template

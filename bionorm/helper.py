@@ -54,10 +54,6 @@ def return_filehandle(open_me):
             t = magic_dict[m]
             if t == "gz":
                 return gzip.open(open_me, "rt")
-    #          elif t == 'bz2':
-    #              return bz2.open(open_me)
-    #          elif t == 'zip':
-    #              return zipfile.open(open_me)
     return open(open_me)
 
 

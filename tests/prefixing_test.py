@@ -7,6 +7,8 @@ import pytest
 import sh
 
 # first-party imports
+from tests.counters import fasta_count
+from tests.counters import line_count
 from tests.download_files import DownloadTestFiles
 
 # global constants
@@ -20,32 +22,6 @@ dlmanager = DownloadTestFiles(
     gzipped=True,
     progressbar=False,
 )
-
-
-def linecount(filepath):
-    """Count the number of lines in a file"""
-    lines = 0
-    buf_size = 1024 * 1024
-    with filepath.open("rb") as fh:
-        read_f = fh.raw.read
-        buf = read_f(buf_size)
-        while buf:
-            lines += buf.count(b"\n")
-            buf = read_f(buf_size)
-    return lines
-
-
-def fasta_count(filepath):
-    """Count the number of lines in a file"""
-    lines = 0
-    buf_size = 1024 * 1024
-    with filepath.open("rb") as fh:
-        read_f = fh.raw.read
-        buf = read_f(buf_size)
-        while buf:
-            lines += buf.count(b">")
-            buf = read_f(buf_size)
-    return lines
 
 
 def test_prefix_gff(tmp_path):
@@ -83,7 +59,7 @@ def test_prefix_gff(tmp_path):
         subdir_path = outdir_path / subdirname
         outfilename = list(subdir_path.glob("*"))[0].name
         assert outfilename == "medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3"
-        assert linecount(Path(GFF_FILE)) == linecount(subdir_path / outfilename)
+        assert line_count(Path(GFF_FILE)) == line_count(subdir_path / outfilename)
 
 
 def test_prefix_fasta(tmp_path):
