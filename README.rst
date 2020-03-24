@@ -15,6 +15,12 @@ Install via pip or (better yet) `pipx <https://pipxproject.github.io/pipx/>`_: :
 
      pipx install bionorm
 
+``bionorm`` contains some long commands and many options.  To enable command-line
+completion for ``bionorm`` commands, execute the following command if you are using
+``bash`` as your shell: ::
+
+    eval "$(_BIONORM_COMPLETE=source_bash bionorm)"
+
 For Developers
 --------------
 If you plan to develop ``bionorm``, you'll need to install

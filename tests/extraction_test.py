@@ -39,54 +39,58 @@ def fasta_count(filepath):
 def test_extraction(tmp_path):
     print("testing command prefix-gff")
     with dlmanager.data_to_working_directory(tmp_path, [GFF_FILE, FASTA_FILE]):
-        try:
-            sh.bionorm(
-                [
-                    "prefix-gff",
-                    "--gnm",
-                    "5",
-                    "--ann",
-                    "1",
-                    "--genus",
-                    "medicago",
-                    "--species",
-                    "truncatula",
-                    "--infra_id",
-                    "jemalong_A17",
-                    "--key",
-                    "FAKE",
-                    "example_jemalong.gff3",
-                ]
-            )
-            sh.bionorm(
-                [
-                    "prefix-fasta",
-                    "--genver",
-                    "5",
-                    "--genus",
-                    "medicago",
-                    "--species",
-                    "truncatula",
-                    "--infra_id",
-                    "jemalong_A17",
-                    "--key",
-                    "FAKE",
-                    "example_jemalong.fna",
-                ]
-            )
-            output = sh.bionorm(
-                [
-                    "extract-fasta",
-                    "Medicago_truncatula/jemalong_A17.gnm5.ann1.FAKE/medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3",
-                    "Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna",
-                ]
-            )
-        except sh.ErrorReturnCode as e:
-            print(e)
-            pytest.fail(e)
+        print("installing gffread")
+        output = sh.bionorm(["install", "gffread",])
+        print(output)
+        print("prefixing gff")
+        output = sh.bionorm(
+            [
+                "prefix-gff",
+                "--gnm",
+                "5",
+                "--ann",
+                "1",
+                "--genus",
+                "medicago",
+                "--species",
+                "truncatula",
+                "--infra_id",
+                "jemalong_A17",
+                "--key",
+                "FAKE",
+                "example_jemalong.gff3",
+            ]
+        )
+        print(output)
+        print("Prefixing fasta")
+        output = sh.bionorm(
+            [
+                "prefix-fasta",
+                "--genver",
+                "5",
+                "--genus",
+                "medicago",
+                "--species",
+                "truncatula",
+                "--infra_id",
+                "jemalong_A17",
+                "--key",
+                "FAKE",
+                "example_jemalong.fna",
+            ]
+        )
+        print(output)
+        print("extracting fasta")
+        output = sh.bionorm(
+            [
+                "extract-fasta",
+                "Medicago_truncatula/jemalong_A17.gnm5.ann1.FAKE/medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3",
+                "Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna",
+            ]
+        )
         print(output)
         loglist = [fp.name for fp in (tmp_path / "logs").glob("*")]
-        assert len(loglist) is 3
+        assert len(loglist) is 4
         assert "bionorm-extract-fasta.log" in loglist
         outdir_path = Path("Medicago_truncatula") / "jemalong_A17.gnm5.ann1.FAKE"
         outfilelist = [fp.name for fp in outdir_path.glob("*")]
