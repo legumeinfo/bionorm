@@ -62,46 +62,48 @@ def test_extraction(tmp_path):
             ]
         )
         print(output)
-        print("Prefixing fasta")
-        output = sh.bionorm(
-            [
-                "prefix-fasta",
-                "--genver",
-                "5",
-                "--genus",
-                "medicago",
-                "--species",
-                "truncatula",
-                "--infra_id",
-                "jemalong_A17",
-                "--key",
-                "FAKE",
-                "example_jemalong.fna",
-            ]
-        )
-        print(output)
-        print("extracting fasta")
-        output = sh.bionorm(
-            [
-                "extract-fasta",
-                "Medicago_truncatula/jemalong_A17.gnm5.ann1.FAKE/medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3",
-                "Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna",
-            ]
-        )
-        print(output)
-        loglist = [fp.name for fp in (tmp_path / "logs").glob("*")]
-        assert len(loglist) is 4
-        assert "bionorm-extract-fasta.log" in loglist
-        outdir_path = Path("Medicago_truncatula") / "jemalong_A17.gnm5.ann1.FAKE"
-        outfilelist = [fp.name for fp in outdir_path.glob("*")]
-        cdsfile = "medtr.jemalong_A17.gnm5.ann1.FAKE.cds.fna"
-        proteinfile = "medtr.jemalong_A17.gnm5.ann1.FAKE.protein.faa"
-        expectedlist = [
-            cdsfile,
-            proteinfile,
-            "medtr.jemalong_A17.gnm5.ann1.FAKE.mrna.fna",
-            "medtr.jemalong_A17.gnm5.ann1.FAKE.protein_primaryTranscript.faa",
-        ]
-        for filename in expectedlist:
-            assert filename in outfilelist
-        assert fasta_count(outdir_path / proteinfile) == fasta_count(outdir_path / cdsfile)
+
+
+#        print("Prefixing fasta")
+#        output = sh.bionorm(
+#            [
+#                "prefix-fasta",
+#                "--genver",
+#                "5",
+#                "--genus",
+#                "medicago",
+#                "--species",
+#                "truncatula",
+#                "--infra_id",
+#                "jemalong_A17",
+#                "--key",
+#                "FAKE",
+#                "example_jemalong.fna",
+#            ]
+#        )
+#        print(output)
+#        print("extracting fasta")
+#       output = sh.bionorm(
+#            [
+#                "extract-fasta",
+#                "Medicago_truncatula/jemalong_A17.gnm5.ann1.FAKE/medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3",
+#                "Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna",
+#            ]
+#        )
+#        print(output)
+#        loglist = [fp.name for fp in (tmp_path / "logs").glob("*")]
+#        assert len(loglist) is 4
+#        assert "bionorm-extract-fasta.log" in loglist
+#        outdir_path = Path("Medicago_truncatula") / "jemalong_A17.gnm5.ann1.FAKE"
+#        outfilelist = [fp.name for fp in outdir_path.glob("*")]
+#        cdsfile = "medtr.jemalong_A17.gnm5.ann1.FAKE.cds.fna"
+#        proteinfile = "medtr.jemalong_A17.gnm5.ann1.FAKE.protein.faa"
+#        expectedlist = [
+#            cdsfile,
+#            proteinfile,
+#            "medtr.jemalong_A17.gnm5.ann1.FAKE.mrna.fna",
+#            "medtr.jemalong_A17.gnm5.ann1.FAKE.protein_primaryTranscript.faa",
+#        ]
+#        for filename in expectedlist:
+#            assert filename in outfilelist
+#        assert fasta_count(outdir_path / proteinfile) == fasta_count(outdir_path / cdsfile)
