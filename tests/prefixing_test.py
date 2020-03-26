@@ -7,26 +7,17 @@ import pytest
 import sh
 
 # first-party imports
-from tests.counters import fasta_count
-from tests.counters import line_count
-from tests.download_files import DownloadTestFiles
-
-# global constants
-FASTA_FILE = "example_jemalong.fna"
-GFF_FILE = "example_jemalong.gff3"
-
-dlmanager = DownloadTestFiles(
-    download_url="http://generisbio.com/ncgr/",
-    files=[FASTA_FILE, GFF_FILE],
-    md5_check=True,
-    gzipped=True,
-    progressbar=False,
-)
+from tests.common import fasta_count
+from tests.common import line_count
+from tests.common import in_tmp_dir
+from tests.common import GFF_FILE
+from tests.common import FASTA_FILE
 
 
-def test_prefix_gff(tmp_path):
+@pytest.mark.dependency()
+def test_prefix_gff(tmp_path, datadir_copy):
     print("testing command prefix-gff")
-    with dlmanager.data_to_working_directory(tmp_path, [GFF_FILE]):
+    with in_tmp_dir(tmp_path, datadir_copy, [GFF_FILE]):
         try:
             output = sh.bionorm(
                 [
@@ -43,7 +34,7 @@ def test_prefix_gff(tmp_path):
                     "jemalong_A17",
                     "--key",
                     "FAKE",
-                    "example_jemalong.gff3",
+                    GFF_FILE,
                 ]
             )
         except sh.ErrorReturnCode as e:
@@ -62,9 +53,10 @@ def test_prefix_gff(tmp_path):
         assert line_count(Path(GFF_FILE)) == line_count(subdir_path / outfilename)
 
 
-def test_prefix_fasta(tmp_path):
+@pytest.mark.dependency()
+def test_prefix_fasta(tmp_path, datadir_copy):
     print("testing command prefix-fasta")
-    with dlmanager.data_to_working_directory(tmp_path, [FASTA_FILE]):
+    with in_tmp_dir(tmp_path, datadir_copy, [FASTA_FILE]):
         try:
             output = sh.bionorm(
                 [
@@ -79,7 +71,7 @@ def test_prefix_fasta(tmp_path):
                     "jemalong_A17",
                     "--key",
                     "FAKE",
-                    "example_jemalong.fna",
+                    FASTA_FILE,
                 ]
             )
         except sh.ErrorReturnCode as e:

@@ -20,11 +20,12 @@ def working_directory(path):
         os.chdir(prev_cwd)
 
 
-def test_global_help(tmp_path):
-    print("testing global help")
+@pytest.mark.dependency(name="cli")
+def test_cli(tmp_path):
+    print("testing basic cli function")
     with working_directory(tmp_path):
         try:
-            output = sh.bionorm(["--help"])
+            output = sh.bionorm()
         except sh.ErrorReturnCode as e:
             print(e)
             pytest.fail(e)
@@ -34,6 +35,7 @@ def test_global_help(tmp_path):
         assert "Commands:" in output
 
 
+@pytest.mark.dependency(name="version")
 def test_version(tmp_path):
     print("testing version")
     with working_directory(tmp_path):
@@ -46,8 +48,9 @@ def test_version(tmp_path):
         assert "version" in output
 
 
+@pytest.mark.dependency(name="context")
 def test_show_context_dict(tmp_path):
-    print("testing command show-context-dict")
+    print("testing context dictionary")
     with working_directory(tmp_path):
         try:
             output = sh.bionorm(["show-context-dict"])
@@ -57,8 +60,9 @@ def test_show_context_dict(tmp_path):
         print(output)
 
 
-def test_test_logging(tmp_path):
-    print("testing command test_logging")
+@pytest.mark.dependency(name="logging")
+def test_logging(tmp_path):
+    print("testing logging")
     with working_directory(tmp_path):
         try:
             output = sh.bionorm(["test-logging"])
@@ -67,5 +71,4 @@ def test_test_logging(tmp_path):
             pytest.fail(e)
         print(output)
         loglist = list((Path.cwd() / "logs").glob("*"))
-        print("directory:", loglist)
         assert len(loglist) is 1

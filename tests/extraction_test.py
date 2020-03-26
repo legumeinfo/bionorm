@@ -7,38 +7,16 @@ import pytest
 import sh
 
 # first-party imports
-from tests.counters import fasta_count
-from tests.download_files import DownloadTestFiles
-
-# global constants
-FASTA_FILE = "example_jemalong.fna"
-GFF_FILE = "example_jemalong.gff3"
-
-dlmanager = DownloadTestFiles(
-    download_url="http://generisbio.com/ncgr/",
-    files=[FASTA_FILE, GFF_FILE],
-    md5_check=True,
-    gzipped=True,
-    progressbar=False,
-)
+from tests.common import fasta_count
+from tests.common import in_tmp_dir
+from tests.common import GFF_FILE
+from tests.common import FASTA_FILE
 
 
-def fasta_count(filepath):
-    """Count the number of lines in a file"""
-    lines = 0
-    buf_size = 1024 * 1024
-    with filepath.open("rb") as fh:
-        read_f = fh.raw.read
-        buf = read_f(buf_size)
-        while buf:
-            lines += buf.count(b">")
-            buf = read_f(buf_size)
-    return lines
-
-
-def test_extraction(tmp_path):
+@pytest.mark.dependency()
+def test_extraction(tmp_path, datadir_copy):
     print("testing command prefix-gff")
-    with dlmanager.data_to_working_directory(tmp_path, [GFF_FILE, FASTA_FILE]):
+    with in_tmp_dir(tmp_path, datadir_copy, [GFF_FILE, FASTA_FILE]):
         print("installing gffread")
         output = sh.bionorm(["install", "gffread",])
         print(output)

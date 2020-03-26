@@ -55,6 +55,8 @@ progressbar2 = "^3.47.0"
 pydocstyle = "^5.0.2"
 virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
 isort = {version = "^4.3.21", extras = ["pyproject"]}
+pytest-dependency = "^0.5.1"
+pytest-datadir-ng = "^1.1.1"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

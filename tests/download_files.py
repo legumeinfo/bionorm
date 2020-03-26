@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
 # standard library imports
-import contextlib
 import gzip
 import hashlib
-import os
 import shutil
 from pathlib import Path
 
 # third-party imports
+import pytest
 from progressbar import DataTransferBar
 from requests_download import HashTracker
 from requests_download import ProgressTracker
 from requests_download import download
 
 
-class DownloadTestFiles(object):
+class DownloadDataFiles(object):
     """Download, verify, cache, and optionally gzip test files from a specified URL"""
 
     def __init__(
         self,
         download_url="https://example.com/dldir/",
         files=[],
-        download_dir=None,
+        subdir=None,
         gzipped=False,
         md5_check=False,
         progressbar=False,
@@ -30,9 +29,9 @@ class DownloadTestFiles(object):
             self.download_url = download_url
         else:
             self.download_url = download_url + "/"
-        if download_dir is None:  # default download is test directory
-            download_dir = Path(__file__).parent
-        self.download_path = Path(download_dir)
+        self.download_path = Path(__file__).parent / "data"
+        if subdir is not None:
+            self.download_path = self.download_path / subdir
         if not self.download_path.exists():
             self.download_path.mkdir(exist_ok=True, parents=True)
         self.progressbar = progressbar
@@ -83,15 +82,3 @@ class DownloadTestFiles(object):
                 print(f'downloaded {check_type} file to {filedict["path"]}')
         else:
             raise ValueError(f'\nhash of {filedict["dlname"]}={hashval}, expected {md5_val}')
-
-    @contextlib.contextmanager
-    def data_to_working_directory(self, tmp_path, filelist=[]):
-        """Copy data and change context to tmp_path directory."""
-        cwd = Path.cwd()
-        for filename in filelist:
-            shutil.copy2(self.file_dict[filename]["path"], tmp_path / filename)
-        os.chdir(tmp_path)
-        try:
-            yield
-        finally:
-            os.chdir(cwd)
