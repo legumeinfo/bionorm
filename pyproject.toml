@@ -53,7 +53,8 @@ black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 progressbar2 = "^3.47.0"
 pydocstyle = "^5.0.2"
-virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
+#virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
+#virtualenv = "^16.7.10"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
 pytest-dependency = "^0.5.1"
 pytest-datadir-ng = "^1.1.1"

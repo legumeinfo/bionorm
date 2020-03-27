@@ -7,11 +7,11 @@ import pytest
 import sh
 
 # first-party imports
-from tests.common import fasta_count
-from tests.common import line_count
-from tests.common import in_tmp_dir
-from tests.common import GFF_FILE
 from tests.common import FASTA_FILE
+from tests.common import GFF_FILE
+from tests.common import fasta_count
+from tests.common import in_tmp_dir
+from tests.common import line_count
 
 
 @pytest.mark.dependency()

@@ -5,14 +5,12 @@ import os
 import shutil
 import sys
 import tempfile
-from packaging import version
 from pathlib import Path
 
 # third-party imports
 import click
 import sh
-
-# third-party imports
+from packaging import version
 from progressbar import DataTransferBar
 from requests_download import ProgressTracker
 from requests_download import download

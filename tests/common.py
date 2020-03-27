@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+# standard library imports
 import contextlib
 import os
 from pathlib import Path
 
+# first-party imports
 from tests.download_files import DownloadDataFiles
 
 # global constants

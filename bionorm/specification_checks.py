@@ -12,7 +12,7 @@ import sys
 from glob import glob
 from os import path
 
-# first-party imports
+# third-party imports
 import requests
 
 # module imports
