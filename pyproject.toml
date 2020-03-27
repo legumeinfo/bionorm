@@ -4,7 +4,7 @@ version = "0.2.6"
 description = "normalize and verify genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
-license = "BSD 3-Clause"
+license = "BSD-3-Clause"
 readme = "README.rst"
 homepage = "https://github.com/ncgr/ncgr"
 documentation = "https://bionorm.readthedocs.org"
@@ -53,8 +53,6 @@ black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 progressbar2 = "^3.47.0"
 pydocstyle = "^5.0.2"
-#virtualenv = "~16.7.10" # later virtualenv breaks pre-commit as of this time
-#virtualenv = "^16.7.10"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
 pytest-dependency = "^0.5.1"
 pytest-datadir-ng = "^1.1.1"
