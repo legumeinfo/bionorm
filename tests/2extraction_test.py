@@ -21,7 +21,7 @@ def test_install_gffread(datadir_mgr):
 
 def test_extraction(datadir_mgr):
     print("testing command prefix-gff")
-    datadir_mgr.add_scope("prefix", module="prefixing_test")
+    datadir_mgr.add_scope("prefix", module="1prefixing_test")
     with datadir_mgr.in_tmp_dir(inpathlist=[GFF_PATH, FASTA_PATH], save_outputs=True, excludepattern="*.log"):
         print("extracting fasta")
         output = sh.bionorm(["extract-fasta", str(GFF_PATH), str(FASTA_PATH)])
