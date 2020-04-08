@@ -20,7 +20,6 @@ def working_directory(path):
         os.chdir(prev_cwd)
 
 
-@pytest.mark.dependency(name="cli")
 def test_cli(tmp_path):
     print("testing basic cli function")
     with working_directory(tmp_path):
@@ -35,7 +34,6 @@ def test_cli(tmp_path):
         assert "Commands:" in output
 
 
-@pytest.mark.dependency(name="version")
 def test_version(tmp_path):
     print("testing version")
     with working_directory(tmp_path):
@@ -48,7 +46,6 @@ def test_version(tmp_path):
         assert "version" in output
 
 
-@pytest.mark.dependency(name="context")
 def test_show_context_dict(tmp_path):
     print("testing context dictionary")
     with working_directory(tmp_path):
@@ -60,7 +57,6 @@ def test_show_context_dict(tmp_path):
         print(output)
 
 
-@pytest.mark.dependency(name="logging")
 def test_logging(tmp_path):
     print("testing logging")
     with working_directory(tmp_path):

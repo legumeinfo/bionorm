@@ -12,7 +12,6 @@ from sequencetools.helpers import sequence_helpers
 # module imports
 from . import cli
 from .common import logger
-from .helper import check_subprocess_dependencies
 
 
 def primary_transcript_check(peptides):
@@ -67,7 +66,6 @@ def extract_fasta(gffpath, fastapath):
           Medicago_truncatula/jemalong_A17.gnm5.FAKE/medtr.jemalong_A17.gnm5.FAKE.genome_main.fna
 
     """
-    check_subprocess_dependencies()
     # gffpath = os.path.abspath(gffpath)  # get full path
     gffpath_attributes = os.path.basename(gffpath).split(".")
     if os.path.basename(fastapath).split(".")[-1] == "gz":

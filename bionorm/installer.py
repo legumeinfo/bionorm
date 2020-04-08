@@ -222,3 +222,4 @@ def install(dependencies, force):
         installer.check_all()
         return
     installer.install_list(dependencies)
+    print("installer done")
