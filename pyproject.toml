@@ -6,7 +6,7 @@ authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
 license = "BSD-3-Clause"
 readme = "README.rst"
-homepage = "https://github.com/ncgr/ncgr"
+homepage = "https://github.com/ncgr/bionorm"
 documentation = "https://bionorm.readthedocs.org"
 keywords = [
     "science",
