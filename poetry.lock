@@ -312,7 +312,7 @@ python = "<3.7"
 version = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A Python Progressbar library to provide visual (yet text based) progress to long running operations."
 name = "progressbar2"
 optional = false
@@ -396,7 +396,7 @@ pytest = ">=3.6"
 testing = ["fields", "hunter", "process-tests (2.0.2)", "six", "virtualenv"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python Utils is a module with some convenient utilities not included with the standard Python install"
 name = "python-utils"
 optional = false
@@ -603,7 +603,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "fb0864a29d2dc543930c5e900557704531e7ef2733e6d0a2dd8d5240bff18af0"
+content-hash = "209ab81f77447d208e8be3e869919447dcaaee489fb56ff8de851e200c589da7"
 python-versions = "^3.6"
 
 [metadata.files]
