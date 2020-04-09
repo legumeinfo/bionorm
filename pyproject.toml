@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.3.2"
+version = "0.4.0"
 description = "normalize and verify genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -55,6 +55,7 @@ black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 pydocstyle = "^5.0.2"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
+pytest-datadir-mgr = "^0.1.0"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

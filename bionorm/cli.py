@@ -9,7 +9,8 @@ from datetime import datetime
 from pathlib import Path
 
 # third-party imports
-import click
+from click import get_current_context as ctx
+from click import option
 
 try:
     from importlib.metadata import distribution  # python 3.8 and above
@@ -50,9 +51,9 @@ def composed(self, *decs):
 
 def click_multi(func):
     """Return composed options."""
-    return composed(
-        click.option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.")
-    )(func)
+    return composed(option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar."))(
+        func
+    )
 
 
 class Logging_CLI_Builder(object):
@@ -80,13 +81,9 @@ class Logging_CLI_Builder(object):
         """Declare the CLI function."""
         self.cli_func = cli_func
 
-    def _ctx(self):
-        """Return private global context function."""
-        return click.get_current_context
-
     def get_user_context_dict(self):
         """Return the user context dictionary."""
-        return self._ctx()().obj
+        return ctx().obj
 
     def init_user_context_obj(self, extra_args=None):
         """Put global options into context dictionary."""
@@ -94,16 +91,16 @@ class Logging_CLI_Builder(object):
         def decorator(f):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
-                self._ctx()().obj = {}
-                ctx_dict = self._ctx()().obj
-                if self._ctx()().params["verbose"]:
+                ctx().obj = {}
+                ctx_dict = ctx().obj
+                if ctx().params["verbose"]:
                     ctx_dict["logLevel"] = "verbose"
-                elif self._ctx()().params["quiet"]:
+                elif ctx().params["quiet"]:
                     ctx_dict["logLevel"] = "quiet"
                 else:
                     ctx_dict["logLevel"] = "default"
                 for key in extra_args:
-                    ctx_dict[key] = self._ctx()().params[key]
+                    ctx_dict[key] = ctx().params[key]
                 return f(*args, **kwargs)
 
             return wrapper
@@ -117,9 +114,9 @@ class Logging_CLI_Builder(object):
             @functools.wraps(f)
             def wrapper(*args, **kwargs):
                 # find the verbose/quiet levels from context
-                if self._ctx()().params["verbose"]:
+                if ctx().params["verbose"]:
                     _log_level = logging.DEBUG
-                elif self._ctx()().params["quiet"]:
+                elif ctx().params["quiet"]:
                     _log_level = logging.ERROR
                 else:
                     _log_level = stderr_log_level
@@ -129,11 +126,11 @@ class Logging_CLI_Builder(object):
                 stderrHandler.setFormatter(stderrFormatter)
                 stderrHandler.setLevel(_log_level)
                 self.logger.addHandler(stderrHandler)
-                if self._ctx()().params["log"]:  # start a log file
+                if ctx().params["log"]:  # start a log file
                     # If a subcommand was used, log to a file in the
                     # logs/ subdirectory of the current working directory
                     #  with the subcommand in the file name.
-                    subcommand = self._ctx()().invoked_subcommand
+                    subcommand = ctx().invoked_subcommand
                     if subcommand is not None:
                         logfile_name = self.name + "-" + subcommand + ".log"
                         logfile_path = Path("./logs/" + logfile_name)
@@ -190,6 +187,8 @@ class Logging_CLI_Builder(object):
             self.logger.warning("warning message")
             self.logger.error("error message")
 
+        return test_logging
+
     def show_context_func(self):
         """Define the show_context_dict command."""
 
@@ -200,3 +199,5 @@ class Logging_CLI_Builder(object):
             self.logger.info("User context dictionary:")
             for key in user_ctx.keys():
                 self.logger.info("   %s: %s", key, user_ctx[key])
+
+        return show_context_dict

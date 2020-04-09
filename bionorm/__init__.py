@@ -74,8 +74,8 @@ def cli(verbose, quiet, log, **kwargs):
 cli_builder.set_cli_func(cli)
 
 # Define some cli-related commands
-test_log = cli_builder.test_log_func()
-show_context = cli_builder.show_context_func()
+cli_builder.test_log_func()
+cli_builder.show_context_func()
 
 # import other CLI functions
 from .prefix import prefix_fasta  # isort:skip
