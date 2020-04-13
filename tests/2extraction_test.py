@@ -13,7 +13,7 @@ from tests.common import fasta_count
 
 def test_install_gffread(datadir_mgr):
     print("testing command prefix-gff")
-    with datadir_mgr.in_tmp_dir():
+    with datadir_mgr.in_tmp_dir(inpathlist=[]):
         print("installing gffread")
         output = sh.bionorm(["install", "gffread",])
         print(output)
