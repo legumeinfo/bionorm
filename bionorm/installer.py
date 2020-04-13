@@ -13,7 +13,7 @@ import sh
 from packaging import version
 from progressbar import DataTransferBar
 from requests_download import ProgressTracker
-from requests_download import download
+from requests_download import download as request_download
 
 # module imports
 from . import cli
@@ -21,42 +21,36 @@ from . import cli
 EXE_ENVIRON_VAR = "EXE_DIR"
 
 SAMTOOLS_VER = "1.10"
+GFFREAD_VER = "0.11.8"
+HTSLIB_DIR = "htslib-" + SAMTOOLS_VER
 
 DEPENDENCY_DICT = {
     "gffread": {
+        "binaries": ["gffread"],
         "git_list": ["https://github.com/gpertea/gffread.git", "https://github.com/gpertea/gclib"],
         "dir": "gffread",
-        "version": version.parse("0.11.8"),
+        "version": version.parse(GFFREAD_VER),
         "version_command": ["--version"],
         "make": ["release"],
         "copy_binaries": ["gffread"],
     },
-    "bgzip": {
-        "git": "",
-        "download": "",
-        "version": version.parse("1.10.2"),
-        "version_command": ["--version"],
-        "make": ["make"],
-        "make_install": ["install"],
-    },
-    "tabix": {
-        "git": "",
-        "download": "",
-        "version": version.parse("1.10.1"),
-        "version_command": ["--version"],
-        "make": ["make"],
-        "install": ["make install"],
-    },
     "samtools": {
+        "binaries": ["samtools", "tabix", "bgzip"],
         "tarball": (
-            "https://github.com/samtools/releases/download/" + SAMTOOLS_VER + "samtools-" + SAMTOOLS_VER + ".tar.bz2"
+            "https://github.com/samtools/samtools/releases/download/"
+            + SAMTOOLS_VER
+            + "/samtools-"
+            + SAMTOOLS_VER
+            + ".tar.bz2"
         ),
         "dir": "samtools-" + SAMTOOLS_VER,
         "version": version.parse(SAMTOOLS_VER),
         "version_command": ["--version"],
-        "configure": [""],
-        "make": [""],
-        "copy_binaries": ["samtools"],
+        "make": [],
+        "make_extra_dirs": [HTSLIB_DIR],
+        "configure": [],
+        "configure_extra_dirs": [HTSLIB_DIR],
+        "copy_binaries": ["samtools", HTSLIB_DIR + "/bgzip", HTSLIB_DIR + "/tabix", HTSLIB_DIR + "/htsfile"],
     },
 }
 
@@ -84,29 +78,29 @@ class DependencyInstaller(object):
     def check_all(self, verbose=True):
         """Check all depenencies for existence and version."""
         for dep in self.dependencies:
-            if sh.which(dep) == None:
-                if verbose:
-                    print(f"Dependency {dep} is not installed")
-                self.dependency_dict[dep]["installed"] = False
-            else:
-                exe = sh.Command(dep)
-                ver_out = exe(*self.dependency_dict[dep]["version_command"], _err_to_out=True)
-                installed_version = version.parse((ver_out.split("\n")[0]).split()[-1])
-                target_version = self.dependency_dict[dep]["version"]
-                if installed_version == self.dependency_dict[dep]["version"]:
-                    ver_str = f"version at recommended version {installed_version}."
-                    self.dependency_dict[dep]["installed"] = not self.force
-                elif installed_version < self.dependency_dict[dep]["version"]:
-                    ver_str = f"installed {self.dependency_dict[dep]['version']} < recommended {installed_version}."
+            target_version = self.dependency_dict[dep]["version"]
+            version_command = self.dependency_dict[dep]["version_command"]
+            self.dependency_dict[dep]["installed"] = not self.force
+            for bin in self.dependency_dict[dep]["binaries"]:
+                if sh.which(bin) == None:
+                    if verbose:
+                        print(f"Binary {bin} of dependency {dep} is not installed")
                     self.dependency_dict[dep]["installed"] = False
-                elif installed_version > self.dependency_dict[dep]["version"]:
-                    ver_str = (
-                        f"installed {self.dependency_dict[dep]['version']} exceeds recommended {installed_version}."
-                    )
-                    self.dependency_dict[dep]["installed"] = True
-                if verbose:
-                    print(f"{dep}: {exe} {ver_str}")
+                else:
+                    exe = sh.Command(bin)
+                    ver_out = exe(*version_command, _err_to_out=True)
+                    installed_version = version.parse((ver_out.split("\n")[0]).split()[-1])
+                    if installed_version == target_version:
+                        ver_str = f"{bin} version at recommended version {installed_version}."
+                    elif installed_version < target_version:
+                        ver_str = f"{bin} installed {installed_version} <  target {target_version}."
+                        self.dependency_dict[dep]["installed"] = False
+                    elif installed_version > target_version:
+                        ver_str = f"installed {installed_version} exceeds target {target_version}."
+                    if verbose:
+                        print(f"{dep}: {exe} {ver_str}")
         self.versions_checked = True
+        # Check that destination directory exists and is writable.
         if self.destination_exists:
             destination_state = "exists, "
         else:
@@ -147,20 +141,57 @@ class DependencyInstaller(object):
 
         for repo in dep_dict["git_list"]:
             if verbose:
-                print(f"   cloning repo {repo}")
+                print(f"   cloning {dep} repo {repo}")
             git.clone(repo)
+
+    def _download_untar(self, dep, dep_dict, verbose, progressbar=True):
+        """Download and untar tarball."""
+        from sh import tar  # isort:skip
+
+        download_url = dep_dict["tarball"]
+        dlname = download_url.split("/")[-1]
+        download_path = Path(".") / dlname
+        if verbose:
+            print(f"downloading {download_url} to {dlname}")
+        tmp_path = download_path / (dlname + ".tmp")
+        if progressbar:
+            trackers = (ProgressTracker(DataTransferBar()),)
+        else:
+            trackers = None
+        request_download(download_url, download_path, trackers=trackers)
+        if verbose:
+            print(f"downloaded file {download_path}, size {download_path.stat().st_size}")
+        tar_output = tar("xvf", download_path)
+        if verbose:
+            print(tar_output)
+            print("untar done")
+
+    def _configure(self, dep, dep_dict, verbose):
+        """Run make to build package."""
+        if verbose:
+            print(f"   configuring {dep} in {Path.cwd()}")
+        configure = sh.Command("./configure")
+        try:
+            configure_out = configure()
+        except:
+            print("ERROR--configure failed.")
+            sys.exit(1)
+        if verbose:
+            print(configure_out)
 
     def _make(self, dep, dep_dict, verbose):
         """Run make to build package."""
         from sh import make  # isort:skip
 
-        print(f"   making {dep}")
+        if verbose:
+            print(f"   making {dep} in {Path.cwd()}")
         try:
             make_out = make(dep_dict["make"])
         except:
             print("ERROR--make failed.")
-            print(make_out)
             sys.exit(1)
+        if verbose:
+            print(make_out)
 
     def _make_install(self, dep, dep_dict, verbose):
         """Run make install to install a package."""
@@ -173,7 +204,8 @@ class DependencyInstaller(object):
         """Copy the named binary to the destination directory."""
         print(f"   copying {dep} into {self.destination_dir}")
         for bin in dep_dict["copy_binaries"]:
-            shutil.copy2(bin, self.destination_dir / dep)
+            binpath = Path(bin)
+            shutil.copy2(binpath, self.destination_dir / binpath.name)
 
     def install(self, dep, verbose=True):
         """Install a particular dependency."""
@@ -181,27 +213,50 @@ class DependencyInstaller(object):
         dep_dict = self.dependency_dict[dep]
         with tempfile.TemporaryDirectory() as tmp:
             tmppath = Path(tmp)
+            if verbose:
+                print(f'build directory: "{tmppath}"')
             os.chdir(tmppath)
             #
             # Get the sources.  Alternatives are git or download
             #
             if "git_list" in dep_dict:
                 self._git(dep, dep_dict, verbose)
+            elif "tarball" in dep_dict:
+                self._download_untar(dep, dep_dict, verbose)
             #
             # Change to the work directory.
             #
-            os.chdir(dep_dict["dir"])
+            if verbose:
+                print(f'building in directory {dep_dict["dir"]}')
+            dirpath = Path(".") / dep_dict["dir"]
+            if not dirpath.exists():
+                raise ValueError(f'directory "{dirpath}" does not exist.')
+            if not dirpath.is_dir():
+                raise ValueError(f'directory "{dirpath}" is not a directory.')
+            os.chdir(dirpath)
+            workpath = Path.cwd()
             #
             # Build the executables.
             #
+            if "configure" in dep_dict:
+                self._configure(dep, dep_dict, verbose)
+            if "configure_extra_dirs" in dep_dict:
+                for newdir in dep_dict["configure_extra_dirs"]:
+                    os.chdir(workpath / newdir)
+                    self._configure(dep, dep_dict, verbose)
+                    os.chdir(workpath)
             if "make" in dep_dict:
                 self._make(dep, dep_dict, verbose)
+            if "make_extra_dirs" in dep_dict:
+                for newdir in dep_dict["make_extra_dirs"]:
+                    os.chdir(workpath / newdir)
+                    self._make(dep, dep_dict, verbose)
+                    os.chdir(workpath)
             #
             # Install the executables.
             #
             if "make_install" in dep_dict:
                 self._make_install(dep, dep_dict, verbose)
-
             elif "copy_binaries" in dep_dict:
                 self._copy_binaries(dep, dep_dict, verbose)
 
