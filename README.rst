@@ -31,7 +31,7 @@ If you haven't previously installed ``poetry``, execute the command: ::
 
 Next, get the master branch from GitHub ::
 
-	git clone https://github.com/ncgr/bionorm.git
+	git clone https://github.com/legumeinfo/bionorm.git
 
 Change to the ``bionorm/`` directory and install with poetry: ::
 
@@ -109,35 +109,35 @@ Project Status
     :target: https://pypi.python.org/pypi/bionorm
     :alt: Python package
 
-.. |repo| image:: https://img.shields.io/github/commits-since/ncgr/bionorm/0.1.0.svg
-    :target: https://github.com/ncgr/bionorm
+.. |repo| image:: https://img.shields.io/github/commits-since/legumeinfo/bionorm/0.1.0.svg
+    :target: https://github.com/legumeinfo/bionorm
     :alt: GitHub repository
 
 .. |license| image:: https://img.shields.io/badge/License-BSD%203--Clause-blue.svg
-    :target: https://github.com/ncgr/bionorm/blob/master/LICENSE.txt
+    :target: https://github.com/legumeinfo/bionorm/blob/master/LICENSE.txt
     :alt: License terms
 
-.. |travis| image:: https://img.shields.io/travis/ncgr/bionorm.svg
-    :target:  https://travis-ci.org/ncgr/bionorm
+.. |travis| image:: https://img.shields.io/travis/legumeinfo/bionorm.svg
+    :target:  https://travis-ci.org/legumeinfo/bionorm
     :alt: Travis CI
 
 .. |codacy| image:: https://api.codacy.com/project/badge/Grade/b23fc0c167fc4660bb649320e14dac7f
-    :target: https://www.codacy.com/gh/ncgr/bionorm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ncgr/bionorm&amp;utm_campaign=Badge_Grade
+    :target: https://www.codacy.com/gh/legumeinfo/bionorm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=legumeinfo/bionorm&amp;utm_campaign=Badge_Grade
     :alt: Codacy.io grade
 
-.. |coverage| image:: https://codecov.io/gh/ncgr/bionorm/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/ncgr/bionorm
+.. |coverage| image:: https://codecov.io/gh/legumeinfo/bionorm/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/legumeinfo/bionorm
     :alt: Codecov.io test coverage
 
 .. |precommit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
     :target: https://github.com/pre-commit/pre-commit
     :alt: pre-commit
 
-.. |issues| image:: https://img.shields.io/github/issues/ncgr/bionorm.svg
-    :target:  https://github.com/ncgr/bionorm/issues
+.. |issues| image:: https://img.shields.io/github/issues/legumeinfo/bionorm.svg
+    :target:  https://github.com/legumeinfo/bionorm/issues
     :alt: Issues reported
 
 
-.. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=ncgr/bionorm
-     :target: https://app.dependabot.com/accounts/ncgr/repos/236847525
+.. |depend| image:: https://api.dependabot.com/badges/status?host=github&repo=legumeinfo/bionorm
+     :target: https://app.dependabot.com/accounts/legumeinfo/repos/236847525
      :alt: dependabot dependencies
