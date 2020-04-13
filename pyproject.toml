@@ -55,7 +55,7 @@ black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 pydocstyle = "^5.0.2"
 isort = {version = "^4.3.21", extras = ["pyproject"]}
-pytest-datadir-mgr = "^0.1.0"
+pytest-datadir-mgr = "^0.1.4"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

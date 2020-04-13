@@ -401,7 +401,7 @@ description = "Manager for test data providing downloads, caching of generated f
 name = "pytest-datadir-mgr"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.0"
+version = "0.1.4"
 
 [package.dependencies]
 progressbar2 = ">=3.50.1,<4.0.0"
@@ -616,7 +616,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "4228de87881a7f3ce4b171227be081f87205d6f71bd647d7966ccb1895ba1dfc"
+content-hash = "eef5ad39f3b68ce0f85c86033ef089a2c3aa0396e371f0a1ec392f7199b684f6"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -821,8 +821,8 @@ pytest-cov = [
     {file = "pytest_cov-2.8.1-py2.py3-none-any.whl", hash = "sha256:cdbdef4f870408ebdbfeb44e63e07eb18bb4619fae852f6e760645fa36172626"},
 ]
 pytest-datadir-mgr = [
-    {file = "pytest-datadir-mgr-0.1.0.tar.gz", hash = "sha256:08112cfabfc226e09f71160ef94d4ae6d3744dc2dea16ee2b0ce9041e2267b72"},
-    {file = "pytest_datadir_mgr-0.1.0-py3-none-any.whl", hash = "sha256:1d9f0ff4b19dd62028c39f18b9d743ee5c9ed0443aa614e427bdaea4da1dfc23"},
+    {file = "pytest-datadir-mgr-0.1.4.tar.gz", hash = "sha256:1f8a62889a5878ebdbfa59f3320c4c57e589455da4796a553d27452376e56c98"},
+    {file = "pytest_datadir_mgr-0.1.4-py3-none-any.whl", hash = "sha256:f8684d80add4cb6bd27891832a60729d9156d8a5b0e7478d6a407a0580a4f1c4"},
 ]
 python-utils = [
     {file = "python-utils-2.4.0.tar.gz", hash = "sha256:f21fc09ff58ea5ebd1fd2e8ef7f63e39d456336900f26bdc9334a03a3f7d8089"},
@@ -899,6 +899,8 @@ requests-download = [
 ]
 sequencetools = [
     {file = "sequencetools-0.0.5-py3-none-any.whl", hash = "sha256:f447ede8929db6cc9308133ada5040d63e9d76723b52f5befd2410cbeeaa99ef"},
+    {file = "sequencetools-0.0.5-py3.6.egg", hash = "sha256:2cbd2be3a652111343ef2eef35876eec33b94d8eeef8c53eb8bb338531394b95"},
+    {file = "sequencetools-0.0.5-py3.7.egg", hash = "sha256:1f89bb6e682f945eca40640426fc028e3d6e9036f5df2f362bd3b98c7450e481"},
     {file = "sequencetools-0.0.5.tar.gz", hash = "sha256:e5cb8dca14dab0046aa17f4c0527a385bd185eff683ce395f9243203da0aef8d"},
 ]
 sh = [
