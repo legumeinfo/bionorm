@@ -3,7 +3,6 @@
 from pathlib import Path
 
 # third-party imports
-import pytest
 import sh
 
 from tests.common import FASTA_PATH
@@ -12,18 +11,16 @@ from tests.common import fasta_count
 
 
 def test_install_gffread(datadir_mgr):
-    print("testing command prefix-gff")
-    with datadir_mgr.in_tmp_dir(inpathlist=[]):
-        print("installing gffread")
+    """Test install gffread."""
+    with datadir_mgr.in_tmp_dir():
         output = sh.bionorm(["install", "gffread",])
         print(output)
 
 
 def test_extraction(datadir_mgr):
-    print("testing command prefix-gff")
+    """Test command extract-fasta."""
     datadir_mgr.add_scope("prefix", module="1prefixing_test")
     with datadir_mgr.in_tmp_dir(inpathlist=[GFF_PATH, FASTA_PATH], save_outputs=True, excludepattern="*.log"):
-        print("extracting fasta")
         output = sh.bionorm(["extract-fasta", str(GFF_PATH), str(FASTA_PATH)])
         print(output)
         loglist = [fp.name for fp in (Path.cwd() / "logs").glob("*")]

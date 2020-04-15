@@ -18,10 +18,15 @@ from requests_download import download as request_download
 # module imports
 from . import cli
 
-EXE_ENVIRON_VAR = "EXE_DIR"
-
+INSTALL_ENVIRON_VAR = "BIONORM_INSTALL_DIR"  # installs go into "/bin" and other subdirs of this directory
+if INSTALL_ENVIRON_VAR in os.environ:
+    INSTALL_PATH = Path(os.environ[INSTALL_ENVIRON_VAR])
+else:
+    INSTALL_PATH = Path(sys.executable).parent.parent
+BIN_PATH = INSTALL_PATH / "bin"
 SAMTOOLS_VER = "1.10"
 GFFREAD_VER = "0.11.8"
+GT_VER = "1.6.1"
 HTSLIB_DIR = "htslib-" + SAMTOOLS_VER
 
 DEPENDENCY_DICT = {
@@ -52,28 +57,30 @@ DEPENDENCY_DICT = {
         "configure_extra_dirs": [HTSLIB_DIR],
         "copy_binaries": ["samtools", HTSLIB_DIR + "/bgzip", HTSLIB_DIR + "/tabix", HTSLIB_DIR + "/htsfile"],
     },
+    "genometools": {
+        "binaries": ["gt"],
+        "tarball": ("https://github.com/genometools/genometools/archive/v" + GT_VER + ".tar.gz"),
+        "dir": "genometools-" + GT_VER,
+        "version": version.parse(GT_VER),
+        "version_command": ["--version"],
+        "make": ["install", "prefix=" + str(INSTALL_PATH), "cairo=no", "useshared=no"],
+    },
 }
 
 
 class DependencyInstaller(object):
     """Install and check binary dependencies."""
 
-    def __init__(self, dependency_dict, destination_dir=None, force=False):
+    def __init__(self, dependency_dict, force=False):
         """Initialize dictionary of dependencies."""
         self.dependency_dict = dependency_dict
         self.force = force
         self.dependencies = tuple(dependency_dict.keys())
         self.versions_checked = False
-        if destination_dir == None:
-            if EXE_ENVIRON_VAR in os.environ:
-                self.destination_dir = Path(os.environ[EXE_ENVIRON_VAR])
-            else:
-                self.destination_dir = Path(sys.executable).parent
-        else:
-            self.destination_dir = Path(destination_dir)
-        self.destination_exists = self.destination_dir.exists()
-        self.destination_writable = os.access(self.destination_dir, os.W_OK)
-        self.destination_in_path = str(self.destination_dir) in os.environ["PATH"].split(":")
+        self.bin_path = BIN_PATH
+        self.bin_path_exists = self.bin_path.exists()
+        self.bin_path_writable = os.access(self.bin_path, os.W_OK)
+        self.bin_path_in_path = str(self.bin_path) in os.environ["PATH"].split(":")
 
     def check_all(self, verbose=True):
         """Check all depenencies for existence and version."""
@@ -100,21 +107,21 @@ class DependencyInstaller(object):
                     if verbose:
                         print(f"{dep}: {exe} {ver_str}")
         self.versions_checked = True
-        # Check that destination directory exists and is writable.
-        if self.destination_exists:
-            destination_state = "exists, "
+        # Check that bin directory exists and is writable.
+        if self.bin_path_exists:
+            bin_path_state = "exists, "
         else:
-            destination_state = "doesn't exist, "
-        if self.destination_writable:
-            destination_state += "writable, "
+            bin_path_state = "doesn't exist, "
+        if self.bin_path_writable:
+            bin_path_state += "writable, "
         else:
-            destination_state += "not writable, "
-        if self.destination_in_path:
-            destination_state += "in path."
+            bin_path_state += "not writable, "
+        if self.bin_path_in_path:
+            bin_path_state += "in path."
         else:
-            destination_state += "not in path."
+            bin_path_state += "not in path."
         if verbose:
-            print(f"Destination dir '{self.destination_dir}' {destination_state}")
+            print(f"Bin dir '{self.bin_path}' {bin_path_state}")
 
     def install_list(self, deplist):
         """Install needed dependencies from a list."""
@@ -123,14 +130,14 @@ class DependencyInstaller(object):
             deplist = self.dependencies
         install_list = [dep for dep in deplist if not self.dependency_dict[dep]["installed"]]
         if len(install_list):
-            if not self.destination_exists:
-                print(f"ERROR--Installation directory {installer.destination_dir} does not exist.")
+            if not self.bin_path_exists:
+                print(f"ERROR--Installation directory {self.bin_path} does not exist.")
                 sys.exit(1)
-            if not self.destination_writable:
-                print(f"ERROR--Installation directory {installer.destination_dir} is not writable.")
+            if not self.bin_path_writable:
+                print(f"ERROR--Installation directory {self.bin_path} is not writable.")
                 sys.exit(1)
-            if not self.destination_in_path:
-                print(f"ERROR--Installation directory {installer.destination_dir} is not in PATH.")
+            if not self.bin_path_in_path:
+                print(f"ERROR--Installation directory {self.bin_path} is not in PATH.")
                 sys.exit(1)
         for dep in install_list:
             self.install(dep)
@@ -195,17 +202,17 @@ class DependencyInstaller(object):
 
     def _make_install(self, dep, dep_dict, verbose):
         """Run make install to install a package."""
-        print(f"   installing {dep} into {self.destination_dir}")
+        print(f"   installing {dep} into {self.bin_path}")
         install_out = make.install(dep_dict["make_install"])
         if verbose:
             print(install_out)
 
     def _copy_binaries(self, dep, dep_dict, verbose):
-        """Copy the named binary to the destination directory."""
-        print(f"   copying {dep} into {self.destination_dir}")
+        """Copy the named binary to the bin directory."""
+        print(f"   copying {dep} into {self.bin_path}")
         for bin in dep_dict["copy_binaries"]:
             binpath = Path(bin)
-            shutil.copy2(binpath, self.destination_dir / binpath.name)
+            shutil.copy2(binpath, self.bin_path / binpath.name)
 
     def install(self, dep, verbose=True):
         """Install a particular dependency."""

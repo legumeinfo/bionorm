@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 # standard library imports
 import json
-import logging
 import os
 import re
-import subprocess
 import sys
 from glob import glob
+from pathlib import Path
 
 # third-party imports
 import click
@@ -14,8 +13,12 @@ from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
 
 # module imports
 from . import specification_checks
-from .helper import check_file
 from .metrics import count_gff_features
+from . import cli
+from .common import logger
+
+# global defs
+DOMAIN = "https://legumeinfo.org/data/public"
 
 
 class Detector:
@@ -25,8 +28,7 @@ class Detector:
     """
 
     def __init__(self, target, **kwargs):
-        """Check for logger, check for gt"""
-        subprocess.check_call("which gt", shell=True)  # check for gt in env
+        """Check for check for gt"""
         self.options = kwargs
         self.checks = {}  # object that determines which checks are skipped
         self.checks["genome_main"] = kwargs.get("disable_genome_main", True)
@@ -48,8 +50,6 @@ class Detector:
             "protein": "gene_models_main",
         }
         self.rank = {"genome_main": 0, "gene_models_main": 1, "protein": 2, "protein_primaryTranscript": 2}
-        self.log_level = kwargs.get("log_level", "INFO")
-        self.log_file = kwargs.get("log_file", "./incongruencies.log")
         self.output_prefix = kwargs.get("output_prefix", "./incongruencies")
         self.write_me = {}
         self.passed = {}  # dictionary of passing names
@@ -57,25 +57,14 @@ class Detector:
         self.fasta_ids = {}
         self.reporting = {}
         self.node_data = {}  # nodes for DSCensor
-        self.target = os.path.abspath(target)
+        self.target = Path(target)
         self.target_readme = ""
-        self.domain = "https://legumeinfo.org/data/public"
-        self.setup_logging()  # setup logging sets self.logger
-        logger = self.logger
-        self.get_target_type()  # sets self.target_name and self.target_type
-        if not self.target_type:  # target type returned False not recognized
-            logger.error("Target type not recognized for {}".format(self.target))
+        self.target_type = self.get_target_type()
+        if self.target_type is None:  # target type returned False not recognized
+            logger.error(f"Target type not recognized for {self.target}")
             sys.exit(1)
-        # if not os.environ.get('BUSCO_ENV_FILE', None) and not kwargs.get('no_busco'):
-        #    logger.error('''
-        #        BUSCO_ENV_File Must Be set, please export
-        #
-        #                This is used to source an Environment for BUSCO as the BUSCO
-        #                Config Does Still Requires AUGUSTUS Environment variables be set
-        #                ''')
         logger.info("Target type looks like {}".format(self.target_type))
         self.get_targets()
-        #        logger.debug(''.format(self.target_objects))
         logger.info("Performing Checks for the Following:\n")
         for t in self.target_objects:  # for each object set validate
             logger.debug("{}".format(t))
@@ -99,38 +88,20 @@ class Detector:
             if count > 1 and not primary:
                 logger.error("Multiple protein files found for {} one must be renamed to primary".format(t))
                 sys.exit(1)
-        #            for c in self.target_objects[t]['children']:
-        #                logger.info('{}'.format(c))
         logger.info("Initialized Detector\n")
 
-    def setup_logging(self):
-        """Return logger based on log_file and log_level"""
-        log_level = getattr(logging, self.log_level.upper(), logging.INFO)
-        msg_format = "%(asctime)s|%(name)s|[%(levelname)s]: %(message)s"
-        logging.basicConfig(format=msg_format, datefmt="%m-%d %H:%M", level=log_level)
-        log_handler = logging.FileHandler(self.log_file, mode="w")
-        formatter = logging.Formatter(msg_format)
-        log_handler.setFormatter(formatter)
-        logger = logging.getLogger("detect_incongruencies")
-        logger.addHandler(log_handler)
-        self.logger = logger
-
     def get_target_type(self):
-        """Determines what type of target this is, is it a file or directory?
-
-           if its a directory, is it an organism directory or a data directory?
+        """Determine whether target is file, organism directory, or data directory.
         """
-        logger = self.logger
-        target_name = os.path.basename(self.target)
-        self.target_name = target_name
-        self.target_type = False
-        logger.debug(self.target_name)
-        if target_name.endswith(".gz"):  # all datastore files end in .gz
-            self.target_type = "file"
-        elif len(target_name.split("_")) == 2 and len(target_name.split(".")) < 3:
-            self.target_type = "organism_dir"  # will always be Genus_species
-        elif len(target_name.split(".")) >= 3:  # standard naming minimum
-            self.target_type = "data_dir"
+        if self.target.is_file():
+            target_type = "file"
+        elif len(self.target.name.split("_")) == 2 and len(self.target.name.split(".")) < 3:
+            target_type = "organism_dir"  # will always be Genus_species
+        elif len(self.target.name.split(".")) >= 3:  # standard naming minimum
+            target_type = "data_dir"
+        else:
+            target_type = None
+        return target_type
 
     def get_targets(self):
         """Gets and discovers target files relation to other files
@@ -139,8 +110,6 @@ class Detector:
 
            all related files that can be checked
         """
-        logger = self.logger
-        target = self.target
         target_type = self.target_type
         if target_type == "file":  # starting with a file
             self.add_target_object()
@@ -148,23 +117,17 @@ class Detector:
         elif target_type == "data_dir" or target_type == "organism_dir":
             self.get_all_files()  # works for both data and organism
             return
-        # elif target_type == 'organism_dir':  # entire organism
-        #    self.get_all_files()
-        #    return
 
     def get_all_files(self):
-        """Walk down filetree and recursively return all files
+        """Walk down filetree and recursively return all files.
 
            These will be checked using add_target_object
         """
-        logger = self.logger
-        target = self.target
-        for root, directories, filenames in os.walk(target):
+        for root, directories, filenames in os.walk(self.target):
             for filename in filenames:  # we only care about the files
-                my_target = os.path.join(root, filename)  # make path
-                logger.debug("Checking file {}".format(my_target))
-                self.target = my_target  # set target
-                self.target_name = os.path.basename(self.target)
+                my_target = root / filename
+                logger.debug(f"Checking file {my_target}")
+                self.target = my_target
                 self.add_target_object()  # add target if canonical
 
     def get_target_file_type(self, target_file):
@@ -180,14 +143,13 @@ class Detector:
 
     def add_target_object(self):
         """Uses parent child logic to create a datastructure for objects"""
-        logger = self.logger
         target = self.target
         logger.debug(target)
         if not check_file(target):
             logger.error("Could not find file: {}".format(target))
             sys.exit(1)
-        target_attributes = self.target_name.split(".")
-        if len(target_attributes) < 3 or self.target_name[0] == "_":
+        target_attributes = self.target.name.split(".")
+        if len(target_attributes) < 3 or self.target.name[0] == "_":
             logger.debug("File {} does not seem to have attributes".format(target))
             return
         canonical_type = target_attributes[-3]  # check content type
@@ -199,14 +161,12 @@ class Detector:
         target_dir = os.path.basename(os.path.dirname(target))
         genus = organism_dir.split("_")[0].lower()
         species = organism_dir.split("_")[1].lower()
-        target_format = target_attributes[-2]  # get gff, fna, faa all gx
-        target_key = target_attributes[-4]  # get key
         target_ref_type = self.canonical_parents[canonical_type]
         logger.debug("Getting target files reference if necessary...")
-        file_type = self.get_target_file_type(self.target_name)
-        file_url = "{}/{}/{}/{}".format(self.domain, organism_dir, target_dir, self.target_name)
+        file_type = self.get_target_file_type(self.target.name)
+        file_url = "{}/{}/{}/{}".format(DOMAIN, organism_dir, target_dir, self.target.name)
         target_node_object = {
-            "filename": self.target_name,
+            "filename": self.target.name,
             "filetype": file_type,
             "canonical_type": canonical_type,
             "url": file_url,
@@ -231,7 +191,7 @@ class Detector:
                 file_type = self.get_target_file_type(parent_name)
                 organism_dir = os.path.basename(os.path.dirname(os.path.dirname(my_reference)))
                 ref_dir = os.path.basename(os.path.dirname(my_reference))
-                file_url = "{}/{}/{}/{}".format(self.domain, organism_dir, ref_dir, parent_name)
+                file_url = "{}/{}/{}/{}".format(DOMAIN, organism_dir, ref_dir, parent_name)
                 ref_node_object = {
                     "filename": parent_name,
                     "filetype": file_type,
@@ -276,7 +236,6 @@ class Detector:
 
     def get_reference(self, glob_target):
         """Finds the FASTA reference for some prefix"""
-        logger = self.logger
         if len(glob(glob_target)) > 1:  # too many references....?
             logger.error("Multiple references found {}".format(glob_target))
             sys.exit(1)
@@ -310,7 +269,6 @@ class Detector:
 
            and outputs to file_name
         """
-        logger = self.logger  # set logging
         node_data = self.node_data  # get current targets nodes
         busco_parse = re.compile(r"C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)")
         output = "{}.busco".format(".".join(file_name.split(".")[:-2]))
@@ -355,7 +313,6 @@ class Detector:
 
            basically all this conditional foo
         """
-        logger = self.logger
         targets = self.target_objects  # get objects from class init
         no_nodes = self.no_nodes  # if true, no nodes for DSCensor written
         for reference in sorted(targets, key=lambda k: self.rank[targets[k]["type"]]):
@@ -418,23 +375,7 @@ class Detector:
 @click.option("--target", multiple=True, help="""TARGETS can be files or directories or both""")
 @click.option("--no_busco", is_flag=True, help="""Disable BUSCO""")
 @click.option("--no_nodes", is_flag=True, help="""Disable DSCensor Stats and Node Generation""")
-@click.option(
-    "--log_file", metavar="<FILE>", default="./bionorm.log", help="""File to write log to. (default:./bionorm.log)"""
-)
-@click.option(
-    "--log_level",
-    metavar="<LOGLEVEL>",
-    default="INFO",
-    help="""Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL (default:INFO)""",
-)
-# @click.option('--normalize', is_flag=True,
-#             help='''Normalizes provided files.
-# Incongruencies in FASTA will be corrected if the provided genome name
-# passes checks.
-# The gff file will be tidied if it fails gff3 validation in gt:
-#    gt gff3 -sort -tidy -retainids input.gff3 > out.gff3
-# ''')
-def cli(target, no_busco, no_nodes, log_file, log_level):
+def cli(target, no_busco, no_nodes):
     """incongruency_detector:
 
         Detect Incongruencies with LIS Data Store Standard
@@ -446,8 +387,6 @@ def cli(target, no_busco, no_nodes, log_file, log_level):
     templates_dir = "{}/templates".format(data_store_home)
     readme_template = "{}/template__README.KEY.yml".format(templates_dir)
     options = {
-        "log_level": log_level,
-        "log_file": log_file,
         "no_busco": no_busco,
         "no_nodes": no_nodes,
         "readme_template": readme_template,

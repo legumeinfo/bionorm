@@ -18,7 +18,7 @@ RAW_GFF_FILE = "example_jemalong.gff3"
 
 
 def test_prefix_gff(datadir_mgr):
-    print("testing command prefix-gff")
+    """Test command prefix-gff."""
     datadir_mgr.download(
         download_url=DOWNLOAD_URL,
         files=[RAW_GFF_FILE],
@@ -64,7 +64,7 @@ def test_prefix_gff(datadir_mgr):
 
 
 def test_prefix_fasta(datadir_mgr):
-    print("testing command prefix-fasta")
+    """Test command prefix-fasta."""
     datadir_mgr.download(
         download_url=DOWNLOAD_URL,
         files=[RAW_FASTA_FILE],

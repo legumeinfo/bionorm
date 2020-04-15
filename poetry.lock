@@ -401,7 +401,7 @@ description = "Manager for test data providing downloads, caching of generated f
 name = "pytest-datadir-mgr"
 optional = false
 python-versions = ">=3.6,<4.0"
-version = "0.1.6"
+version = "0.2.0"
 
 [package.dependencies]
 progressbar2 = ">=3.50.1,<4.0.0"
@@ -616,7 +616,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "4228de87881a7f3ce4b171227be081f87205d6f71bd647d7966ccb1895ba1dfc"
+content-hash = "21b1a3561717a145654e71b7d1e463984a8326f87cf760866c64d59195922ebc"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -821,8 +821,8 @@ pytest-cov = [
     {file = "pytest_cov-2.8.1-py2.py3-none-any.whl", hash = "sha256:cdbdef4f870408ebdbfeb44e63e07eb18bb4619fae852f6e760645fa36172626"},
 ]
 pytest-datadir-mgr = [
-    {file = "pytest-datadir-mgr-0.1.6.tar.gz", hash = "sha256:76e6308233e4ef43e6f0b174de04229cf5052b0b27ad848a398b42ae95f18293"},
-    {file = "pytest_datadir_mgr-0.1.6-py3-none-any.whl", hash = "sha256:0588bbe3c951a9206e8362a61c81c9e0566f66567e1a811b0b673d91d8585936"},
+    {file = "pytest-datadir-mgr-0.2.0.tar.gz", hash = "sha256:9067807387e8274dd09b62f150c89418920e35c32814302deda346a273cd0c8f"},
+    {file = "pytest_datadir_mgr-0.2.0-py3-none-any.whl", hash = "sha256:1266f5876f57823d5cbbba5b096dd6f4a1452d6de5054b09c688108454758e9b"},
 ]
 python-utils = [
     {file = "python-utils-2.4.0.tar.gz", hash = "sha256:f21fc09ff58ea5ebd1fd2e8ef7f63e39d456336900f26bdc9334a03a3f7d8089"},
