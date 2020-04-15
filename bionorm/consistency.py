@@ -22,10 +22,8 @@ DOMAIN = "https://legumeinfo.org/data/public"
 
 
 class Detector:
-    """Class to detect datastore file incongruencies with
 
-       https://github.com/LegumeFederation/datastore
-    """
+    """Detect datastore file inconsistencies."""
 
     def __init__(self, target, **kwargs):
         """Check for check for gt"""
@@ -332,10 +330,6 @@ class Detector:
                 if passed:  # validation passed writing object node for DSCensor
                     self.passed[reference] = 1
                     self.node_data = targets[reference]["node_data"]
-                    #                if targets[reference]['type'] == 'genome_main':  # BUSCO
-                    #                    file_name = targets[reference]['node_data']['filename']
-                    #                    if not self.options.get('no_busco'):
-                    #                        self.run_busco('genome', file_name)
                     if not no_nodes:
                         logger.info("Writing node object for {}".format(reference))
                         # dscensor node
@@ -371,18 +365,12 @@ class Detector:
                     logger.debug("{}".format(c))
 
 
-@click.command()
-@click.option("--target", multiple=True, help="""TARGETS can be files or directories or both""")
-@click.option("--no_busco", is_flag=True, help="""Disable BUSCO""")
-@click.option("--no_nodes", is_flag=True, help="""Disable DSCensor Stats and Node Generation""")
-def cli(target, no_busco, no_nodes):
-    """incongruency_detector:
-
-        Detect Incongruencies with LIS Data Store Standard
-    """
-    if not target:
-        print("Must specify at least one --target.  Run with --help for usage")
-        sys.exit(1)
+@cli.command()
+@click.option("--no_busco", is_flag=True, help="""Disable BUSCO.""")
+@click.option("--no_nodes", is_flag=True, help="""Disable DSCensor stats and node generation.""")
+@click.argument("targets", nargs=-1)
+def consistency(targets, no_busco, no_nodes):
+    """Check for consistency with Data Store standards."""
     data_store_home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     templates_dir = "{}/templates".format(data_store_home)
     readme_template = "{}/template__README.KEY.yml".format(templates_dir)
@@ -391,10 +379,6 @@ def cli(target, no_busco, no_nodes):
         "no_nodes": no_nodes,
         "readme_template": readme_template,
     }
-    for t in target:
+    for t in targets:
         detector = Detector(t, **options)  # initializers
         detector.detect_incongruencies()  # class method runs all detection methods
-
-
-if __name__ == "__main__":
-    cli()
