@@ -4,13 +4,18 @@
 from pathlib import Path
 
 # global constants
-FASTA_PATH = Path("Medicago_truncatula") / "jemalong_A17.gnm5.FAKE" / "medtr.jemalong_A17.gnm5.FAKE.genome_main.fna"
+GENOME_PATH = Path("Medicago_truncatula") / "jemalong_A17.gnm5.FAKE"
+FASTA_PATH = GENOME_PATH / "medtr.jemalong_A17.gnm5.FAKE.genome_main.fna"
 ANN_PATH = Path("Medicago_truncatula") / "jemalong_A17.gnm5.ann1.FAKE"
 GFF_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3"
+PREFIXING_LIST = [GFF_PATH, FASTA_PATH]
+#
 PROTEIN_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.protein.faa"
 CDS_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.cds.fna"
 MRNA_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.mrna.fna"
 TRANSCRIPT_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.protein_primaryTranscript.faa"
+EXTRACTION_LIST = [PROTEIN_PATH, CDS_PATH, MRNA_PATH, TRANSCRIPT_PATH]
+PROTEIN_COUNT = 11408  # number of protein entries
 
 
 def line_count(filepath):

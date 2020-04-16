@@ -57,7 +57,7 @@ def run_gffread(gff, fastapath):
 @click.argument("gffpath", type=click.Path(exists=True, readable=True, dir_okay=False))
 @click.argument("fastapath", type=click.Path(exists=True, readable=True, dir_okay=False))
 def extract_fasta(gffpath, fastapath):
-    """Extract CDS, mrna, protein, and primary transcript files from gff and genome.
+    """Extract CDS, mrna, and protein files from genome.
 
     \b
     Example:

@@ -82,4 +82,6 @@ from .prefix import prefix_fasta  # isort:skip
 from .prefix import prefix_gff  # isort:skip
 from .extract_fasta import extract_fasta  # isort:skip
 from .installer import install  # isort:skip
+from .index import index_fasta  # isort:skip
+from .index import index_gff  # isort:skip
 from .consistency import consistency  # isort:skip

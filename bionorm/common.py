@@ -13,6 +13,9 @@ import click
 #
 PROGRAM_NAME = "bionorm"
 CONFIG_FILE_ENVVAR = "BIONORM_CONFIG_FILE_PATH"
+FASTA_TYPES = ["fna", "fasta", "fa", "faa"]
+GFF_TYPES = ["gff", "gff3"]
+COMPRESSED_TYPES = ["gz", "bgz", "bz", "xz"]
 #
 # global logger object
 #

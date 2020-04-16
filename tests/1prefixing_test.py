@@ -7,10 +7,13 @@ import pytest
 import sh
 
 # first-party imports
+from tests.common import ANN_PATH
 from tests.common import FASTA_PATH
+from tests.common import GENOME_PATH
 from tests.common import GFF_PATH
 from tests.common import fasta_count
 from tests.common import line_count
+
 
 DOWNLOAD_URL = "http://generisbio.com/ncgr/"
 RAW_FASTA_FILE = "example_jemalong.fna"
@@ -54,13 +57,13 @@ def test_prefix_gff(datadir_mgr):
         loglist = list((Path.cwd() / "logs").glob("*"))
         assert len(loglist) is 1
         assert str(loglist[0].name) == "bionorm-prefix-gff.log"
-        outdir_path = Path(GFF_PATH.parts[0])
+        outdir_path = Path(ANN_PATH.parts[0])
         subdirname = list(outdir_path.glob("*"))[0].parts[-1]
-        assert subdirname == GFF_PATH.parts[1]
+        assert subdirname == ANN_PATH.parts[1]
         subdir_path = outdir_path / subdirname
         outfilename = list(subdir_path.glob("*"))[0].name
         assert outfilename == GFF_PATH.parts[2]
-        assert line_count(Path(RAW_GFF_FILE)) == line_count(subdir_path / outfilename)
+        assert line_count(Path(RAW_GFF_FILE)) == line_count(GFF_PATH)
 
 
 def test_prefix_fasta(datadir_mgr):
@@ -98,10 +101,10 @@ def test_prefix_fasta(datadir_mgr):
         loglist = list((Path.cwd() / "logs").glob("*"))
         assert len(loglist) is 1
         assert str(loglist[0].name) == "bionorm-prefix-fasta.log"
-        outdir_path = Path(FASTA_PATH.parts[0])
+        outdir_path = Path(GENOME_PATH.parts[0])
         subdirname = list(outdir_path.glob("*"))[0].parts[-1]
-        assert subdirname == FASTA_PATH.parts[1]
+        assert subdirname == GENOME_PATH.parts[1]
         subdir_path = outdir_path / subdirname
         outfilename = list(subdir_path.glob("*"))[0].name
         assert outfilename == FASTA_PATH.parts[2]
-        assert fasta_count(Path(RAW_FASTA_FILE)) == fasta_count(subdir_path / outfilename)
+        assert fasta_count(Path(RAW_FASTA_FILE)) == fasta_count(FASTA_PATH)

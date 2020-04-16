@@ -345,7 +345,7 @@ class Detector:
 @click.option("--fasta_headers", is_flag=True, help="""Check consistency of FASTA headers and GFF.""")
 @click.argument("target", nargs=1)
 def consistency(target, busco, nodes, genome_main, gene_models_main, genometools, fasta_headers):
-    """Check for consistency with Data Store standards."""
+    """Check self-consistency and consistency with standards."""
     detector = Detector(
         target,
         busco=busco,
