@@ -13,7 +13,6 @@ from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
 
 # module imports
 from . import specification_checks
-from .metrics import count_gff_features
 from . import cli
 from .common import logger
 
@@ -21,6 +20,21 @@ from .common import logger
 DOMAIN = "https://legumeinfo.org/data/public"
 FASTA_TYPES = ("fna", "faa", "fasta", "frn")
 GFF_TYPES = ("gff", "gff3")
+
+
+def count_gff_features(gff):
+    counts = {}
+    with Path(gff).open("r") as fopen:
+        for line in fopen:
+            if not line or line.isspace() or line.startswith("#"):  # skip comments
+                continue
+            line = line.rstrip()
+            f = line.split("\t")  # get fields
+            if f[2] not in counts:  # feature type
+                counts[f[2]] = 1
+                continue
+            counts[f[2]] += 1
+    return counts
 
 
 class Detector:
