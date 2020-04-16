@@ -3,34 +3,40 @@
 
 # standard library imports
 import hashlib
-import json
-import logging
 import os
+import gzip
 import re
 import subprocess
 import sys
-from glob import glob
-from os import path
 
-# third-party imports
-import requests
+from .common import logger
 
-# module imports
-from .helper import check_file
-from .helper import return_filehandle
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+def return_filehandle(open_me):
+    """return file handle for gz compressed or text file"""
+    magic_dict = {  # headers for compression
+        b"\x1f\x8b\x08": "gz",
+        #                 '\x42\x5a\x68': 'bz2',
+        #                 '\x50\x4b\x03\x04': 'zip'
+    }
+    max_bytes = max(len(t) for t in magic_dict)
+    with open(open_me, "rb") as f:
+        s = f.read(max_bytes)
+    for m in magic_dict:
+        if s.startswith(m):  # check file header for match with m
+            t = magic_dict[m]
+            if t == "gz":
+                return gzip.open(open_me, "rt")
+    return open(open_me)
 
 
 class genome_main:
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
-        self.logger = detector.logger
 
     def run(self):
         """Runs checks"""
-        logger = self.logger
         target = self.target
         logger.info(f"Performing Naming Checks for {target}\n")
         if not self.check_genome_main():
@@ -52,7 +58,6 @@ class genome_main:
            checks these file attributes to ensure they are correct
         """
         target = self.target
-        logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 7:  # should be 7 fields
             logger.error(f"File did not have 7 fields! {attr}")
@@ -86,7 +91,6 @@ class genome_main:
 
            PUT SOME RULE REFERENCE HERE
         """
-        logger = self.logger
         fasta = self.target  # get fasta file
         attr = os.path.basename(fasta).split(".")  # get attributes for naming
         true_header = ".".join(attr[:3])
@@ -123,12 +127,10 @@ class gene_models_main:
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
-        self.logger = detector.logger
         self.fasta_ids = detector.fasta_ids
 
     def run(self):
         """Run checks"""
-        logger = self.logger
         target = self.target
         logger.info("Checking Gene Models File Naming...")
         if not self.check_gene_models_main():
@@ -155,7 +157,6 @@ class gene_models_main:
            checks these file attributes to ensure they are correct
         """
         target = self.target
-        logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error(f"File did not have 7 fields! {attr}")
@@ -201,7 +202,6 @@ class gene_models_main:
            https://github.com/LegumeFederation/datastore/issues/23
         """
         gff = self.target
-        logger = self.logger
         gff_name = os.path.basename(gff)
         gt_report = f"./{gff_name}_gt_gff3validator_report.txt"
         gt_cmd = f"(gt gff3validator {gff} 2>&1) > {gt_report}"
@@ -220,7 +220,6 @@ class gene_models_main:
            https://github.com/LegumeFederation/datastore/issues/23
         """
         gff = self.target
-        logger = self.logger
         fasta_ids = self.fasta_ids  # list of FASTA IDS from Reference
         logger.debug(fasta_ids)
         fh = return_filehandle(gff)
@@ -264,18 +263,9 @@ class gene_models_main:
                     #                    groups = get_id_name.search(attributes).groups()
                     feature_id = get_id.search(attributes).group(1)
                     logger.debug(feature_id)
-                    #                    if len(groups) != 2:  # should just be ID and Name
-                    #                        logger.error('too many groups detected: {}'.format(
-                    #                                                                      groups))
-                    #                        passed = False
-                    #                    (feature_id, feature_name) = groups
                     if not feature_id.startswith(true_id):  # check id
                         logger.error("gene feature id, should start with " + f"{true_id} line {lines}")
                         passed = False
-        #                    if not feature_name.startswith(true_name):
-        #                        logger.error('feature name, should start with ' +
-        #                                     '{} line {}'.format(true_name, lines))
-        #                        passed = False
         return passed
 
 
@@ -283,11 +273,9 @@ class protein:
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
-        self.logger = detector.logger
 
     def run(self):
         """Run Checks for protein"""
-        logger = self.logger
         logger.info(f"protein check {self.target}")
         if not self.check_protein():
             logger.error("protein file naming checks FAILED")
@@ -303,7 +291,6 @@ class protein:
            checks these file attributes to ensure they are correct
         """
         target = self.target
-        logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error(f"File did not have 7 fields! {attr}")
@@ -348,11 +335,9 @@ class protein_primaryTranscript:
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
-        self.logger = detector.logger
 
     def run(self):
         """Run Checks for protein_primaryTranscript"""
-        logger = self.logger
         logger.info(f"protein_primaryTranscript check {self.target}")
         if not self.check_protein_primaryTranscript():
             logger.error("protein_primaryTranscript naming checks FAILED")
@@ -368,7 +353,6 @@ class protein_primaryTranscript:
            checks these file attributes to ensure they are correct
         """
         target = self.target
-        logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
             logger.error(f"File did not have 7 fields! {attr}")
@@ -413,12 +397,10 @@ class readme_md:  # need to populate this correctly later
     def __init__(self, detector, **kwargs):
         self.detector = detector
         self.target = detector.target
-        self.logger = detector.logger
         self.fasta_ids = detector.fasta_ids
 
     def validate_checksum(self, md5_file, check_me):
         """Get md5 checksum for file and compare to expected"""
-        logger = self.logger
         fh = return_filehandle(md5_file)
         hash_md5 = hashlib.md5()
         check_sum_target = ""
@@ -451,13 +433,3 @@ class readme_md:  # need to populate this correctly later
             logger.error((f"Checksum for file {check_me} {target_sum} " + f"did not match {check_sum_target}"))
             sys.exit(1)
         logger.info("Checksums checked out, moving on...")
-
-    def validate_doi(self, readme):
-        """Parse README.<key>.yml and get publication or dataset DOIs
-
-           Uses http://www.doi.org/factsheets/DOIProxy.html#rest-api
-        """
-        logger = self.logger
-        publication_doi = ""
-        dataset_doi = ""
-        object_dois = {}

@@ -2,24 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # standard library imports
-import gzip
-import logging
 import os
-import re
-import subprocess
 import sys
 
 # third-party imports
 import click
 from ruamel.yaml import YAML
-from ruamel.yaml import RoundTripDumper
 
 # module imports
-from ..helper import check_file
-from ..helper import check_subprocess_dependencies
-from ..helper import create_directories
-from ..helper import return_filehandle
-from ..helper import setup_logging
+from .common import logger
 
 
 def read_yaml(template):
@@ -29,12 +20,12 @@ def read_yaml(template):
     return yaml, target_yaml
 
 
-def generate_readme(template, attributes, logger):
+def generate_readme(template, attributes):
     """Writes target YAML file"""
     yaml, my_yaml = read_yaml(template)
-    my_readme = "{}/README.{}.yaml".format(attributes["target_dir"], attributes["key"])
+    my_readme = f"{attributes['target_dir']}/README.{attributes['key']}.yaml"
     identifier = attributes["key"]
-    sci_name = "{} {}".format(attributes["genus"].capitalize(), attributes["species"].lower())
+    sci_name = f"{attributes['genus'].capitalize()} {attributes['species'].lower()}"
     sci_name_abr = attributes["gensp"].lower()
     genotype = attributes["infra_id"]
     my_yaml["identifier"] = identifier  # set key
@@ -64,7 +55,6 @@ def generate_readme(template, attributes, logger):
 )
 def cli(target, template, log_file, log_level):
     """Determines what typae of index to apply to input target"""
-    logger = setup_logging(log_file, log_level)
     if not (target and template):
         logger.error("--target and --template arguments are required")
         sys.exit(1)
@@ -77,13 +67,13 @@ def cli(target, template, log_file, log_level):
     organism_attributes = organism_dir.split("_")  # Genus_species
     target_attributes = target_dir.split(".")
     if len(organism_attributes) != 2:
-        logger.error("Parent directory {} is not Genus_species".format(organism_dir))
+        logger.error(f"Parent directory {organism_dir} is not Genus_species")
         sys.exit(1)
     if len(target_attributes) < 3:
-        logger.error("Target directory {} is not delimited correctly".format(target_dir))
+        logger.error(f"Target directory {target_dir} is not delimited correctly")
         sys.exit(1)
     # abbreviation in yaml README file
-    gensp = "{}{}".format(organism_attributes[0][:3], organism_attributes[1][:2])
+    gensp = f"{organism_attributes[0][:3]}{organism_attributes[1][:2]}"
     attributes = {
         "genus": organism_attributes[0],
         "species": organism_attributes[1],
@@ -92,5 +82,4 @@ def cli(target, template, log_file, log_level):
         "infra_id": target_attributes[0],
         "target_dir": target,
     }
-    #    print('{}\t{}\t{}'.format(template, attributes, logger))
-    generate_readme(template, attributes, logger)  # write readme template
+    generate_readme(template, attributes)  # write readme template

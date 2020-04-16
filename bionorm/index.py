@@ -2,47 +2,38 @@
 # -*- coding: utf-8 -*-
 
 # standard library imports
-import gzip
-import logging
 import os
-import re
 import subprocess
 import sys
 
 # third-party imports
 import click
-from ruamel.yaml import YAML
 
-# module imports
-from ..helper import check_file
-from ..helper import check_subprocess_dependencies
-from ..helper import create_directories
-from ..helper import return_filehandle
-from ..helper import setup_logging
+from .common import logger
 
 
 def index_fasta(fasta):
     """Indexes the supplied fasta file using bgzip and samtools"""
-    compressed_fasta = "{}.gz".format(fasta)  # will now have gz after bgzip
+    compressed_fasta = f"{fasta}.gz"  # will now have gz after bgzip
     if not check_file(compressed_fasta):
-        cmd = "bgzip -f --index {}".format(fasta)  # bgzip command
+        cmd = f"bgzip -f --index {fasta}"  # bgzip command
         subprocess.check_call(cmd, shell=True)
-    cmd = "samtools faidx {}".format(compressed_fasta)  # samtools faidx
+    cmd = f"samtools faidx {compressed_fasta}"  # samtools faidx
     subprocess.check_call(cmd, shell=True)
     return compressed_fasta  # return new compressed and indexed gff
 
 
 def index_gff3(gff3):
     """Indexes the supplied gff3 file using bgzip and tabix"""
-    compressed_gff = "{}.gz".format(gff3)  # will now have gz after bgzip
+    compressed_gff = f"{gff3}.gz"  # will now have gz after bgzip
     if not check_file(compressed_gff):
-        cmd = "bgzip -f {}".format(gff3)  # bgzip command
+        cmd = f"bgzip -f {gff3}"  # bgzip command
         subprocess.check_call(cmd, shell=True)
-    cmd = "tabix -p gff {}".format(compressed_gff)  # tabix index command
+    cmd = f"tabix -p gff {compressed_gff}"  # tabix index command
     standard_outval = subprocess.call(cmd.split(" "))
     if standard_outval:
         # tabix index command
-        cmd = "tabix --csi -p gff {}".format(compressed_gff)
+        cmd = f"tabix --csi -p gff {compressed_gff}"
         subprocess.check_call(cmd, shell=True)
     return compressed_gff  # return new compressed and indexed gff
 
@@ -63,8 +54,6 @@ def index_gff3(gff3):
 )
 def cli(target, log_file, log_level):
     """Determines what type of index to apply to input target"""
-    check_subprocess_dependencies()
-    logger = setup_logging(log_file, log_level)
     if not target:
         logger.error("--target argument required")
         sys.exit(1)
@@ -86,16 +75,16 @@ def cli(target, log_file, log_level):
         logger.error("Uncompress file for indexing.  Compression is done specifically for each index type")
         sys.exit(1)
     if file_type not in file_types:
-        logger.error("File {} is not a type in {}".format(target, file_types))
+        logger.error(f"File {target} is not a type in {file_types}")
         sys.exit(1)
     if file_type in fasta:
         logger.info("Target is a FASTA file indexing...")
         new_file = index_fasta(target)
-        logger.info("Indexing done, final file: {}".format(new_file))
+        logger.info(f"Indexing done, final file: {new_file}")
     if file_type in gff3:
         logger.info("Target is a gff3 file indexing...")
         new_file = index_gff3(target)
-        logger.info("Indexing done, final file: {}".format(new_file))
+        logger.info(f"Indexing done, final file: {new_file}")
     if not new_file:
         logger.error("Indexing FAILED.  See Log.")
         sys.exit(1)

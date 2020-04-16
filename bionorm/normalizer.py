@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # standard library imports
-import os
 import sys
 
 

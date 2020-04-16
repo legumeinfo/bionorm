@@ -13,9 +13,6 @@ import click
 # module imports
 from . import cli
 from .common import logger
-from .helper import check_file
-from .helper import create_directories
-from .helper import return_filehandle
 
 # global constants
 GENUS_CODE_LEN = 3
@@ -67,9 +64,8 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
     fasta_file_path = new_file_dir / f"{org_code}.{infra_id}.gnm{genver}.{key}.genome_main.fna"
     new_fasta = open(fasta_file_path, "w")
     name_prefix = f"{org_code}.{infra_id}.gnm{genver}"
-    fh = return_filehandle(fastafile)
     n_headers = 0
-    with fh as gopen:
+    with Path(fastafile).open("r") as gopen:
         for line in gopen:
             line = line.rstrip()
             if re_header.match(line):  # header line
@@ -101,7 +97,7 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
         logger.error("file %s contains no headers, are you sure it is a FASTA?", fastafile)
         os.remove(fasta_file_path)
         sys.exit(1)
-    if not check_file(fasta_file_path):
+    if not fasta_file_path.is_file():
         logger.error(f"Output file {fasta_file_path} not found for normalize fasta")
         sys.exit(1)  # new file not found return False
     logger.debug("%d sequences in output file", n_headers)
@@ -165,7 +161,7 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     new_gff_name = f"{org_code}.{infra_id}.{gnm}.{ann}.{key}.gene_models_main.gff3"
     species_dir = Path(".") / get_species_dirname(genus, species)
     new_file_dir = species_dir / f"{infra_id}.{gnm}.{ann}.{key}"
-    create_directories(new_file_dir)  # make genus species dir for output
+    new_file_dir.mkdir(exist_ok=True, parents=True)  # make genus species dir for output
     gff_file_path = new_file_dir / new_gff_name
     new_gff = open(gff_file_path, "w")
     get_id = re.compile("ID=([^;]+)")  # gff3 get id string
@@ -175,9 +171,8 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     sub_tree = {}  # feature hierarchy sub tree
     type_hierarchy = {}  # type hierarchy for features, will be ranked
     prefix_name = False
-    fh = return_filehandle(gff3file)  # get filehandle for gff3file
     n_lines = 0
-    with fh as gopen:
+    with Path(gff3file).open("r") as gopen:
         for line in gopen:
             line = line.rstrip()
             if not line:
@@ -262,7 +257,7 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
             l = get_parents.sub(f"Parent={new_ids}", l)
         new_gff.write(f"{l}\n")
     new_gff.close()
-    if not check_file(gff_file_path):  # check for output error if not found
+    if not gff_file_path.is_file():  # check for output error if not found
         logger.error(f"Output file {gff_file_path} not found for normalize gff")
         sys.exit(1)  # new file not found return False
     logger.info(gff_file_path)
