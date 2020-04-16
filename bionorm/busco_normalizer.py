@@ -21,10 +21,10 @@ def preprocess_input(target):
     """Creates a temporary file for BUSCO to act on and sets temp and output"""
     name = os.path.basename(target)
     target_dir = os.path.dirname(target)
-    busco_dir = "{}/busco".format(target_dir)
+    busco_dir = f"{target_dir}/busco"
     create_directories(busco_dir)  # make runtime dir
     change_directories(busco_dir)  # go to runtime dir cause busco cannot path
-    temp_file = "./{}_buscoready.fa".format(name)
+    temp_file = f"./{name}_buscoready.fa"
     temp_file_handle = open(temp_file, "w")
     temp_target = return_filehandle(target)
     temp_file_handle.writelines(temp_target)
@@ -90,8 +90,8 @@ def cli(target, lineage, mode, threads):
     logger.info("Setting up output and making temp input...")
     busco_me = preprocess_input(target)
     name = os.path.basename(target)
-    output = "{}_busco".format(name)
-    temp_dir = "{}_temp".format(name)
-    logger.info("Runnig BUSCO on {} with mode {} and lineage {}...".format(target, mode, lineage))
+    output = f"{name}_busco"
+    temp_dir = f"{name}_temp"
+    logger.info(f"Runnig BUSCO on {target} with mode {mode} and lineage {lineage}...")
     output = run_busco(busco_me, output, temp_dir, threads, mode, lineage)
-    logger.info("BUSCO done output: {}".format(output))
+    logger.info(f"BUSCO done output: {output}")

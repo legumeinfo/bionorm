@@ -15,7 +15,7 @@ def count_gff_features(gff):
     counts = {}
     fh = return_filehandle(gff)  # use magic filehandle method
     if not fh:
-        logger.error("could not open {}".format(gff))
+        logger.error(f"could not open {gff}")
         sys.exit(1)
     with fh as fopen:
         for line in fopen:

@@ -85,13 +85,13 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
                     if len(parsed_header) == 2:  # header and description
                         hid = parsed_header[0]  # header
                         desc = parsed_header[1]  # description
-                        new_header = ">{}.{} {}".format(name_prefix, hid, desc)
+                        new_header = f">{name_prefix}.{hid} {desc}"
                         n_headers += 1
                         logger.debug(hid)
                         logger.debug(desc)
                         logger.debug(new_header)
                     else:
-                        logger.error("header {} looks odd...".format(line))
+                        logger.error(f"header {line} looks odd...")
                         sys.exit(1)
                 new_fasta.write(new_header + "\n")  # write new header
             else:  # sequence lines
@@ -102,7 +102,7 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
         os.remove(fasta_file_path)
         sys.exit(1)
     if not check_file(fasta_file_path):
-        logger.error("Output file {} not found for normalize fasta".format(fasta_file_path))
+        logger.error(f"Output file {fasta_file_path} not found for normalize fasta")
         sys.exit(1)  # new file not found return False
     logger.debug("%d sequences in output file", n_headers)
     logger.info(fasta_file_path)
@@ -155,8 +155,8 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
         bionorm prefix-gff --gnm 5 --ann 1 --species truncatula --genus medicago \\
                 --infra_id jemalong_A17 --key FAKE example_jemalong.gff3
     """
-    gnm = "gnm{}".format(gnm)
-    ann = "ann{}".format(ann)
+    gnm = f"gnm{gnm}"
+    ann = f"ann{ann}"
     if sort_only:
         logger.debug("sorting ONLY...")
     else:
@@ -164,7 +164,7 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     org_code = organism_code(genus, species)
     new_gff_name = f"{org_code}.{infra_id}.{gnm}.{ann}.{key}.gene_models_main.gff3"
     species_dir = Path(".") / get_species_dirname(genus, species)
-    new_file_dir = species_dir / "{}.{}.{}.{}".format(infra_id, gnm, ann, key)
+    new_file_dir = species_dir / f"{infra_id}.{gnm}.{ann}.{key}"
     create_directories(new_file_dir)  # make genus species dir for output
     gff_file_path = new_file_dir / new_gff_name
     new_gff = open(gff_file_path, "w")
@@ -191,13 +191,13 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
                     sys.exit(1)
             if line.startswith("#"):  # header
                 if sort_only:  # do not prefix
-                    new_gff.write("{}\n".format(line))
+                    new_gff.write(f"{line}\n")
                     continue
                 if line.startswith("##sequence-region"):  # replace header
                     fields = re.split(r"\s+", line)
-                    ref_name = "{}.{}.{}.{}".format(org_code, infra_id, gnm, fields[1])
+                    ref_name = f"{org_code}.{infra_id}.{gnm}.{fields[1]}"
                     line = re.sub(fields[1], ref_name, line)
-                new_gff.write("{}\n".format(line))
+                new_gff.write(f"{line}\n")
                 continue
             fields = line.split("\t")
             gff3_lines.append(fields)
@@ -217,7 +217,7 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
         for p in sub_tree[f]["parent_ids"]:
             parent_type = sub_tree[p]["type"]
             if not parent_type:  # must have type
-                logger.error("could not find type for parent {}".format(parent_type))
+                logger.error(f"could not find type for parent {parent_type}")
                 sys.exit(1)  # error no type
             parent_types.append(parent_type)
         update_hierarchy(type_hierarchy, feature_type, parent_types)
@@ -233,37 +233,37 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
                 check = 1
         if not check:  # escape loop when all features are ranked
             ranking = 0
-    feature_prefix = "{}.{}.{}.{}".format(org_code, infra_id, gnm, ann)
+    feature_prefix = f"{org_code}.{infra_id}.{gnm}.{ann}"
     for l in sorted(
         gff3_lines, key=lambda x: (x[0], int(x[3]), type_rank(type_hierarchy, x[2]))
     ):  # rank by chromosome, start, type_rank and stop
         if sort_only:  # do not prefix or change IDs
             l = "\t".join(l)
-            new_gff.write("{}\n".format(l))
+            new_gff.write(f"{l}\n")
             continue
-        l[0] = "{}.{}.{}.{}".format(org_code, infra_id, gnm, l[0])  # rename
+        l[0] = f"{org_code}.{infra_id}.{gnm}.{l[0]}"  # rename
         l = "\t".join(l)
         feature_id = get_id.search(l)
         feature_name = get_name.search(l)
         feature_parents = get_parents.search(l)
         if feature_id:  # if id set new id
-            new_id = "{}.{}".format(feature_prefix, feature_id.group(1))
-            l = get_id.sub("ID={}".format(new_id), l)
+            new_id = f"{feature_prefix}.{feature_id.group(1)}"
+            l = get_id.sub(f"ID={new_id}", l)
         if feature_name and prefix_name:  # if name and flag set new name
-            new_name = "{}.{}".format(feature_prefix, feature_name.group(1))
-            l = get_name.sub("Name={}".format(new_name), l)
+            new_name = f"{feature_prefix}.{feature_name.group(1)}"
+            l = get_name.sub(f"Name={new_name}", l)
         if feature_parents:  # parents set new parent ids
             parent_ids = feature_parents.group(1).split(",")
             new_ids = []
             for p in parent_ids:  # for all parents
-                new_id = "{}.{}".format(feature_prefix, p)
+                new_id = f"{feature_prefix}.{p}"
                 new_ids.append(new_id)
             new_ids = ",".join(new_ids)  # set delimiter for multiple parents
-            l = get_parents.sub("Parent={}".format(new_ids), l)
-        new_gff.write("{}\n".format(l))
+            l = get_parents.sub(f"Parent={new_ids}", l)
+        new_gff.write(f"{l}\n")
     new_gff.close()
     if not check_file(gff_file_path):  # check for output error if not found
-        logger.error("Output file {} not found for normalize gff".format(gff_file_path))
+        logger.error(f"Output file {gff_file_path} not found for normalize gff")
         sys.exit(1)  # new file not found return False
     logger.info(gff_file_path)
     return gff_file_path  # return path to new gff file

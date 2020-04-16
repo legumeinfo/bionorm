@@ -32,7 +32,7 @@ class genome_main:
         """Runs checks"""
         logger = self.logger
         target = self.target
-        logger.info("Performing Naming Checks for {}\n".format(target))
+        logger.info(f"Performing Naming Checks for {target}\n")
         if not self.check_genome_main():
             logger.error("Naming Check FAILED")
             return False
@@ -55,28 +55,28 @@ class genome_main:
         logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 7:  # should be 7 fields
-            logger.error("File did not have 7 fields! {}".format(attr))
+            logger.error(f"File did not have 7 fields! {attr}")
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
-            logger.error("File must have 5 letter prefix, not {}".format(attr[0]))
+            logger.error(f"File must have 5 letter prefix, not {attr[0]}")
             return False
         if not attr[2].startswith("gnm"):  # should be gnm type
-            logger.error("File should have gnm in field 3, not {}".format(attr[2]))
+            logger.error(f"File should have gnm in field 3, not {attr[2]}")
             return False
         gnm_v = attr[2].replace("gnm", "")
         try:
             int(gnm_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if len(gnm_v.split(".")) > 1:  # check for float
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if not attr[5] == "fna":  # should be fna type
-            logger.error("File should be fna not {}".format(attr[5]))
+            logger.error(f"File should be fna not {attr[5]}")
             return False
         if not attr[6] == "gz":  # should be gzip compressed
-            logger.error("Last field should be gz, not {}".format(attr[6]))
+            logger.error(f"Last field should be gz, not {attr[6]}")
             return False
         logger.info("Genome Naming Looks Correct")
         return True
@@ -108,13 +108,13 @@ class genome_main:
                         else:
                             hid = hid.groups(0)[0]  # get id portion of header
                     else:
-                        logger.error("Header {} looks odd...".format(line))
+                        logger.error(f"Header {line} looks odd...")
                         return False
                     logger.debug(hid)
                     self.detector.fasta_ids[hid] = 1
                     standard_header = true_header + "." + hid
                     if not hid.startswith(true_header):
-                        logger.warning(("Inconsistency {} ".format(hid) + "Should be {}".format(standard_header)))
+                        logger.warning((f"Inconsistency {hid} " + f"Should be {standard_header}"))
                         passed = False
         return passed
 
@@ -158,40 +158,40 @@ class gene_models_main:
         logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
-            logger.error("File did not have 7 fields! {}".format(attr))
+            logger.error(f"File did not have 7 fields! {attr}")
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
-            logger.error("File must have 5 letter prefix, not {}".format(attr[0]))
+            logger.error(f"File must have 5 letter prefix, not {attr[0]}")
             return False
         if not attr[2].startswith("gnm"):  # should be gnm type
-            logger.error("File should have gnm in field 3, not {}".format(attr[2]))
+            logger.error(f"File should have gnm in field 3, not {attr[2]}")
             return False
         gnm_v = attr[2].replace("gnm", "")
         try:
             int(gnm_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if len(gnm_v.split(".")) > 1:  # check for float
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if not attr[3].startswith("ann"):  # should be gnm type
-            logger.error("File should have ann in field 4, not {}".format(attr[2]))
+            logger.error(f"File should have ann in field 4, not {attr[2]}")
             return False
         ann_v = attr[3].replace("ann", "")
         try:
             int(ann_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("ann version must be integer not {}".format(ann_v))
+            logger.error(f"ann version must be integer not {ann_v}")
             return False
         if len(ann_v.split(".")) > 1:  # check for float
-            logger.error("ann version must be integer not {}".format(gnm_v))
+            logger.error(f"ann version must be integer not {gnm_v}")
             return False
         if not attr[6] == "gff3":  # should be gff3 type
-            logger.error("File should be gff3 not {}".format(attr[6]))
+            logger.error(f"File should be gff3 not {attr[6]}")
             return False
         if not attr[7] == "gz":  # should be gzip compressed
-            logger.error("Last field should be gz, not {}".format(attr[6]))
+            logger.error(f"Last field should be gz, not {attr[6]}")
             return False
         return True
 
@@ -203,8 +203,8 @@ class gene_models_main:
         gff = self.target
         logger = self.logger
         gff_name = os.path.basename(gff)
-        gt_report = "./{}_gt_gff3validator_report.txt".format(gff_name)
-        gt_cmd = "(gt gff3validator {} 2>&1) > {}".format(gff, gt_report)
+        gt_report = f"./{gff_name}_gt_gff3validator_report.txt"
+        gt_cmd = f"(gt gff3validator {gff} 2>&1) > {gt_report}"
         logger.debug(gt_cmd)
         exit_val = subprocess.call(gt_cmd, shell=True)  # get gt exit_val
         logger.debug(exit_val)
@@ -248,7 +248,7 @@ class gene_models_main:
                     if seqid not in fasta_ids:  # fasta header check
                         logger.debug(seqid)
                         if seqid not in seen:
-                            logger.error("{} not found in genome_main".format(seqid))
+                            logger.error(f"{seqid} not found in genome_main")
                             seen[seqid] = 1
                         passed = False
                 feature_type = columns[2]  # get type
@@ -258,7 +258,7 @@ class gene_models_main:
                     continue
                 #                if not get_id_name.match(attributes):  # check for ID and Name
                 if not get_id.search(attributes):  # check for ID and Name
-                    logger.error("No ID and Name attributes. line {}".format(lines))
+                    logger.error(f"No ID and Name attributes. line {lines}")
                     passed = False
                 else:
                     #                    groups = get_id_name.search(attributes).groups()
@@ -270,7 +270,7 @@ class gene_models_main:
                     #                        passed = False
                     #                    (feature_id, feature_name) = groups
                     if not feature_id.startswith(true_id):  # check id
-                        logger.error("gene feature id, should start with " + "{} line {}".format(true_id, lines))
+                        logger.error("gene feature id, should start with " + f"{true_id} line {lines}")
                         passed = False
         #                    if not feature_name.startswith(true_name):
         #                        logger.error('feature name, should start with ' +
@@ -288,7 +288,7 @@ class protein:
     def run(self):
         """Run Checks for protein"""
         logger = self.logger
-        logger.info("protein check {}".format(self.target))
+        logger.info(f"protein check {self.target}")
         if not self.check_protein():
             logger.error("protein file naming checks FAILED")
             return False
@@ -306,40 +306,40 @@ class protein:
         logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
-            logger.error("File did not have 7 fields! {}".format(attr))
+            logger.error(f"File did not have 7 fields! {attr}")
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
-            logger.error("File must have 5 letter prefix, not {}".format(attr[0]))
+            logger.error(f"File must have 5 letter prefix, not {attr[0]}")
             return False
         if not attr[2].startswith("gnm"):  # should be gnm type
-            logger.error("File should have gnm in field 3, not {}".format(attr[2]))
+            logger.error(f"File should have gnm in field 3, not {attr[2]}")
             return False
         gnm_v = attr[2].replace("gnm", "")
         try:
             int(gnm_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if len(gnm_v.split(".")) > 1:  # check for float
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if not attr[3].startswith("ann"):  # should be gnm type
-            logger.error("File should have ann in field 4, not {}".format(attr[2]))
+            logger.error(f"File should have ann in field 4, not {attr[2]}")
             return False
         ann_v = attr[3].replace("ann", "")
         try:
             int(ann_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("ann version must be integer not {}".format(ann_v))
+            logger.error(f"ann version must be integer not {ann_v}")
             return False
         if len(ann_v.split(".")) > 1:  # check for float
-            logger.error("ann version must be integer not {}".format(gnm_v))
+            logger.error(f"ann version must be integer not {gnm_v}")
             return False
         if not attr[6] == "faa":  # should be gff3 type
-            logger.error("File should be gff3 not {}".format(attr[6]))
+            logger.error(f"File should be gff3 not {attr[6]}")
             return False
         if not attr[7] == "gz":  # should be gzip compressed
-            logger.error("Last field should be gz, not {}".format(attr[6]))
+            logger.error(f"Last field should be gz, not {attr[6]}")
             return False
         return True
 
@@ -353,7 +353,7 @@ class protein_primaryTranscript:
     def run(self):
         """Run Checks for protein_primaryTranscript"""
         logger = self.logger
-        logger.info("protein_primaryTranscript check {}".format(self.target))
+        logger.info(f"protein_primaryTranscript check {self.target}")
         if not self.check_protein_primaryTranscript():
             logger.error("protein_primaryTranscript naming checks FAILED")
             return False
@@ -371,40 +371,40 @@ class protein_primaryTranscript:
         logger = self.logger
         attr = os.path.basename(target).split(".")  # split on delimiter
         if len(attr) != 8:  # should be 8 fields
-            logger.error("File did not have 7 fields! {}".format(attr))
+            logger.error(f"File did not have 7 fields! {attr}")
             return False
         if len(attr[0]) != 5:  # should be 5 letter prefix
-            logger.error("File must have 5 letter prefix, not {}".format(attr[0]))
+            logger.error(f"File must have 5 letter prefix, not {attr[0]}")
             return False
         if not attr[2].startswith("gnm"):  # should be gnm type
-            logger.error("File should have gnm in field 3, not {}".format(attr[2]))
+            logger.error(f"File should have gnm in field 3, not {attr[2]}")
             return False
         gnm_v = attr[2].replace("gnm", "")
         try:
             int(gnm_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if len(gnm_v.split(".")) > 1:  # check for float
-            logger.error("gnm version must be integer not {}".format(gnm_v))
+            logger.error(f"gnm version must be integer not {gnm_v}")
             return False
         if not attr[3].startswith("ann"):  # should be gnm type
-            logger.error("File should have ann in field 4, not {}".format(attr[2]))
+            logger.error(f"File should have ann in field 4, not {attr[2]}")
             return False
         ann_v = attr[3].replace("ann", "")
         try:
             int(ann_v)
         except ValueError:  # best way to check for int in python2
-            logger.error("ann version must be integer not {}".format(ann_v))
+            logger.error(f"ann version must be integer not {ann_v}")
             return False
         if len(ann_v.split(".")) > 1:  # check for float
-            logger.error("ann version must be integer not {}".format(gnm_v))
+            logger.error(f"ann version must be integer not {gnm_v}")
             return False
         if not attr[6] == "faa":  # should be gff3 type
-            logger.error("File should be gff3 not {}".format(attr[6]))
+            logger.error(f"File should be gff3 not {attr[6]}")
             return False
         if not attr[7] == "gz":  # should be gzip compressed
-            logger.error("Last field should be gz, not {}".format(attr[6]))
+            logger.error(f"Last field should be gz, not {attr[6]}")
             return False
         return True
 
@@ -431,15 +431,15 @@ class readme_md:  # need to populate this correctly later
                 fields = line.split()
                 check_sum = fields[0]
                 filename = fields[1]
-                logger.debug("check_sum: {}, filename: {}".format(check_sum, filename))
+                logger.debug(f"check_sum: {check_sum}, filename: {filename}")
                 if not check_sum and filename:
-                    logger.error("Could not find sum and name for {}".format(line))
+                    logger.error(f"Could not find sum and name for {line}")
                 if filename == os.path.basename(check_me):
-                    logger.info("Checksum found for {}".format(filename))
+                    logger.info(f"Checksum found for {filename}")
                     check_sum_target = check_sum
                     switch = 1
         if not switch:
-            logger.error("Could not find checksum for {}".format(check_me))
+            logger.error(f"Could not find checksum for {check_me}")
             sys.exit(1)
         with open(check_me, "rb") as copen:
             for chunk in iter(lambda: copen.read(4096), b""):  # 4096 buffer
@@ -448,9 +448,7 @@ class readme_md:  # need to populate this correctly later
         logger.debug(target_sum)
         logger.debug(check_sum_target)
         if target_sum != check_sum_target:  # compare sums
-            logger.error(
-                ("Checksum for file {} {} ".format(check_me, target_sum) + "did not match {}".format(check_sum_target))
-            )
+            logger.error((f"Checksum for file {check_me} {target_sum} " + f"did not match {check_sum_target}"))
             sys.exit(1)
         logger.info("Checksums checked out, moving on...")
 

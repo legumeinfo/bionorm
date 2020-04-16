@@ -19,10 +19,10 @@ def primary_transcript_check(peptides):
     seq_handle = open(peptides, "rt")
     longest = {}
     count = 0
-    primary = "{}.protein_primaryTranscript.faa".format(".".join(peptides.split(".")[:-2]))
+    primary = f"{'.'.join(peptides.split('.')[:-2])}.protein_primaryTranscript.faa"
     for record in sequence_helpers.get_seqio_fasta_record(seq_handle):
         count += 1
-        my_record = ">{}\n{}".format(record.id, record.seq)
+        my_record = f">{record.id}\n{record.seq}"
         my_obj = {"record": my_record, "length": len(record.seq)}
         gene_id = ".".join(record.id.split(".")[:-1])
         if gene_id not in longest:
@@ -44,10 +44,10 @@ def run_gffread(gff, fastapath):
     """Read gff3 file and write mRNA, CDS and peptides."""
     gff_dir = os.path.dirname(gff)
     gff_attributes = os.path.basename(gff).split(".")
-    mrna = "{}/{}.mrna.fna".format(gff_dir, ".".join(gff_attributes[:5]))
-    cds = "{}/{}.cds.fna".format(gff_dir, ".".join(gff_attributes[:5]))
-    pep = "{}/{}.protein.faa".format(gff_dir, ".".join(gff_attributes[:5]))
-    cmd = "gffread {} -g {} -w {} -x {} -y {} -W".format(gff, fastapath, mrna, cds, pep)
+    mrna = f"{gff_dir}/{'.'.join(gff_attributes[:5])}.mrna.fna"
+    cds = f"{gff_dir}/{'.'.join(gff_attributes[:5])}.cds.fna"
+    pep = f"{gff_dir}/{'.'.join(gff_attributes[:5])}.protein.faa"
+    cmd = f"gffread {gff} -g {fastapath} -w {mrna} -x {cds} -y {pep} -W"
     # print("cmd=", cmd)
     subprocess.check_call(cmd, shell=True)
     primary_transcript_check(pep)
@@ -72,6 +72,6 @@ def extract_fasta(gffpath, fastapath):
         logger.error("GFFREAD cannot process compressed fasta as fastapath")
         sys.exit(1)
     if len(gffpath_attributes) < 7:
-        logger.error("Target file {} is not delimited correctly".format(gffpath))
+        logger.error(f"Target file {gffpath} is not delimited correctly")
         sys.exit(1)
     run_gffread(gffpath, fastapath)  # write readme template
