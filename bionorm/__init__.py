@@ -85,3 +85,4 @@ from .installer import install  # isort:skip
 from .index import index_fasta  # isort:skip
 from .index import index_gff  # isort:skip
 from .consistency import consistency  # isort:skip
+from .generate_readme import generate_readme  # isort:skip

@@ -13,10 +13,10 @@ import click
 # module imports
 from . import cli
 from .common import logger
+from .common import GENUS_CODE_LEN
+from .common import SPECIES_CODE_LEN
 
 # global constants
-GENUS_CODE_LEN = 3
-SPECIES_CODE_LEN = 2
 GFF_SPLIT_MAGIC = ["##gff-version", "3"]
 
 

@@ -17,6 +17,8 @@ try:
 except ModuleNotFoundError:
     from importlib_metadata import distribution
 
+# module imports
+from . import cli
 
 # global constants
 DEFAULT_FILE_LOGLEVEL = logging.DEBUG

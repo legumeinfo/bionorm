@@ -74,4 +74,4 @@ def extract_fasta(gffpath, fastapath):
     if len(gffpath_attributes) < 7:
         logger.error(f"Target file {gffpath} is not delimited correctly")
         sys.exit(1)
-    run_gffread(gffpath, fastapath)  # write readme template
+    run_gffread(gffpath, fastapath)
