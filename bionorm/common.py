@@ -5,7 +5,7 @@
 import locale
 import logging
 from pathlib import Path
-from pathlib import PurePosixPath
+from pathlib import PosixPath
 
 # third-party imports
 import click
@@ -58,7 +58,7 @@ def get_user_context_obj():
     return click.get_current_context().obj
 
 
-class DataStorePath(PurePosixPath):
+class DataStorePath(PosixPath):
 
     """Pathlib path with Data Store attributes."""
 
@@ -81,45 +81,39 @@ class PathToDataStoreAttributes(Dict):
             path = path
         else:
             path = Path(path)
-        self.file_type = None
-        self.file_subtype = None
+        dir_types = (
+            ("annotation", self.annotation_dir, self.annotation_file),
+            ("genome", self.genome_dir, self.genome_file),
+            ("about", self.about_dir, self.about_file),
+            ("organism", self.organism_dir, self.organism_file),
+        )
         self.dir_type = None
-        self.invalid = False
+        self.file_type = None
+        self.dir_type = None
         self.invalid_key = None
         self.invalid_val = None
+        self.file_name = None
+        self.applies_to = None
         if path.is_file():
-            self.file_type = "unknown"
-            self.file_subtype = "unrecognized"
-            self.modifies = None
-            self.compressed = path.suffix[1:] in COMPRESSED_TYPES
-            if self.annotation_dir(path.resolve().parent):
-                self.file_type = "annotation"
-                if not self.annotation_file(path):
-                    self.invalid = True
-            elif self.genome_dir(path.resolve().parent):
-                self.file_type = "genomic"
-                if not self.genome_file(path):
-                    self.invalid = True
-            elif self.organism_dir(path.parent):
-                self.file_type = "organism"
-                self.is_organism_file = True
-            return
+            for name, dir_method, file_method in dir_types:
+                if dir_method(path.resolve().parent):
+                    self.dir_type = name
+                    self.file_name = path.name
+                    self.compressed = path.suffix[1:] in COMPRESSED_TYPES
+                    if not file_method(path):
+                        self.file_type = "invalid"
+                    break
         elif path.is_dir():
-            dir_types = (
-                ("annotation", self.annotation_dir),
-                ("genome", self.genome_dir),
-                ("organism", self.organism_dir),
-            )
             # Check more-restrictive rules first
-            self.dir_type = "unrecognized"
-            for name, dir_method in dir_types:
+            for name, dir_method, file_method in dir_types:
                 if dir_method(path):
                     self.dir_type = name
                     break
 
     def organism_dir(self, path):
         """Check if path.name is of form Genus_species."""
-        parts = path.resolve().name.split("_")
+        name = path.resolve().name
+        parts = name.split("_")
         if len(parts) != 2:
             return False
         if parts[0] != parts[0].capitalize():
@@ -130,6 +124,7 @@ class PathToDataStoreAttributes(Dict):
         self.species = parts[1]
         self.scientific_name = f"{parts[0]} {parts[1]}"
         self.scientific_name_abbrev = f"{parts[0][:GENUS_CODE_LEN]}{parts[1][:SPECIES_CODE_LEN]}".lower()
+        self.organism_dir_name = name
         return True
 
     def check_filename_part(self, namepart, key):
@@ -142,7 +137,15 @@ class PathToDataStoreAttributes(Dict):
             return True
 
     def annotation_file(self, path):
-        parts = path.resolve().name.split(".")
+        """Check if annotation file is of known type."""
+        name = path.resolve().name
+        parts = name.split(".")
+        if parts[-1] == "yml":
+            return self.YAML_name_checker(name)
+        elif parts[-1] == "md5":
+            return self.MD5_name_checker(name)
+        elif parts[-1] == "txt":
+            return self.text_name_checker(name)
         if len(parts) < 7:
             self.invalid_key = "dots_in_name"
             self.invalid_val = len(parts)
@@ -160,11 +163,62 @@ class PathToDataStoreAttributes(Dict):
         if parts[5] in ANNOTATION_SUBTYPES:
             subtype_dict = ANNOTATION_SUBTYPES[parts[5]]
             if not self.is_modified(parts[6:], subtype_dict):
-                self.file_subtype = subtype_dict["name"]
+                self.file_type = subtype_dict["name"]
             if parts[6] != subtype_dict["ext"]:
                 self.invalid_key = "ext"
                 self.invalid_val = parts[6]
                 return False
+        else:
+            self.file_type = "unrecognized"
+        return True
+
+    def genome_file(self, path):
+        """Check if file is a valid genomic file."""
+        name = path.resolve().name
+        parts = name.split(".")
+        if parts[-1] == "yml":
+            return self.YAML_name_checker(name)
+        elif parts[-1] == "md5":
+            return self.MD5_name_checker(name)
+        elif parts[-1] == "txt":
+            return self.text_name_checker(name)
+        if len(parts) < 6:
+            self.invalid_key = "dots_in_name"
+            self.invalid_val = len(parts)
+            return False
+        if not self.check_filename_part(parts[0], "scientific_name_abbrev"):
+            return False
+        if not self.check_filename_part(parts[1], "genotype"):
+            return False
+        if not self.versioned_val(parts[2], "gnm"):
+            return False
+        if not self.identifier_val(parts[3]):
+            return False
+        if parts[4] in GENOME_SUBTYPES:
+            subtype_dict = GENOME_SUBTYPES[parts[4]]
+            if not self.is_modified(parts[5:], subtype_dict):
+                self.file_type = subtype_dict["name"]
+            if parts[5] != subtype_dict["ext"]:
+                self.invalid_key = "ext"
+                self.invalid_val = parts[5]
+                return False
+        else:
+            self.file_type = "unrecognized"
+        return True
+
+    def about_file(self, path):
+        """Check if file is a valid about_this_collection file."""
+        name = path.resolve().name
+        parts = name.split(".")
+        if parts[-1] == "yml":
+            return self.YAML_name_checker(name)
+        else:
+            self.file_type = "unrecognized"
+        return True
+
+    def organism_file(self, path):
+        """Check if file is a valid organismic file."""
+        self.file_type = "unrecognized"  # no organismic files
         return True
 
     def is_modified(self, endparts, subtype_dict):
@@ -181,33 +235,8 @@ class PathToDataStoreAttributes(Dict):
             mod_pos = 1
         if endparts[mod_pos] not in subtype_dict["modifiers"]:
             return False
-        self.file_subtype = subtype_dict["modifiers"][endparts[mod_pos]]
-        self.modifies = subtype_dict["name"]
-        return True
-
-    def genome_file(self, path):
-        """Check if file is a valid genomic file."""
-        parts = path.resolve().name.split(".")
-        if len(parts) < 6:
-            self.invalid_key = "dots_in_name"
-            self.invalid_val = len(parts)
-            return False
-        if not self.check_filename_part(parts[0], "scientific_name_abbrev"):
-            return False
-        if not self.check_filename_part(parts[1], "genotype"):
-            return False
-        if not self.versioned_val(parts[2], "gnm"):
-            return False
-        if not self.identifier_val(parts[3]):
-            return False
-        if parts[4] in GENOME_SUBTYPES:
-            subtype_dict = GENOME_SUBTYPES[parts[4]]
-            if not self.is_modified(parts[5:], subtype_dict):
-                self.file_subtype = subtype_dict["name"]
-            if parts[5] != subtype_dict["ext"]:
-                self.invalid_key = "ext"
-                self.invalid_val = parts[5]
-                return False
+        self.file_type = subtype_dict["modifiers"][endparts[mod_pos]]
+        self.applies_to = subtype_dict["name"]
         return True
 
     def identifier_val(self, string):
@@ -248,9 +277,79 @@ class PathToDataStoreAttributes(Dict):
             return False
         return True
 
+    def YAML_name_checker(self, filename):
+        """Check for consistency of YAML filenames."""
+        parts = filename.split(".")
+        underscore_parts = parts[0].split("_")
+        if parts[0] == "README":
+            if len(parts) != 3:
+                self.invalid_key = "length"
+                self.invalid_val = len(parts)
+                return False
+            if not self.identifier_val(parts[1]):
+                return False
+            self.file_type = "readme"
+        elif parts[0] == "MANIFEST":
+            if len(parts) != 4:
+                self.invalid_key = "length"
+                self.invalid_val = len(parts)
+                return False
+            if not self.identifier_val(parts[1]):
+                return False
+            if parts[2] not in ["correspondence", "descriptions"]:
+                self.invalid_key = "type"
+                self.invalid_val = parts[2]
+                return False
+            self.file_type = parts[2]
+        elif underscore_parts[0] in ["strains", "description"]:
+            if len(underscore_parts) != 3:
+                self.invalid_key = "length"
+                self.invalid_val = len(underscore_parts)
+                return False
+            if underscore_parts[1] != self.genus:
+                self.invalid_key = "genus"
+                self.invalid_val = underscore_parts[1]
+                return False
+            if underscore_parts[2] != self.species:
+                self.invalid_key = "species"
+                self.invalid_val = underscore_parts[2]
+                return False
+            self.file_type = underscore_parts[0]
+        else:
+            self.invalid_key = "unknown_YAML"
+            self.invalid_value = filename
+            return False
+        return True
+
+    def MD5_name_checker(self, filename):
+        """Check for consistency of YAML filenames."""
+        parts = filename.split(".")
+        if parts[0] == "CHECKSUM":
+            if len(parts) != 3:
+                self.invalid_key = "length"
+                self.invalid_val = len(parts)
+                return False
+            if not self.identifier_val(parts[1]):
+                return False
+            self.file_type = "checksum"
+        else:
+            self.invalid_key = "name"
+            self.invalid_val = parts[0]
+            return False
+        return True
+
+    def text_name_checker(self, filename):
+        """Check for consistency of text filenames."""
+        if filename.startswith("original"):
+            self.file_type = "original_text"
+        else:
+            self.file_type = "unrecognized"
+        return True
+
     def genome_dir(self, path):
         """See if path is of form genotype.gnmX.KEYV"""
-        parts = path.resolve().name.split(".")
+        name = path.resolve().name
+        parts = name.split(".")
         if len(parts) != 3:
             return False
         if not self.versioned_val(parts[1], "gnm"):
@@ -260,11 +359,13 @@ class PathToDataStoreAttributes(Dict):
         if not self.organism_dir(path.parent):
             return False
         self.genotype = parts[0]
+        self.dir_name = name
         return True
 
     def annotation_dir(self, path):
         """See if path is of form strain.gnmX.annY.KEYV"""
-        parts = path.resolve().name.split(".")
+        name = path.resolve().name
+        parts = name.split(".")
         if len(parts) != 4:
             return False
         if not self.versioned_val(parts[1], "gnm"):
@@ -276,25 +377,47 @@ class PathToDataStoreAttributes(Dict):
         if not self.organism_dir(Path(path.resolve().parent)):
             return False
         self.genotype = parts[0]
+        self.dir_name = name
         return True
+
+    def about_dir(self, path):
+        """See if path is of form genotype.gnmX.KEYV"""
+        name = path.resolve().name
+        if name != "about_this_collection":
+            return False
+        if not self.organism_dir(path.parent):
+            return False
+        self.dir_name = name
+        return True
+
+    def describe(self, name):
+        """Return human-readable summary of attributes."""
+        node_text = f"Node {name} is "
+        if self.file_name is not None:
+            if self.file_type is not None:
+                node_text += f"{self.file_type} file "
+            else:
+                node_text += "unknown file "
+            if self.applies_to is not None:
+                node_text += f"that applies to {self.applies_to} file "
+            node_text += "in "
+        if self.dir_type is not None:
+            node_text += f"{self.dir_type} directory with "
+        else:
+            node_text += "in non-Data-Store directory with"
+        n_keys = len([k for k in self.keys() if self[k] is not None])
+        if n_keys and self.invalid_key is None:
+            node_text += f"{n_keys} non-null Data Store attributes.\n"
+        elif self.invalid_key is not None:
+            node_text += f'invalid key "{self.invalid_key}" value "{self.invalid_val}"\n'
+        else:
+            node_text = "No Data Store attributes.\n"
+        return node_text
 
     def __repr__(self):
         """Print Data Store attributes."""
-        node_text = "Node is "
-        if self.dir_type is not None:
-            node_text += f"{self.dir_type} directory with "
-        elif self.file_type is not None:
-            node_text += f"{self.file_type} {self.file_subtype} "
-            if self.modifies is not None:
-                node_text += f"of {self.modifies} "
-        exclusionlist = ["invalid", "invalid_key", "invalid_val", "dir_type", "file_type", "file_subtype", "modifies"]
-        keys = [k for k in self.keys() if k not in exclusionlist]
-        if len(keys) and not self.invalid:
-            node_text += f"file with {len(keys)} Data Store attributes:\n"
-            for key in sorted(keys):
-                node_text += f"   {key}: {self[key]}\n"
-        elif self.invalid:
-            node_text += f'invalid key "{self.invalid_key}" value "{self.invalid_val}"\n'
-        else:
-            node_text = "no Data Store attributes."
+        node_text = ""
+        keys = [k for k in self.keys() if self[k] is not None]
+        for key in sorted(keys):
+            node_text += f"   {key}: {self[key]}\n"
         return node_text
