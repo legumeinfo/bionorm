@@ -27,7 +27,7 @@ def test_consistency(datadir_mgr):
     with datadir_mgr.in_tmp_dir(
         inpathlist=[CDS_PATH, GFF_PATH, FASTA_PATH, MRNA_PATH, TRANSCRIPT_PATH],
         save_outputs=True,
-        excludepattern="*.log",
+        excludepatterns=["*.log"],
     ):
         output = sh.bionorm(["consistency", "--help"])
         print(output)

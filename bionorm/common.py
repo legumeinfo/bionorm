@@ -33,6 +33,43 @@ GENOME_SUBTYPES = {
 GENUS_CODE_LEN = 3
 SPECIES_CODE_LEN = 2
 KEY_LEN = 4
+DIR_DESCRIPTORS = [
+    "ann",
+    "bac",
+    "div",
+    "expr",
+    "esm",
+    "fam",
+    "genefam",
+    "gnm",
+    "map",
+    "met",
+    "mrk",
+    "rpt",
+    "samplesetN",
+    "syn",
+    "tcp",
+    "trt",
+]
+DATA_STORE_ATTRIBUTES = [
+    "about_dir",
+    "annotation_dir",
+    "applies_to",
+    "compressed",
+    "dir_name",
+    "dir_type",
+    "file_name",
+    "file_type",
+    "genotype",
+    "genus",
+    "identifier",
+    "invalid_key",
+    "invalid_val",
+    "scientific_name",
+    "scientific_name_abbrev",
+    "species",
+] + DIR_DESCRIPTORS
+
 #
 # global logger object
 #
@@ -87,13 +124,8 @@ class PathToDataStoreAttributes(Dict):
             ("about", self.about_dir, self.about_file),
             ("organism", self.organism_dir, self.organism_file),
         )
-        self.dir_type = None
-        self.file_type = None
-        self.dir_type = None
-        self.invalid_key = None
-        self.invalid_val = None
-        self.file_name = None
-        self.applies_to = None
+        for att in DATA_STORE_ATTRIBUTES:
+            self[att] = None
         if path.is_file():
             for name, dir_method, file_method in dir_types:
                 if dir_method(path.resolve().parent):
@@ -246,11 +278,12 @@ class PathToDataStoreAttributes(Dict):
             self.invalid_key = code + "_len"
             self.invalid_val = string
             return False
-        if string != string.upper():
-            self.invalid_key = code + "_case"
-            self.invalid_val = string
-            return False
-        if code not in self:
+        # decided that upppercase is not a strict rule for now
+        # if string != string.upper():
+        #    self.invalid_key = code + "_case"
+        #    self.invalid_val = string
+        #    return False
+        if self[code] is None:
             self[code] = string
         elif self[code] != string:
             self.invalid_key = code
@@ -264,15 +297,18 @@ class PathToDataStoreAttributes(Dict):
             self.invalid_key = code
             self.invalid_val = string
             return False
-        if not string[len(code) :].isnumeric():
-            self.invalid_key = code + "_number"
-            self.invalid_val = string[len(code) :]
-            return False
-        val = int(string[len(code) :])
-        if code not in self:
+        if len(code) == len(string):
+            val = 0  # no number
+        else:
+            if not string[len(code) :].isnumeric():
+                self.invalid_key = code + "_number"
+                self.invalid_val = string[len(code) :]
+                return False
+            val = int(string[len(code) :])
+        if self[code] is None:
             self[code] = val
         elif self[code] != val:
-            self.invalid_key = code + "_number"
+            self.invalid_key = code + "_verify"
             self.invalid_val = val
             return False
         return True
