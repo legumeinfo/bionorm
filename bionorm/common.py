@@ -51,23 +51,25 @@ DIR_DESCRIPTORS = [
     "tcp",
     "trt",
 ]
+# order in list will ultimately be order in tsv file
 DATA_STORE_ATTRIBUTES = [
+    "organism_dir_name",
+    "dir_name",
+    "file_name",
+    "dir_type",
+    "file_type",
+    "genus",
+    "species",
+    "scientific_name",
+    "scientific_name_abbrev",
+    "identifier",
+    "genotype",
+    "compressed",
+    "invalid_key",
+    "invalid_val",
     "about_dir",
     "annotation_dir",
     "applies_to",
-    "compressed",
-    "dir_name",
-    "dir_type",
-    "file_name",
-    "file_type",
-    "genotype",
-    "genus",
-    "identifier",
-    "invalid_key",
-    "invalid_val",
-    "scientific_name",
-    "scientific_name_abbrev",
-    "species",
 ] + DIR_DESCRIPTORS
 
 #

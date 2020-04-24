@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.6.0"
+version = "0.6.5"
 description = "normalize and verify genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -36,7 +36,7 @@ classifiers = [
     ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.6.1"
 biopython = "^1.76"
 click = "^7.0"
 "ruamel.yaml" = "^0.16.6"
@@ -48,6 +48,7 @@ sh = "^1.12.14"
 packaging = "^20.3"
 progressbar2 = "^3.50.1"
 addict = "^2.2.1"
+pandas = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
