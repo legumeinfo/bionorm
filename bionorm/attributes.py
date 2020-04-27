@@ -4,7 +4,6 @@
 # standard library imports
 import json as jsonlib
 import sys
-from pathlib import Path
 
 # third-party imports
 import click
@@ -12,7 +11,9 @@ import pandas as pd
 
 # module imports
 from . import cli
-from .common import DataStorePath
+from .common import COLLECTION_ATT_FILENAME
+from .common import CollectionPath
+from .common import args_to_pathlist
 
 
 @cli.command()
@@ -37,40 +38,28 @@ def ls(nodelist, json, invalid, long, unrecognized, recurse, tsv, directory, fil
 
     """
     n_invalid = 0
-    if nodelist == ():  # empty nodelist
-        if directory:
-            nodelist = [Path(".")]
-        else:
-            nodelist = [p for p in Path(".").glob("*")]
-    if recurse:
-        filelist = []
-        for node in nodelist:
-            filelist += [f for f in Path(node).rglob("*") if f.is_file()]
-        nodelist = filelist
     att_dict_list = []
-    for node in nodelist:
-        node = DataStorePath(node)
-        if node.data_store_attributes.invalid_key is not None:
+    for node in args_to_pathlist(nodelist, directory, recurse):
+        node = CollectionPath(node)
+        if node.collection_attributes.invalid_key is not None:
             n_invalid += 1
         else:
             if invalid:
                 continue
-        if unrecognized and not node.data_store_attributes.file_type == "unrecognized":
+        if unrecognized and not node.collection_attributes.file_type == "unrecognized":
             continue
         if json:
-            print(jsonlib.dumps(node.data_store_attributes))
+            print(jsonlib.dumps(node.collection_attributes))
         elif long:
-            print(node.data_store_attributes.describe(node), end="")
-            print(node.data_store_attributes, end="")
+            print(node.collection_attributes.describe(node), end="")
+            print(node.collection_attributes, end="")
         elif tsv:
-            att_dict_list.append(dict(node.data_store_attributes))
+            att_dict_list.append(dict(node.collection_attributes))
         else:
             print(node)
-
     if tsv:
         att_frame = pd.DataFrame(att_dict_list)
-        tsv_filename = "bionorm_attributes.tsv"
-        att_frame.to_csv(tsv_filename, sep="\t")
-        print(f"{len(att_frame)} attribute records written to {tsv_filename}")
+        att_frame.to_csv(COLLECTION_ATT_FILENAME, sep="\t")
+        print(f"{len(att_frame)} attribute records written to {COLLECTION_ATT_FILENAME}")
     if n_invalid:
         print(f"ERROR--{n_invalid} invalid nodes were found.", file=sys.stderr)

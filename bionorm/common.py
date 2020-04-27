@@ -4,11 +4,13 @@
 # standard library imports
 import locale
 import logging
+import os
 from pathlib import Path
 from pathlib import PosixPath
 
 # third-party imports
 import click
+import toml
 from addict import Dict
 
 #
@@ -53,8 +55,6 @@ DIR_DESCRIPTORS = [
 ]
 # order in list will ultimately be order in tsv file
 DATA_STORE_ATTRIBUTES = [
-    "organism_dir_name",
-    "dir_name",
     "file_name",
     "dir_type",
     "file_type",
@@ -72,6 +72,10 @@ DATA_STORE_ATTRIBUTES = [
     "applies_to",
 ] + DIR_DESCRIPTORS
 
+COLLECTION_DIR = ".bionorm"
+COLLECTION_ATT_FILENAME = "collection_attributes.tsv"
+METADATA_DIR_SUFFIX = "_metadata"
+FILE_METADATA_SUFFIX = METADATA_DIR_SUFFIX + ".toml"
 #
 # global logger object
 #
@@ -97,17 +101,7 @@ def get_user_context_obj():
     return click.get_current_context().obj
 
 
-class DataStorePath(PosixPath):
-
-    """Pathlib path with Data Store attributes."""
-
-    def __init__(self, path):
-        """"Init with attributes."""
-        super().__init__()
-        self.data_store_attributes = PathToDataStoreAttributes(self)
-
-
-class PathToDataStoreAttributes(Dict):
+class PathToAttributes(Dict):
 
     """Dictionary/attributes of Data Store nodes."""
 
@@ -158,7 +152,6 @@ class PathToDataStoreAttributes(Dict):
         self.species = parts[1]
         self.scientific_name = f"{parts[0]} {parts[1]}"
         self.scientific_name_abbrev = f"{parts[0][:GENUS_CODE_LEN]}{parts[1][:SPECIES_CODE_LEN]}".lower()
-        self.organism_dir_name = name
         return True
 
     def check_filename_part(self, namepart, key):
@@ -397,7 +390,6 @@ class PathToDataStoreAttributes(Dict):
         if not self.organism_dir(path.parent):
             return False
         self.genotype = parts[0]
-        self.dir_name = name
         return True
 
     def annotation_dir(self, path):
@@ -415,7 +407,6 @@ class PathToDataStoreAttributes(Dict):
         if not self.organism_dir(Path(path.resolve().parent)):
             return False
         self.genotype = parts[0]
-        self.dir_name = name
         return True
 
     def about_dir(self, path):
@@ -425,7 +416,6 @@ class PathToDataStoreAttributes(Dict):
             return False
         if not self.organism_dir(path.parent):
             return False
-        self.dir_name = name
         return True
 
     def describe(self, name):
@@ -459,3 +449,83 @@ class PathToDataStoreAttributes(Dict):
         for key in sorted(keys):
             node_text += f"   {key}: {self[key]}\n"
         return node_text
+
+
+def recursive_check_for_collection(path):
+    "Check for access to COLLECTION_DIR in parents of path."
+    if not os.access(path, os.R_OK):
+        return None
+    potential_path = path / COLLECTION_DIR
+    if potential_path.exists():
+        if potential_path.is_dir():
+            return potential_path
+        else:
+            print(f"WARNING--{COLLECTION_DIR} exists in {path} but is not a directory.")
+            return None
+    else:
+        if path == Path("/"):
+            return None
+        else:
+            return recursive_check_for_collection(path.parent)
+
+
+def find_collection_home(path=None):
+    "Set path defaults then check for COLLECTION_DIR."
+    if path is None:
+        path = Path.cwd()
+    if not path.is_absolute():
+        path = path.absolute()
+    return recursive_check_for_collection(path)
+
+
+COLLECTION_HOME = find_collection_home()
+METADATA_HOME = None
+INSTALLATION_DICT = None
+DATA_PATH = None
+REPOSITORY_DICT = None
+DOWNLOAD_URL = None
+if COLLECTION_HOME is not None:
+    metadata_paths = list(COLLECTION_HOME.glob("*" + METADATA_DIR_SUFFIX))
+    if len(metadata_paths) and metadata_paths[0].is_dir():
+        METADATA_HOME = metadata_paths[0]
+        collection_name = METADATA_HOME.name[: -len(METADATA_DIR_SUFFIX)]
+        installation_data_path = COLLECTION_HOME / (collection_name + ".toml")
+        if installation_data_path.exists():
+            with installation_data_path.open("r") as inst_fh:
+                INSTALLATION_DICT = toml.load(inst_fh)
+                DATA_PATH = Path(INSTALLATION_DICT["installation"]["data_path"])
+                if not DATA_PATH.is_absolute():
+                    DATA_PATH = (COLLECTION_HOME / DATA_PATH).resolve()
+        repository_path = METADATA_HOME / ("repository" + FILE_METADATA_SUFFIX)
+        if repository_path.exists():
+            with repository_path.open("r") as repo_fh:
+                REPOSITORY_DICT = toml.load(repo_fh)
+                DOWNLOAD_URL = REPOSITORY_DICT["repository"]["download_url"]
+
+
+class CollectionPath(PosixPath):
+
+    """Pathlib path with Data Store attributes."""
+
+    def __init__(self, path):
+        """"Init with attributes."""
+        super().__init__()
+        self.collection_attributes = PathToAttributes(self)
+        self.file_attributes = None
+
+
+def args_to_pathlist(nodelist, directory, recurse):
+    """Process optional list of files."""
+    if nodelist == ():  # empty nodelist
+        if directory:
+            pathlist = [Path(".")]
+        else:
+            pathlist = [p for p in Path(".").glob("*") if p.is_file()]
+    else:
+        pathlist = [n for n in Path(nodelist[0]).glob("*") if n.is_file()]
+    if recurse:
+        filelist = []
+        for node in nodelist:
+            filelist += [f for f in Path(node).rglob("*") if f.is_file()]
+        pathlist = filelist
+    return pathlist

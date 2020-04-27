@@ -7,6 +7,7 @@ genomes must be formatted and checked for consistency.
 """
 
 # standard library imports
+import sys
 import warnings
 from pkg_resources import iter_entry_points
 
@@ -46,7 +47,7 @@ def bionorm_check(warnings_as_errors=False, **others):
 
 # define the CLI
 cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=parser_options)
-
+VERSION = cli_builder.version
 # create CLI
 @with_plugins(iter_entry_points(PROGRAM_NAME + ".cli_plugins"))
 @click.group(epilog=cli_builder.author + " <" + cli_builder.email + ">.  " + cli_builder.copyright)
@@ -58,7 +59,7 @@ cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=pars
 @click.option(
     "--warnings_as_errors", "-e", is_flag=True, show_default=True, default=False, help="Warnings cause exceptions."
 )
-@click.version_option(version=cli_builder.version, prog_name=PROGRAM_NAME)
+@click.version_option(version=VERSION, prog_name=PROGRAM_NAME)
 @cli_builder.init_dual_logger()
 @cli_builder.init_user_context_obj(extra_args=["progress", "first_n"])
 def cli(verbose, quiet, log, **kwargs):
@@ -87,3 +88,6 @@ from .index import index_gff  # isort:skip
 from .consistency import consistency  # isort:skip
 from .generate_readme import generate_readme  # isort:skip
 from .attributes import ls  # isort:skip
+from .metadata import show_collection  # isort:skip
+from .metadata import init_collection  # isort:skip
+from .metadata import write_metadata  # isort:skip
