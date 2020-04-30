@@ -18,6 +18,7 @@ from requests_download import download as request_download
 # module imports
 from . import cli
 
+
 INSTALL_ENVIRON_VAR = "BIONORM_INSTALL_DIR"  # installs go into "/bin" and other subdirs of this directory
 if INSTALL_ENVIRON_VAR in os.environ:
     INSTALL_PATH = Path(os.environ[INSTALL_ENVIRON_VAR])

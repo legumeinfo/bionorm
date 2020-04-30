@@ -9,10 +9,11 @@ from pathlib import Path
 
 # third-party imports
 import click
+from loguru import logger
 
 # module imports
 from . import cli
-from .common import logger
+from . import click_loguru
 from .common import GENUS_CODE_LEN
 from .common import SPECIES_CODE_LEN
 
@@ -43,6 +44,7 @@ def get_genome_dir(infra_id, genver=None, annver=None, key=None):
 
 
 @cli.command()
+@click_loguru.init_logger()
 @click.option("--genver", type=int, required=True, help="Genome version number.")
 @click.option("--genus", required=True, help="Genus name of organism.")
 @click.option("--species", required=True, help="Species name of organism.")
@@ -94,13 +96,13 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
                 new_fasta.write(line + "\n")
     new_fasta.close()
     if not n_headers:
-        logger.error("file %s contains no headers, are you sure it is a FASTA?", fastafile)
+        logger.error(f"file {fastafile} contains no headers, are you sure it is a FASTA?")
         os.remove(fasta_file_path)
         sys.exit(1)
     if not fasta_file_path.is_file():
         logger.error(f"Output file {fasta_file_path} not found for normalize fasta")
         sys.exit(1)  # new file not found return False
-    logger.debug("%d sequences in output file", n_headers)
+    logger.debug(f"{n_headers} sequences in output file")
     logger.info(fasta_file_path)
     return fasta_file_path
 
@@ -135,6 +137,7 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 
 
 @cli.command()
+@click_loguru.init_logger()
 @click.option("--gnm", required=True, type=int, help="Genome version number.")
 @click.option("--ann", required=True, type=int, help="""Annotation version number.""")
 @click.option("--genus", required=True, help="Genus name of organism.")

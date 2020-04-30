@@ -10,11 +10,12 @@ from pathlib import Path
 # third-party imports
 import click
 from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
+from loguru import logger
 
 # module imports
 from . import specification_checks
 from . import cli
-from .common import logger
+from . import click_loguru
 
 # global defs
 DOMAIN = "https://legumeinfo.org/data/public"
@@ -351,6 +352,7 @@ class Detector:
 
 
 @cli.command()
+@click_loguru.init_logger()
 @click.option("--busco", is_flag=True, default=True, help="""Run BUSCO checks.""")
 @click.option("--nodes", is_flag=True, default=True, help="""Generate DSCensor stats and node.""")
 @click.option("--genome_main", is_flag=True, default=True, help="""Verify genomic DNA files.""")

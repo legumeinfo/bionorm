@@ -1,93 +1,72 @@
 # -*- coding: utf-8 -*-
-"""bionorm -- normalize and validate genomic data files.
-
-This tool is used to ingest data into the Legume Federation Data Store
-(https://www.legumefederation.org/en/data-store/) and is useful anytime
-genomes must be formatted and checked for consistency.
-"""
-
 # standard library imports
-import sys
+import locale
 import warnings
 from pkg_resources import iter_entry_points
 
 # third-party imports
 import click
+from click_loguru import ClickLoguru
 from click_plugins import with_plugins
+from loguru import logger
 
 # module imports
-from .cli import Logging_CLI_Builder
-from .common import PROGRAM_NAME
-from .common import logger
+from .common import COLLECTION_HOME
+from .common import NAME
+from .common import COLLECTION_TITLE
+from .common import VERSION
 
 # global constants
-DEFAULT_FIRST_N = 0
+LOG_FILE_RETENTION = 3
 
+# set locale so grouping works
+for localename in ["en_US", "en_US.utf8", "English_United_States"]:
+    try:
+        locale.setlocale(locale.LC_ALL, localename)
+        break
+    except locale.Error:
+        continue
 
-# define parser options
-parser_options = [
-    {
-        "args": ("--progress",),
-        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Show a progress bar."},
-    },
-    {"args": ("--first_n",), "kwargs": {"default": 0, help: "Process only this many records. [default: all]"}},
-    {
-        "args": ("--warnings_as_errors", "-e"),
-        "kwargs": {"is_flag": True, "show_default": True, "default": False, "help": "Warnings cause exceptions."},
-    },
-]
+# set up logging
+click_loguru = ClickLoguru(NAME, VERSION, retention=LOG_FILE_RETENTION, log_dir_parent=COLLECTION_HOME)
+if COLLECTION_TITLE is None:
+    epilog = "Not in a repository."
+else:
+    epilog = f'Currently in "{COLLECTION_TITLE}" collection.'
+# create CLI
+@with_plugins(iter_entry_points(NAME + ".cli_plugins"))
+@click_loguru.logging_options
+@click.group(epilog=epilog)
+@click_loguru.stash_subcommand()
+@click.option(
+    "-e", "--warnings_as_errors", is_flag=True, show_default=True, default=False, help="Treat warnings as fatal."
+)
+@click.version_option(version=VERSION, prog_name=NAME)
+def cli(warnings_as_errors, **kwargs):
+    """bionorm -- normalize, verify, and select genomic data.
 
+    For more information, see the homepage at https://github.com/legumeinfo/bionorm
 
-def bionorm_check(warnings_as_errors=False, **others):
-    """CLI check function, parameters must be keyworded."""
+    Originally written by Connor Cameron <ctc@ncgr.org>.
+    Maintained by Joel Berendzen <joelb@ncgr.org>,
+    Copyright (C) 2020. National Center for Genome Resources. All rights reserved.
+    License: BSD-3-Clause
+    """
     if warnings_as_errors:
         logger.warn("Runtime warnings (e.g., from pandas) will cause exceptions")
         warnings.filterwarnings("error")
 
 
-# define the CLI
-cli_builder = Logging_CLI_Builder(PROGRAM_NAME, logger, global_options_list=parser_options)
-VERSION = cli_builder.version
-# create CLI
-@with_plugins(iter_entry_points(PROGRAM_NAME + ".cli_plugins"))
-@click.group(epilog=cli_builder.author + " <" + cli_builder.email + ">.  " + cli_builder.copyright)
-@click.option("-v", "--verbose", is_flag=True, show_default=True, default=False, help="Log debugging info to stderr.")
-@click.option("-q", "--quiet", is_flag=True, show_default=True, default=False, help="Suppress logging to stderr.")
-@click.option("--log/--no_log", is_flag=True, show_default=True, default=True, help="Log to file.")
-@click.option("--progress", is_flag=True, show_default=True, default=False, help="Show a progress bar.")
-@click.option("--first_n", default=DEFAULT_FIRST_N, help="Process only this many records. [default: all]")
-@click.option(
-    "--warnings_as_errors", "-e", is_flag=True, show_default=True, default=False, help="Warnings cause exceptions."
-)
-@click.version_option(version=VERSION, prog_name=PROGRAM_NAME)
-@cli_builder.init_dual_logger()
-@cli_builder.init_user_context_obj(extra_args=["progress", "first_n"])
-def cli(verbose, quiet, log, **kwargs):
-    """Bionorm -- normalize and verify genomic data files.
-
-    If COMMAND is present, and --no_log was not invoked,
-    a log file named bionorm-COMMAND.log
-    will be written in the ./logs/ directory.
-    """
-    bionorm_check(**kwargs)
-
-
-cli_builder.set_cli_func(cli)
-
-# Define some cli-related commands
-cli_builder.test_log_func()
-cli_builder.show_context_func()
-
-# import other CLI functions
+# import CLI functions after cli is defined.
+from .consistency import consistency  # isort:skip
 from .prefix import prefix_fasta  # isort:skip
 from .prefix import prefix_gff  # isort:skip
 from .extract_fasta import extract_fasta  # isort:skip
 from .installer import install  # isort:skip
 from .index import index_fasta  # isort:skip
 from .index import index_gff  # isort:skip
-from .consistency import consistency  # isort:skip
 from .generate_readme import generate_readme  # isort:skip
 from .attributes import ls  # isort:skip
-from .metadata import show_collection  # isort:skip
 from .metadata import init_collection  # isort:skip
+from .metadata import show_collection  # isort:skip
 from .metadata import write_metadata  # isort:skip

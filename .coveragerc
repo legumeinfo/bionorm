@@ -7,7 +7,6 @@ data_file = .coverage
 parallel = True
 omit =
     tests/*
-    */__main__.py
 
 [report]
 exclude_lines =

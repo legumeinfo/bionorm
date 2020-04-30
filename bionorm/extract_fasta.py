@@ -7,11 +7,13 @@ import sys
 
 # third-party imports
 import click
+from loguru import logger
 from sequencetools.helpers import sequence_helpers
+
 
 # module imports
 from . import cli
-from .common import logger
+from . import click_loguru
 
 
 def primary_transcript_check(peptides):
@@ -54,6 +56,7 @@ def run_gffread(gff, fastapath):
 
 
 @cli.command()
+@click_loguru.init_logger()
 @click.argument("gffpath", type=click.Path(exists=True, readable=True, dir_okay=False))
 @click.argument("fastapath", type=click.Path(exists=True, readable=True, dir_okay=False))
 def extract_fasta(gffpath, fastapath):

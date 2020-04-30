@@ -3,21 +3,23 @@
 
 # standard library imports
 import locale
-import logging
 import os
 from pathlib import Path
 from pathlib import PosixPath
 
 # third-party imports
 import click
+import poetry_version
 import toml
 from addict import Dict
+
 
 #
 # global constants
 #
-PROGRAM_NAME = "bionorm"
-CONFIG_FILE_ENVVAR = "BIONORM_CONFIG_FILE_PATH"
+NAME = "bionorm"
+VERSION = "".join(poetry_version.extract(source_file=__file__))
+CONFIG_FILE_ENVVAR = NAME.upper() + "_CONFIG_FILE_PATH"
 FASTA_TYPES = ["fna", "fasta", "fa", "faa"]
 GFF_TYPES = ["gff", "gff3"]
 COMPRESSED_TYPES = ["gz", "bgz", "bz", "xz"]
@@ -72,14 +74,10 @@ DATA_STORE_ATTRIBUTES = [
     "applies_to",
 ] + DIR_DESCRIPTORS
 
-COLLECTION_DIR = ".bionorm"
+COLLECTION_DIR = "." + NAME
 COLLECTION_ATT_FILENAME = "collection_attributes.tsv"
 METADATA_DIR_SUFFIX = "_metadata"
 FILE_METADATA_SUFFIX = METADATA_DIR_SUFFIX + ".toml"
-#
-# global logger object
-#
-logger = logging.getLogger(PROGRAM_NAME)
 #
 # set locale so grouping works
 #
@@ -483,7 +481,8 @@ METADATA_HOME = None
 INSTALLATION_DICT = None
 DATA_PATH = None
 REPOSITORY_DICT = None
-DOWNLOAD_URL = None
+REPOSITORY_URL = None
+COLLECTION_TITLE = None
 if COLLECTION_HOME is not None:
     metadata_paths = list(COLLECTION_HOME.glob("*" + METADATA_DIR_SUFFIX))
     if len(metadata_paths) and metadata_paths[0].is_dir():
@@ -500,7 +499,8 @@ if COLLECTION_HOME is not None:
         if repository_path.exists():
             with repository_path.open("r") as repo_fh:
                 REPOSITORY_DICT = toml.load(repo_fh)
-                DOWNLOAD_URL = REPOSITORY_DICT["repository"]["download_url"]
+                REPOSITORY_URL = REPOSITORY_DICT["repository"]["download_url"]
+                COLLECTION_TITLE = REPOSITORY_DICT["repository"]["title"]
 
 
 class CollectionPath(PosixPath):
@@ -512,6 +512,12 @@ class CollectionPath(PosixPath):
         super().__init__()
         self.collection_attributes = PathToAttributes(self)
         self.file_attributes = None
+
+    def n_files(self):
+        if self.is_dir:
+            return len([f for f in self.glob("*") if f.is_file()])
+        else:
+            return None
 
 
 def args_to_pathlist(nodelist, directory, recurse):

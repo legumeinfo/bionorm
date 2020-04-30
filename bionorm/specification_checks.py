@@ -9,7 +9,7 @@ import re
 import subprocess
 import sys
 
-from .common import logger
+from loguru import logger
 
 
 def return_filehandle(open_me):
@@ -47,7 +47,7 @@ class genome_main:
         if not self.check_genome_fasta():
             logger.error("FASTA Check FAILED")
             return False
-        logger.info("ALL GENOME CHECKS PASSED\n")
+        logger.info("ALL GENOME CHECKS PASSED")
         return True
 
     def check_genome_main(self):
@@ -146,7 +146,7 @@ class gene_models_main:
         if not self.check_seqid_attributes():
             logger.error("Genome and Gene Models are not Congruent FAILED")
             return False
-        logger.info("ALL GENE MODELS CHECKS PASSED\n")
+        logger.info("ALL GENE MODELS CHECKS PASSED")
         return True
 
     def check_gene_models_main(self):

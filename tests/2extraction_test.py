@@ -31,7 +31,7 @@ def test_extraction(datadir_mgr):
         print(output)
         loglist = [fp.name for fp in (Path.cwd() / "logs").glob("*")]
         assert len(loglist) is 1
-        assert "bionorm-extract-fasta.log" in loglist
+        assert "bionorm-extract-fasta_0.log" in loglist
         outfilelist = [fp.name for fp in ANN_PATH.glob("*")]
         expectedlist = [p.name for p in EXTRACTION_LIST]
         for filename in expectedlist:

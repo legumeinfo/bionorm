@@ -56,7 +56,7 @@ def test_prefix_gff(datadir_mgr):
         print(output)
         loglist = list((Path.cwd() / "logs").glob("*"))
         assert len(loglist) is 1
-        assert str(loglist[0].name) == "bionorm-prefix-gff.log"
+        assert str(loglist[0].name) == "bionorm-prefix-gff_0.log"
         outdir_path = Path(ANN_PATH.parts[0])
         subdirname = list(outdir_path.glob("*"))[0].parts[-1]
         assert subdirname == ANN_PATH.parts[1]
@@ -100,7 +100,7 @@ def test_prefix_fasta(datadir_mgr):
         print(output)
         loglist = list((Path.cwd() / "logs").glob("*"))
         assert len(loglist) is 1
-        assert str(loglist[0].name) == "bionorm-prefix-fasta.log"
+        assert str(loglist[0].name) == "bionorm-prefix-fasta_0.log"
         outdir_path = Path(GENOME_PATH.parts[0])
         subdirname = list(outdir_path.glob("*"))[0].parts[-1]
         assert subdirname == GENOME_PATH.parts[1]

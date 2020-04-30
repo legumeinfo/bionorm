@@ -8,8 +8,7 @@ import sys
 # third-party imports
 import click
 
-# module imports
-from .common import logger
+from loguru import logger
 
 
 def create_directories(dirpath):

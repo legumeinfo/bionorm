@@ -44,27 +44,3 @@ def test_version(tmp_path):
             pytest.fail(e)
         print(output)
         assert "version" in output
-
-
-def test_show_context_dict(tmp_path):
-    print("testing context dictionary")
-    with working_directory(tmp_path):
-        try:
-            output = sh.bionorm(["show-context-dict"])
-        except sh.ErrorReturnCode as e:
-            print(e)
-            pytest.fail(e)
-        print(output)
-
-
-def test_logging(tmp_path):
-    print("testing logging")
-    with working_directory(tmp_path):
-        try:
-            output = sh.bionorm(["test-logging"])
-        except sh.ErrorReturnCode as e:
-            print(e)
-            pytest.fail(e)
-        print(output)
-        loglist = list((Path.cwd() / "logs").glob("*"))
-        assert len(loglist) is 1

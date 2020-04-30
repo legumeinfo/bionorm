@@ -1,6 +1,5 @@
 ---
 
 exclude_paths:
-  - 'doc/**'
-  - '*.min.js'
+  - 'docs/**'
   - 'tests/**'

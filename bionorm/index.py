@@ -7,13 +7,13 @@ from pathlib import Path
 
 # third-party imports
 import click
+from loguru import logger
 
 # module imports
 from . import cli
 from .common import COMPRESSED_TYPES
 from .common import FASTA_TYPES
 from .common import GFF_TYPES
-from .common import logger
 
 
 @cli.command()

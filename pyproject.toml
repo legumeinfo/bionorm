@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.7.0"
-description = "normalize and verify genomic data"
+version = "0.7.5"
+description = "normalize, verify, and select genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
 license = "BSD-3-Clause"
@@ -51,6 +51,10 @@ addict = "^2.2.1"
 pandas = "^1.0.3"
 pygit2 = "^1.2.0"
 toml = "^0.10.0"
+loguru = "^0.4.1"
+poetry_version = "^0.1.5"
+ansimarkup = "^1.4.0"
+click_loguru = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
