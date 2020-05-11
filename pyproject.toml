@@ -57,7 +57,7 @@ ansimarkup = "^1.4.0"
 click_loguru = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^5.4"
 pytest-cov = "^2.8.1"
 black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
