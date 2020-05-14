@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.7.9.post1.dev0+5d73431"
+version = "0.7.9.post2.dev0+311dd07"
 description = "normalize, verify, and select genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]

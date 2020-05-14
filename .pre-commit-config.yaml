@@ -46,6 +46,9 @@ repos:
   - id: tests
     name: run tests
     entry: pytest -s
-    language: system
+    language: python
     types: [python]
     stages: [push]
+    additional_dependencies:
+      - pytest
+      - pytest-cov
