@@ -9,7 +9,6 @@ from pathlib import PosixPath
 
 # third-party imports
 import click
-import poetry_version
 import toml
 from addict import Dict
 
@@ -18,7 +17,7 @@ from addict import Dict
 # global constants
 #
 NAME = "bionorm"
-VERSION = "".join(poetry_version.extract(source_file=__file__))
+__version__ = "0.7.6"
 CONFIG_FILE_ENVVAR = NAME.upper() + "_CONFIG_FILE_PATH"
 FASTA_TYPES = ["fna", "fasta", "fa", "faa"]
 GFF_TYPES = ["gff", "gff3"]

@@ -52,7 +52,6 @@ pandas = "^1.0.3"
 pygit2 = "^1.2.0"
 toml = "^0.10.0"
 loguru = "^0.4.1"
-poetry_version = "^0.1.5"
 ansimarkup = "^1.4.0"
 click_loguru = "^0.1.0"
 

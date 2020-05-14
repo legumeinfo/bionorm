@@ -27,7 +27,7 @@ from .common import REPOSITORY_URL
 from .common import FILE_METADATA_SUFFIX
 from .common import METADATA_DIR_SUFFIX
 from .common import METADATA_HOME
-from .common import VERSION
+from .common import __version__
 from .common import CollectionPath
 from .common import args_to_pathlist
 
@@ -92,7 +92,7 @@ def init_collection(data_path, title, repo_url):
                 "metadata_url": repo_url,
                 "data_path": str(data_path),
                 "title": title,
-                "version": VERSION,
+                "version": __version__,
             }
             toml.dump(collection_dict, toml_fh)
 

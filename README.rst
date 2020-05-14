@@ -53,12 +53,10 @@ The following options are global in scope and, if used, must be placed before
 ``COMMAND``. Not all commands support every global option:
 
 ============================= ====================================================
-    --verbose/-v              Log debugging info to stderr.
-    --quiet/-q                Suppress logging to stderr.
-    --no_log                  Suppress logging to file.
-    --progress                Show a progress bar.
-    --first_n                 Process only this many records. [default: all]
-    --warnings_as_errors/-e   Warnings cause exceptions.
+    -v, --verbose             Log debugging info to stderr.
+    -q, --quiet               Suppress logging to stderr.
+    --no-logfile              Suppress logging to file.
+    -e, --warnings_as_errors  Treat warnings as fatal (for testing).
 ============================= ====================================================
 
 Commands

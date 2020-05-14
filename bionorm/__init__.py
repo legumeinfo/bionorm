@@ -14,7 +14,7 @@ from loguru import logger
 from .common import COLLECTION_HOME
 from .common import NAME
 from .common import COLLECTION_TITLE
-from .common import VERSION
+from .common import __version__
 
 # global constants
 LOG_FILE_RETENTION = 3
@@ -28,7 +28,7 @@ for localename in ["en_US", "en_US.utf8", "English_United_States"]:
         continue
 
 # set up logging
-click_loguru = ClickLoguru(NAME, VERSION, retention=LOG_FILE_RETENTION, log_dir_parent=COLLECTION_HOME)
+click_loguru = ClickLoguru(NAME, __version__, retention=LOG_FILE_RETENTION, log_dir_parent=COLLECTION_HOME)
 if COLLECTION_TITLE is None:
     epilog = "Not in a repository."
 else:
@@ -41,7 +41,7 @@ else:
 @click.option(
     "-e", "--warnings_as_errors", is_flag=True, show_default=True, default=False, help="Treat warnings as fatal."
 )
-@click.version_option(version=VERSION, prog_name=NAME)
+@click.version_option(version=__version__, prog_name=NAME)
 def cli(warnings_as_errors, **kwargs):
     """bionorm -- normalize, verify, and select genomic data.
 
