@@ -20,6 +20,7 @@ from loguru import logger
 # module imports
 from . import cli
 from . import click_loguru
+from .__version__ import __version__
 from .common import COLLECTION_ATT_FILENAME
 from .common import COLLECTION_DIR
 from .common import COLLECTION_HOME
@@ -30,7 +31,6 @@ from .common import METADATA_DIR_SUFFIX
 from .common import METADATA_HOME
 from .common import REPOSITORY_URL
 from .common import CollectionPath
-from .common import __version__
 from .common import args_to_pathlist
 
 

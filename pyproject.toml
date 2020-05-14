@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.7.5"
+version = "0.7.9"
 description = "normalize, verify, and select genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -54,6 +54,7 @@ toml = "^0.10.0"
 loguru = "^0.4.1"
 ansimarkup = "^1.4.0"
 click_loguru = "^0.1.0"
+pylint = "^2.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -64,6 +65,8 @@ pydocstyle = "^5.0.2"
 pytest-datadir-mgr = "^1.0.1"
 flynt = "^0.46"
 isort = {extras = ["pyproject"], version = "^4.3.21"}
+pylint = "^2.5.2"
+poetry-dynamic-versioning = "^0.7.0"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"
@@ -92,12 +95,13 @@ exclude = '''
 '''
 
 [tool.isort]
+atomic=true
 force_single_line = true
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
-line_length = 120
+line_length = 79
 import_heading_stdlib = "standard library imports"
 import_heading_thirdparty = "third-party imports"
 import_heading_firstparty = "first-party imports"

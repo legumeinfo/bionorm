@@ -11,10 +11,10 @@ from click_plugins import with_plugins
 from loguru import logger
 
 # module imports
+from .__version__ import __version__
 from .common import COLLECTION_HOME
 from .common import COLLECTION_TITLE
 from .common import NAME
-from .common import __version__
 
 # global constants
 LOG_FILE_RETENTION = 3

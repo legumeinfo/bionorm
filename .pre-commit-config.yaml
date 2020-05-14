@@ -16,7 +16,7 @@ repos:
     -  id: isort
        name: run isort
        entry: isort
-       args: [--atomic, -yq]
+       args: [-yq]
        language: python
        additional_dependencies:
          - isort
@@ -31,6 +31,14 @@ repos:
     language: python
     additional_dependencies:
        - flynt
+#- repo: local
+#  hooks:
+#  - id: version
+#    name: update version from SCM tags
+#    entry: poetry-dynamic-versioning
+#    always_run: true
+#    exclude: .*
+#    language: system
 - repo: local
   hooks:
   - id: tests
