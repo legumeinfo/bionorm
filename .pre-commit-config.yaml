@@ -31,14 +31,16 @@ repos:
     language: python
     additional_dependencies:
        - flynt
-#- repo: local
-#  hooks:
-#  - id: version
-#    name: update version from SCM tags
-#    entry: poetry-dynamic-versioning
-#    always_run: true
-#    exclude: .*
-#    language: system
+- repo: local
+  hooks:
+  - id: poetry-dynamic-versioning
+    name: update version from SCM tags
+    entry: poetry-dynamic-versioning
+    always_run: true
+    exclude: .*
+    language: python
+    additional_dependencies:
+      - poetry-dynamic-versioning
 - repo: local
   hooks:
   - id: tests
