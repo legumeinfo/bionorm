@@ -77,9 +77,17 @@ def run_busco(busco_target, output, temp_dir, threads, mode, lineage):
 
 
 @click.command()
-@click.option("--target", type=str, help="""TARGETS can be files or directories or both""")
-@click.option("--lineage", type=str, help="""BUSCO lineage to compare target against""")
-@click.option("--mode", type=str, help="""BUSCO mode (genome, protein, transcript)""")
+@click.option(
+    "--target",
+    type=str,
+    help="""TARGETS can be files or directories or both""",
+)
+@click.option(
+    "--lineage", type=str, help="""BUSCO lineage to compare target against"""
+)
+@click.option(
+    "--mode", type=str, help="""BUSCO mode (genome, protein, transcript)"""
+)
 @click.option("--threads", type=int, default=4, help="""Threads for BUSCO""")
 def cli(target, lineage, mode, threads):
     """Determines what type of index to apply to input target"""
@@ -106,12 +114,17 @@ def cli(target, lineage, mode, threads):
         logger.error(error_message)
         sys.exit(1)
     if (
-        not (file_attributes[-2].lower() in canonical_types or file_attributes[-3].lower() in canonical_types)
+        not (
+            file_attributes[-2].lower() in canonical_types
+            or file_attributes[-3].lower() in canonical_types
+        )
         and not mode
     ):
         logger.info(
-            "file {} was not recognized as a canonical type and mode cannot be assigned please specify --mode for BUSCO"
-            " to run anyway".format(target)
+            "file {} was not recognized as a canonical type and mode cannot be"
+            " assigned please specify --mode for BUSCO to run anyway".format(
+                target
+            )
         )
         sys.exit(1)
     if file_attributes[-2].lower() in canonical_types and not mode:
@@ -119,13 +132,18 @@ def cli(target, lineage, mode, threads):
     elif file_attributes[-3].lower() in canonical_types and not mode:
         mode = canonical_types[file_attributes[-3].lower()]
     if not mode:
-        logger.info("Mode was not assigned and could not be autodetected, please specify BUSCO mode with --mode")
+        logger.info(
+            "Mode was not assigned and could not be autodetected, please"
+            " specify BUSCO mode with --mode"
+        )
         sys.exit(1)
     logger.info("Setting up output and making temp input...")
     busco_me = preprocess_input(target)
     name = os.path.basename(target)
     output = f"{name}_busco"
     temp_dir = f"{name}_temp"
-    logger.info(f"Runnig BUSCO on {target} with mode {mode} and lineage {lineage}...")
+    logger.info(
+        f"Runnig BUSCO on {target} with mode {mode} and lineage {lineage}..."
+    )
     output = run_busco(busco_me, output, temp_dir, threads, mode, lineage)
     logger.info(f"BUSCO done output: {output}")

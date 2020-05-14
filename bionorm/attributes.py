@@ -25,15 +25,61 @@ UNRECOGNIZED_COLOR = "yellow"
 @cli.command()
 @click_loguru.init_logger(logfile=False)
 @click.option("-j", "--json", help="Output JSON.", is_flag=True, default=False)
-@click.option("-c", "--nocolor", help="Don't colorize output", is_flag=True, default=False)
-@click.option("-l", "--long", help="Output detailed path data store info.", is_flag=True, default=False)
+@click.option(
+    "-c",
+    "--nocolor",
+    help="Don't colorize output",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "-l",
+    "--long",
+    help="Output detailed path data store info.",
+    is_flag=True,
+    default=False,
+)
 @click.option("-t", "--tsv", help="Output tsv.", is_flag=True, default=False)
-@click.option("-d", "--directory", help="Filter only directory info.", is_flag=True, default=False)
-@click.option("-u", "--unrecognized", help="Filter only unrecognized nodes.", is_flag=True, default=False)
-@click.option("-i", "--invalid", help="Filter only invalid node info.", is_flag=True, default=False)
-@click.option("-r", "--recurse", help="Recursively visit all nodes.", is_flag=True, default=False)
+@click.option(
+    "-d",
+    "--directory",
+    help="Filter only directory info.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "-u",
+    "--unrecognized",
+    help="Filter only unrecognized nodes.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "-i",
+    "--invalid",
+    help="Filter only invalid node info.",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "-r",
+    "--recurse",
+    help="Recursively visit all nodes.",
+    is_flag=True,
+    default=False,
+)
 @click.argument("nodelist", nargs=-1)
-def ls(nodelist, json, invalid, long, unrecognized, recurse, tsv, directory, nocolor):
+def ls(
+    nodelist,
+    json,
+    invalid,
+    long,
+    unrecognized,
+    recurse,
+    tsv,
+    directory,
+    nocolor,
+):
     """Print attributes of nodes in data store.
 
     \b
@@ -76,13 +122,18 @@ def ls(nodelist, json, invalid, long, unrecognized, recurse, tsv, directory, noc
             elif node_is_invalid:
                 ansiprint(f"<{INVALID_COLOR}>{node}</{INVALID_COLOR}>")
             elif node_is_unrecognized:
-                ansiprint(f"<{UNRECOGNIZED_COLOR}>{node}</{UNRECOGNIZED_COLOR}>")
+                ansiprint(
+                    f"<{UNRECOGNIZED_COLOR}>{node}</{UNRECOGNIZED_COLOR}>"
+                )
             else:
                 print(node)
     if tsv:
         att_frame = pd.DataFrame(att_dict_list)
         att_frame.to_csv(COLLECTION_ATT_FILENAME, sep="\t")
-        logger.info(f"{len(att_frame)} attribute records written to {COLLECTION_ATT_FILENAME}")
+        logger.info(
+            f"{len(att_frame)} attribute records written to"
+            f" {COLLECTION_ATT_FILENAME}"
+        )
     if n_unrecognized:
         logger.warning(f"{n_unrecognized} unrecognized files were found.")
     if n_invalid:

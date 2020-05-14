@@ -24,7 +24,13 @@ def test_consistency(datadir_mgr):
     datadir_mgr.add_scope("prefix", module="1prefixing_test")
     datadir_mgr.add_scope("extract", module="2extraction_test")
     with datadir_mgr.in_tmp_dir(
-        inpathlist=[CDS_PATH, GFF_PATH, FASTA_PATH, MRNA_PATH, TRANSCRIPT_PATH],
+        inpathlist=[
+            CDS_PATH,
+            GFF_PATH,
+            FASTA_PATH,
+            MRNA_PATH,
+            TRANSCRIPT_PATH,
+        ],
         save_outputs=True,
         excludepatterns=["*.log"],
     ):

@@ -13,7 +13,10 @@ PREFIXING_LIST = [GFF_PATH, FASTA_PATH]
 PROTEIN_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.protein.faa"
 CDS_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.cds.fna"
 MRNA_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.mrna.fna"
-TRANSCRIPT_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.protein_primaryTranscript.faa"
+TRANSCRIPT_PATH = (
+    ANN_PATH
+    / "medtr.jemalong_A17.gnm5.ann1.FAKE.protein_primaryTranscript.faa"
+)
 EXTRACTION_LIST = [PROTEIN_PATH, CDS_PATH, MRNA_PATH, TRANSCRIPT_PATH]
 PROTEIN_COUNT = 11408  # number of protein entries
 

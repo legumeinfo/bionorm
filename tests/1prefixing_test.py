@@ -27,7 +27,9 @@ def test_prefix_gff(datadir_mgr):
         gunzip=True,
         progressbar=False,
     )
-    with datadir_mgr.in_tmp_dir(inpathlist=[RAW_GFF_FILE], save_outputs=True, excludepatterns=["*.log"]):
+    with datadir_mgr.in_tmp_dir(
+        inpathlist=[RAW_GFF_FILE], save_outputs=True, excludepatterns=["*.log"]
+    ):
         try:
             output = sh.bionorm(
                 [
@@ -73,7 +75,11 @@ def test_prefix_fasta(datadir_mgr):
         gunzip=True,
         progressbar=False,
     )
-    with datadir_mgr.in_tmp_dir(inpathlist=[RAW_FASTA_FILE], save_outputs=True, excludepatterns=["*.log"]):
+    with datadir_mgr.in_tmp_dir(
+        inpathlist=[RAW_FASTA_FILE],
+        save_outputs=True,
+        excludepatterns=["*.log"],
+    ):
         try:
             output = sh.bionorm(
                 [

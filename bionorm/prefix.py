@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import click
 from loguru import logger
 
@@ -23,7 +23,9 @@ GFF_SPLIT_MAGIC = ["##gff-version", "3"]
 
 def organism_code(genus, species):
     """Return code from genus and species."""
-    return f"{genus[:GENUS_CODE_LEN].lower()}{species[:SPECIES_CODE_LEN].lower()}"
+    return (
+        f"{genus[:GENUS_CODE_LEN].lower()}{species[:SPECIES_CODE_LEN].lower()}"
+    )
 
 
 def get_species_dirname(genus, species):
@@ -45,12 +47,25 @@ def get_genome_dir(infra_id, genver=None, annver=None, key=None):
 
 @cli.command()
 @click_loguru.init_logger()
-@click.option("--genver", type=int, required=True, help="Genome version number.")
+@click.option(
+    "--genver", type=int, required=True, help="Genome version number."
+)
 @click.option("--genus", required=True, help="Genus name of organism.")
 @click.option("--species", required=True, help="Species name of organism.")
-@click.option("--infra_id", required=True, help="Infraspecies identifier. [e.g., 'A17_HM341']")
-@click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
-@click.argument("fastafile", type=click.Path(exists=True, readable=True, dir_okay=False))
+@click.option(
+    "--infra_id",
+    required=True,
+    help="Infraspecies identifier. [e.g., 'A17_HM341']",
+)
+@click.option(
+    "--key",
+    required=True,
+    metavar="<STRING, len=4>",
+    help="4-character unique identifier.",
+)
+@click.argument(
+    "fastafile", type=click.Path(exists=True, readable=True, dir_okay=False)
+)
 def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
     """Prefix FASTA files to data store standards.
 
@@ -61,9 +76,16 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
     """
     re_header = re.compile(r"^>(\S+)\s*(.*)")  # match header
     org_code = organism_code(genus, species)
-    new_file_dir = Path(".") / get_species_dirname(genus, species) / get_genome_dir(infra_id, genver=genver, key=key)
+    new_file_dir = (
+        Path(".")
+        / get_species_dirname(genus, species)
+        / get_genome_dir(infra_id, genver=genver, key=key)
+    )
     new_file_dir.mkdir(parents=True, exist_ok=True)
-    fasta_file_path = new_file_dir / f"{org_code}.{infra_id}.gnm{genver}.{key}.genome_main.fna"
+    fasta_file_path = (
+        new_file_dir
+        / f"{org_code}.{infra_id}.gnm{genver}.{key}.genome_main.fna"
+    )
     new_fasta = open(fasta_file_path, "w")
     name_prefix = f"{org_code}.{infra_id}.gnm{genver}"
     n_headers = 0
@@ -96,11 +118,16 @@ def prefix_fasta(fastafile, genver, genus, species, infra_id, key):
                 new_fasta.write(line + "\n")
     new_fasta.close()
     if not n_headers:
-        logger.error(f"file {fastafile} contains no headers, are you sure it is a FASTA?")
+        logger.error(
+            f"file {fastafile} contains no headers, are you sure it is a"
+            " FASTA?"
+        )
         os.remove(fasta_file_path)
         sys.exit(1)
     if not fasta_file_path.is_file():
-        logger.error(f"Output file {fasta_file_path} not found for normalize fasta")
+        logger.error(
+            f"Output file {fasta_file_path} not found for normalize fasta"
+        )
         sys.exit(1)  # new file not found return False
     logger.debug(f"{n_headers} sequences in output file")
     logger.info(fasta_file_path)
@@ -122,30 +149,57 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
     """
     if not parent_types:  # this feature must be a root
         if feature_type not in hierarchy:  # add to hierarchy
-            hierarchy[feature_type] = {"children": [], "parents": [], "rank": 0}
+            hierarchy[feature_type] = {
+                "children": [],
+                "parents": [],
+                "rank": 0,
+            }
         hierarchy[feature_type]["rank"] = 1  # rank is 1 because no parents
     else:  # feature has parents
         if feature_type not in hierarchy:
-            hierarchy[feature_type] = {"children": [], "parents": [], "rank": 0}
+            hierarchy[feature_type] = {
+                "children": [],
+                "parents": [],
+                "rank": 0,
+            }
         hierarchy[feature_type]["parents"] = parent_types
         for p in parent_types:  # set children and aprents for all p
             if hierarchy.get(p):
                 if feature_type not in hierarchy[p]["children"]:
                     hierarchy[p]["children"].append(feature_type)
             else:
-                hierarchy[p] = {"children": [feature_type], "parents": [], "rank": 0}
+                hierarchy[p] = {
+                    "children": [feature_type],
+                    "parents": [],
+                    "rank": 0,
+                }
 
 
 @cli.command()
 @click_loguru.init_logger()
 @click.option("--gnm", required=True, type=int, help="Genome version number.")
-@click.option("--ann", required=True, type=int, help="""Annotation version number.""")
+@click.option(
+    "--ann", required=True, type=int, help="""Annotation version number."""
+)
 @click.option("--genus", required=True, help="Genus name of organism.")
 @click.option("--species", required=True, help="Species name of organism.")
-@click.option("--infra_id", required=True, help="Infraspecies identifier. [e.g., 'A17_HM341']")
-@click.option("--key", required=True, metavar="<STRING, len=4>", help="4-character unique identifier.")
-@click.option("--sort_only", is_flag=True, help="Perform sorting only.", default=False)
-@click.argument("gff3file", type=click.Path(exists=True, readable=True, dir_okay=False))
+@click.option(
+    "--infra_id",
+    required=True,
+    help="Infraspecies identifier. [e.g., 'A17_HM341']",
+)
+@click.option(
+    "--key",
+    required=True,
+    metavar="<STRING, len=4>",
+    help="4-character unique identifier.",
+)
+@click.option(
+    "--sort_only", is_flag=True, help="Perform sorting only.", default=False
+)
+@click.argument(
+    "gff3file", type=click.Path(exists=True, readable=True, dir_okay=False)
+)
 def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     """Prefix and sort GFF3 file to data store standards.
 
@@ -161,10 +215,14 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     else:
         logger.debug("prefixing and sorting...")
     org_code = organism_code(genus, species)
-    new_gff_name = f"{org_code}.{infra_id}.{gnm}.{ann}.{key}.gene_models_main.gff3"
+    new_gff_name = (
+        f"{org_code}.{infra_id}.{gnm}.{ann}.{key}.gene_models_main.gff3"
+    )
     species_dir = Path(".") / get_species_dirname(genus, species)
     new_file_dir = species_dir / f"{infra_id}.{gnm}.{ann}.{key}"
-    new_file_dir.mkdir(exist_ok=True, parents=True)  # make genus species dir for output
+    new_file_dir.mkdir(
+        exist_ok=True, parents=True
+    )  # make genus species dir for output
     gff_file_path = new_file_dir / new_gff_name
     new_gff = open(gff_file_path, "w")
     get_id = re.compile("ID=([^;]+)")  # gff3 get id string
@@ -183,7 +241,10 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
             n_lines += 1
             if n_lines == 1:  # magic in first line
                 if not line.split() == GFF_SPLIT_MAGIC:
-                    logger.error("File does not start with GFF3 magic, are you sure is is a GFF3?")
+                    logger.error(
+                        "File does not start with GFF3 magic, are you sure is"
+                        " is a GFF3?"
+                    )
                     new_gff.close()
                     os.remove(gff_file_path)
                     sys.exit(1)
@@ -208,7 +269,10 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
             if not feature_id:
                 continue
             feature_id = feature_id.group(1)
-            sub_tree[feature_id] = {"type": fields[2], "parent_ids": parent_ids}  # parent child
+            sub_tree[feature_id] = {
+                "type": fields[2],
+                "parent_ids": parent_ids,
+            }  # parent child
     for f in sub_tree:
         feature_type = sub_tree[f]["type"]
         parent_types = []
@@ -222,18 +286,25 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
     ranking = 1  # switch to stop ranking in while below
     while ranking:  # this is over-engineered for tabix indexing, but tis cool
         check = 0  # switch to indicate no features unranked
-        for t in sorted(type_hierarchy, key=lambda k: type_hierarchy[k]["rank"], reverse=True):
+        for t in sorted(
+            type_hierarchy,
+            key=lambda k: type_hierarchy[k]["rank"],
+            reverse=True,
+        ):
             if type_hierarchy[t]["rank"]:  # rank !=0
                 for c in type_hierarchy[t]["children"]:
                     if not type_hierarchy[c]["rank"]:
-                        type_hierarchy[c]["rank"] = type_hierarchy[t]["rank"] + 1
+                        type_hierarchy[c]["rank"] = (
+                            type_hierarchy[t]["rank"] + 1
+                        )
             else:  # rank == 0
                 check = 1
         if not check:  # escape loop when all features are ranked
             ranking = 0
     feature_prefix = f"{org_code}.{infra_id}.{gnm}.{ann}"
     for l in sorted(
-        gff3_lines, key=lambda x: (x[0], int(x[3]), type_rank(type_hierarchy, x[2]))
+        gff3_lines,
+        key=lambda x: (x[0], int(x[3]), type_rank(type_hierarchy, x[2])),
     ):  # rank by chromosome, start, type_rank and stop
         if sort_only:  # do not prefix or change IDs
             l = "\t".join(l)
@@ -261,7 +332,9 @@ def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
         new_gff.write(f"{l}\n")
     new_gff.close()
     if not gff_file_path.is_file():  # check for output error if not found
-        logger.error(f"Output file {gff_file_path} not found for normalize gff")
+        logger.error(
+            f"Output file {gff_file_path} not found for normalize gff"
+        )
         sys.exit(1)  # new file not found return False
     logger.info(gff_file_path)
     return gff_file_path  # return path to new gff file

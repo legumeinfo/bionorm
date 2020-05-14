@@ -12,7 +12,10 @@ GFF_PATH = "medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3"
 ORGANISM_DIR = str(ANN_PATH.parent)
 UNREC_PATH = ANN_PATH / "medtr.jemalong_A17.gnm5.ann1.FAKE.badname.fna"
 ANN_INVALID_LIST = [
-    ("bad.jemalong_A17.gnm5.ann1.FAKE.genome_name.fna", "scientific_name_abbrev"),
+    (
+        "bad.jemalong_A17.gnm5.ann1.FAKE.genome_name.fna",
+        "scientific_name_abbrev",
+    ),
     ("medtr.jemalong_A17.gnm1.ann1.FAKE.genome_name.fna", "gnm_verify"),
     ("medtr.jemalong_A17.gnm5.ann2.FAKE.genome_name.fna", "ann_verify"),
     ("medtr.jemalong_A17.gnm5.ann1.BADD.genome_name.fna", "identifier"),
@@ -29,15 +32,25 @@ def test_ls(datadir_mgr):
     datadir_mgr.add_scope("extract", module="2extraction_test")
     datadir_mgr.add_scope("index", module="3indexing_test")
     with datadir_mgr.in_tmp_dir(
-        inpathlist=test_file_paths, save_outputs=True, excludepatterns=["*.log"],
+        inpathlist=test_file_paths,
+        save_outputs=True,
+        excludepatterns=["*.log"],
     ):
         output = sh.bionorm(["ls", "--recurse", ORGANISM_DIR])
         lines_out = output.count("\n")
         assert lines_out == len(test_file_paths)
-        assert not sh.bionorm(["ls", "-r", "--invalid", ORGANISM_DIR]).count("\n")  # no invalid filename
-        assert not sh.bionorm(["ls", "-r", "--unrecognized", ORGANISM_DIR]).count("\n")  # no unrecognized filenames
+        assert not sh.bionorm(["ls", "-r", "--invalid", ORGANISM_DIR]).count(
+            "\n"
+        )  # no invalid filename
+        assert not sh.bionorm(
+            ["ls", "-r", "--unrecognized", ORGANISM_DIR]
+        ).count(
+            "\n"
+        )  # no unrecognized filenames
         UNREC_PATH.touch()
-        assert 1 == sh.bionorm(["ls", "-ru", ORGANISM_DIR]).count("\n")  # now 1 unrecognized filename
+        assert 1 == sh.bionorm(["ls", "-ru", ORGANISM_DIR]).count(
+            "\n"
+        )  # now 1 unrecognized filename
         UNREC_PATH.unlink()
         for badname, reason in ANN_INVALID_LIST:
             badpath = ANN_PATH / badname

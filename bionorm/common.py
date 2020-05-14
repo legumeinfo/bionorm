@@ -28,8 +28,16 @@ ANNOTATION_SUBTYPES = {
     "cds": {"name": "cds", "ext": "fna", "modifiers": FAIDX_DICT},
     "mrna": {"name": "mrna", "ext": "fna", "modifiers": FAIDX_DICT},
     "protein": {"name": "protein", "ext": "faa", "modifiers": FAIDX_DICT},
-    "protein_primaryTranscript": {"name": "primary", "ext": "faa", "modifiers": FAIDX_DICT},
-    "gene_models_main": {"name": "gff", "ext": "gff3", "modifiers": {"tbi": "tabix", "csi": "CSIindex"}},
+    "protein_primaryTranscript": {
+        "name": "primary",
+        "ext": "faa",
+        "modifiers": FAIDX_DICT,
+    },
+    "gene_models_main": {
+        "name": "gff",
+        "ext": "gff3",
+        "modifiers": {"tbi": "tabix", "csi": "CSIindex"},
+    },
 }
 GENOME_SUBTYPES = {
     "genome_main": {"name": "genome", "ext": "fna", "modifiers": FAIDX_DICT},
@@ -149,7 +157,9 @@ class PathToAttributes(Dict):
         self.genus = parts[0]
         self.species = parts[1]
         self.scientific_name = f"{parts[0]} {parts[1]}"
-        self.scientific_name_abbrev = f"{parts[0][:GENUS_CODE_LEN]}{parts[1][:SPECIES_CODE_LEN]}".lower()
+        self.scientific_name_abbrev = (
+            f"{parts[0][:GENUS_CODE_LEN]}{parts[1][:SPECIES_CODE_LEN]}".lower()
+        )
         return True
 
     def check_filename_part(self, namepart, key):
@@ -458,7 +468,10 @@ def recursive_check_for_collection(path):
         if potential_path.is_dir():
             return potential_path
         else:
-            print(f"WARNING--{COLLECTION_DIR} exists in {path} but is not a directory.")
+            print(
+                f"WARNING--{COLLECTION_DIR} exists in {path} but is not a"
+                " directory."
+            )
             return None
     else:
         if path == Path("/"):
@@ -492,7 +505,9 @@ if COLLECTION_HOME is not None:
         if installation_data_path.exists():
             with installation_data_path.open("r") as inst_fh:
                 INSTALLATION_DICT = toml.load(inst_fh)
-                DATA_PATH = Path(INSTALLATION_DICT["installation"]["data_path"])
+                DATA_PATH = Path(
+                    INSTALLATION_DICT["installation"]["data_path"]
+                )
                 if not DATA_PATH.is_absolute():
                     DATA_PATH = (COLLECTION_HOME / DATA_PATH).resolve()
         repository_path = METADATA_HOME / ("repository" + FILE_METADATA_SUFFIX)

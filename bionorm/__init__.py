@@ -28,7 +28,12 @@ for localename in ["en_US", "en_US.utf8", "English_United_States"]:
         continue
 
 # set up logging
-click_loguru = ClickLoguru(NAME, __version__, retention=LOG_FILE_RETENTION, log_dir_parent=COLLECTION_HOME)
+click_loguru = ClickLoguru(
+    NAME,
+    __version__,
+    retention=LOG_FILE_RETENTION,
+    log_dir_parent=COLLECTION_HOME,
+)
 if COLLECTION_TITLE is None:
     epilog = "Not in a repository."
 else:
@@ -39,7 +44,12 @@ else:
 @click.group(epilog=epilog)
 @click_loguru.stash_subcommand()
 @click.option(
-    "-e", "--warnings_as_errors", is_flag=True, show_default=True, default=False, help="Treat warnings as fatal."
+    "-e",
+    "--warnings_as_errors",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Treat warnings as fatal.",
 )
 @click.version_option(version=__version__, prog_name=NAME)
 def cli(warnings_as_errors, **kwargs):
@@ -53,7 +63,9 @@ def cli(warnings_as_errors, **kwargs):
     License: BSD-3-Clause
     """
     if warnings_as_errors:
-        logger.warn("Runtime warnings (e.g., from pandas) will cause exceptions")
+        logger.warn(
+            "Runtime warnings (e.g., from pandas) will cause exceptions"
+        )
         warnings.filterwarnings("error")
 
 

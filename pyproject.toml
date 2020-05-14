@@ -69,7 +69,7 @@ isort = {extras = ["pyproject"], version = "^4.3.21"}
 bionorm = "bionorm:cli"
 
 [tool.black]
-line-length = 120
+line-length = 79
 target-version = ['py36', 'py37', 'py38']
 include = '\.pyi?$'
 exclude = '''

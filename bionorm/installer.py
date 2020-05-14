@@ -18,7 +18,9 @@ from requests_download import download as request_download
 # module imports
 from . import cli
 
-INSTALL_ENVIRON_VAR = "BIONORM_INSTALL_DIR"  # installs go into "/bin" and other subdirs of this directory
+INSTALL_ENVIRON_VAR = (  # installs go into "/bin" and other subdirs of this directory
+    "BIONORM_INSTALL_DIR"
+)
 if INSTALL_ENVIRON_VAR in os.environ:
     INSTALL_PATH = Path(os.environ[INSTALL_ENVIRON_VAR])
 else:
@@ -32,7 +34,10 @@ HTSLIB_DIR = "htslib-" + SAMTOOLS_VER
 DEPENDENCY_DICT = {
     "gffread": {
         "binaries": ["gffread"],
-        "git_list": ["https://github.com/gpertea/gffread.git", "https://github.com/gpertea/gclib"],
+        "git_list": [
+            "https://github.com/gpertea/gffread.git",
+            "https://github.com/gpertea/gclib",
+        ],
         "dir": "gffread",
         "version": version.parse(GFFREAD_VER),
         "version_command": ["--version"],
@@ -55,15 +60,29 @@ DEPENDENCY_DICT = {
         "make_extra_dirs": [HTSLIB_DIR],
         "configure": [],
         "configure_extra_dirs": [HTSLIB_DIR],
-        "copy_binaries": ["samtools", HTSLIB_DIR + "/bgzip", HTSLIB_DIR + "/tabix", HTSLIB_DIR + "/htsfile"],
+        "copy_binaries": [
+            "samtools",
+            HTSLIB_DIR + "/bgzip",
+            HTSLIB_DIR + "/tabix",
+            HTSLIB_DIR + "/htsfile",
+        ],
     },
     "genometools": {
         "binaries": ["gt"],
-        "tarball": ("https://github.com/genometools/genometools/archive/v" + GT_VER + ".tar.gz"),
+        "tarball": (
+            "https://github.com/genometools/genometools/archive/v"
+            + GT_VER
+            + ".tar.gz"
+        ),
         "dir": "genometools-" + GT_VER,
         "version": version.parse(GT_VER),
         "version_command": ["--version"],
-        "make": ["install", "prefix=" + str(INSTALL_PATH), "cairo=no", "useshared=no"],
+        "make": [
+            "install",
+            "prefix=" + str(INSTALL_PATH),
+            "cairo=no",
+            "useshared=no",
+        ],
     },
 }
 
@@ -80,7 +99,9 @@ class DependencyInstaller(object):
         self.bin_path = BIN_PATH
         self.bin_path_exists = self.bin_path.exists()
         self.bin_path_writable = os.access(self.bin_path, os.W_OK)
-        self.bin_path_in_path = str(self.bin_path) in os.environ["PATH"].split(":")
+        self.bin_path_in_path = str(self.bin_path) in os.environ["PATH"].split(
+            ":"
+        )
 
     def check_all(self, verbose=True):
         """Check all depenencies for existence and version."""
@@ -91,19 +112,33 @@ class DependencyInstaller(object):
             for bin in self.dependency_dict[dep]["binaries"]:
                 if sh.which(bin) == None:
                     if verbose:
-                        print(f"Binary {bin} of dependency {dep} is not installed")
+                        print(
+                            f"Binary {bin} of dependency {dep} is not"
+                            " installed"
+                        )
                     self.dependency_dict[dep]["installed"] = False
                 else:
                     exe = sh.Command(bin)
                     ver_out = exe(*version_command, _err_to_out=True)
-                    installed_version = version.parse((ver_out.split("\n")[0]).split()[-1])
+                    installed_version = version.parse(
+                        (ver_out.split("\n")[0]).split()[-1]
+                    )
                     if installed_version == target_version:
-                        ver_str = f"{bin} version at recommended version {installed_version}."
+                        ver_str = (
+                            f"{bin} version at recommended version"
+                            f" {installed_version}."
+                        )
                     elif installed_version < target_version:
-                        ver_str = f"{bin} installed {installed_version} <  target {target_version}."
+                        ver_str = (
+                            f"{bin} installed {installed_version} <  target"
+                            f" {target_version}."
+                        )
                         self.dependency_dict[dep]["installed"] = False
                     elif installed_version > target_version:
-                        ver_str = f"installed {installed_version} exceeds target {target_version}."
+                        ver_str = (
+                            f"installed {installed_version} exceeds target"
+                            f" {target_version}."
+                        )
                     if verbose:
                         print(f"{dep}: {exe} {ver_str}")
         self.versions_checked = True
@@ -128,16 +163,29 @@ class DependencyInstaller(object):
         self.check_all(verbose=False)
         if deplist == ("all",):
             deplist = self.dependencies
-        install_list = [dep for dep in deplist if not self.dependency_dict[dep]["installed"]]
+        install_list = [
+            dep
+            for dep in deplist
+            if not self.dependency_dict[dep]["installed"]
+        ]
         if len(install_list):
             if not self.bin_path_exists:
-                print(f"ERROR--Installation directory {self.bin_path} does not exist.")
+                print(
+                    f"ERROR--Installation directory {self.bin_path} does not"
+                    " exist."
+                )
                 sys.exit(1)
             if not self.bin_path_writable:
-                print(f"ERROR--Installation directory {self.bin_path} is not writable.")
+                print(
+                    f"ERROR--Installation directory {self.bin_path} is not"
+                    " writable."
+                )
                 sys.exit(1)
             if not self.bin_path_in_path:
-                print(f"ERROR--Installation directory {self.bin_path} is not in PATH.")
+                print(
+                    f"ERROR--Installation directory {self.bin_path} is not in"
+                    " PATH."
+                )
                 sys.exit(1)
         for dep in install_list:
             self.install(dep)
@@ -167,7 +215,10 @@ class DependencyInstaller(object):
             trackers = None
         request_download(download_url, download_path, trackers=trackers)
         if verbose:
-            print(f"downloaded file {download_path}, size {download_path.stat().st_size}")
+            print(
+                f"downloaded file {download_path}, size"
+                f" {download_path.stat().st_size}"
+            )
         tar_output = tar("xvf", download_path)
         if verbose:
             print(tar_output)
@@ -269,7 +320,11 @@ class DependencyInstaller(object):
 
 
 @cli.command()
-@click.option("--force/--no-force", help="Force overwrites of existing binaries.", default=False)
+@click.option(
+    "--force/--no-force",
+    help="Force overwrites of existing binaries.",
+    default=False,
+)
 @click.argument("dependencies", nargs=-1)
 def install(dependencies, force):
     """Check for/install binary dependencies.

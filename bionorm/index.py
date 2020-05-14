@@ -5,7 +5,7 @@
 import sys
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import click
 from loguru import logger
 
@@ -17,7 +17,12 @@ from .common import GFF_TYPES
 
 
 @cli.command()
-@click.option("--compress", is_flag=True, default=True, help="Compress with bgzip before indexing.")
+@click.option(
+    "--compress",
+    is_flag=True,
+    default=True,
+    help="Compress with bgzip before indexing.",
+)
 @click.argument("fasta", type=click.Path(exists=True, readable=True))
 def index_fasta(fasta, compress=True):
     """Index and optionally compress a fasta file.
@@ -39,7 +44,9 @@ def index_fasta(fasta, compress=True):
         logger.error(f"Uncompress {target} befor indexing.")
         sys.exit(1)
     if target.suffix.lstrip(".") not in FASTA_TYPES:
-        logger.error(f"File {target} does not have a recognized FASTA extension.")
+        logger.error(
+            f"File {target} does not have a recognized FASTA extension."
+        )
         sys.exit(1)
     if compress:
         output = bgzip(["-f", "--index", str(target)])
@@ -51,7 +58,12 @@ def index_fasta(fasta, compress=True):
 
 
 @cli.command()
-@click.option("--compress", is_flag=True, default=True, help="Compress with bgzip before indexing.")
+@click.option(
+    "--compress",
+    is_flag=True,
+    default=True,
+    help="Compress with bgzip before indexing.",
+)
 @click.argument("gff", type=click.Path(exists=True, readable=True))
 def index_gff(gff, compress=True):
     """Index and optionally compress a GFF file.
@@ -72,7 +84,9 @@ def index_gff(gff, compress=True):
         logger.error(f"Uncompress {target} befor indexing.")
         sys.exit(1)
     if target.suffix.lstrip(".") not in GFF_TYPES:
-        logger.error(f"File {target} does not have a recognized GFF extension.")
+        logger.error(
+            f"File {target} does not have a recognized GFF extension."
+        )
         sys.exit(1)
     if compress:
         output = bgzip(["-f", str(target)])

@@ -5,7 +5,7 @@
 import sys
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import click
 from ruamel.yaml import YAML
 
@@ -14,7 +14,11 @@ from . import cli
 
 
 @cli.command()
-@click.option("--force/--no-force", help="Force overwrites of existing binaries.", default=False)
+@click.option(
+    "--force/--no-force",
+    help="Force overwrites of existing binaries.",
+    default=False,
+)
 @click.argument("target_dir", nargs=-1)
 def generate_readme(target_dir, force):
     """Write context-appropriate templated qREADME YAML file to target_dir.
@@ -42,7 +46,9 @@ def generate_readme(target_dir, force):
     elif attributes.is_organism_dir:
         print("organism dir")
     else:
-        print(f"ERROR--target directory '{target_dir}' is not a recognized type.")
+        print(
+            f"ERROR--target directory '{target_dir}' is not a recognized type."
+        )
         sys.exit(1)
     print(attributes, end="")
     yaml = YAML()

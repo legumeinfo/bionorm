@@ -7,7 +7,6 @@ repos:
       - id: check-toml
       - id: check-merge-conflict
       - id: fix-encoding-pragma
-      - id: name-tests-test
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:

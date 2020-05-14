@@ -20,7 +20,9 @@ def primary_transcript_check(peptides):
     seq_handle = open(peptides, "rt")
     longest = {}
     count = 0
-    primary = f"{'.'.join(peptides.split('.')[:-2])}.protein_primaryTranscript.faa"
+    primary = (
+        f"{'.'.join(peptides.split('.')[:-2])}.protein_primaryTranscript.faa"
+    )
     for record in sequence_helpers.get_seqio_fasta_record(seq_handle):
         count += 1
         my_record = f">{record.id}\n{record.seq}"
@@ -56,8 +58,12 @@ def run_gffread(gff, fastapath):
 
 @cli.command()
 @click_loguru.init_logger()
-@click.argument("gffpath", type=click.Path(exists=True, readable=True, dir_okay=False))
-@click.argument("fastapath", type=click.Path(exists=True, readable=True, dir_okay=False))
+@click.argument(
+    "gffpath", type=click.Path(exists=True, readable=True, dir_okay=False)
+)
+@click.argument(
+    "fastapath", type=click.Path(exists=True, readable=True, dir_okay=False)
+)
 def extract_fasta(gffpath, fastapath):
     """Extract CDS, mrna, and protein files from genome.
 

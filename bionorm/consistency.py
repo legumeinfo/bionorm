@@ -27,7 +27,9 @@ def count_gff_features(gff):
     counts = {}
     with Path(gff).open("r") as fopen:
         for line in fopen:
-            if not line or line.isspace() or line.startswith("#"):  # skip comments
+            if (
+                not line or line.isspace() or line.startswith("#")
+            ):  # skip comments
                 continue
             line = line.rstrip()
             f = line.split("\t")  # get fields
@@ -42,7 +44,15 @@ class Detector:
 
     """Detect datastore file inconsistencies."""
 
-    def __init__(self, target, genome_main, gene_models_main, genometools, fasta_headers, nodes):
+    def __init__(
+        self,
+        target,
+        genome_main,
+        gene_models_main,
+        genometools,
+        fasta_headers,
+        nodes,
+    ):
         """Check for check for gt"""
         self.checks = {}  # object that determines which checks are skipped
         self.checks["genome_main"] = genome_main
@@ -62,7 +72,12 @@ class Detector:
             "protein_primaryTranscript": "gene_models_main",
             "protein": "gene_models_main",
         }
-        self.rank = {"genome_main": 0, "gene_models_main": 1, "protein": 2, "protein_primaryTranscript": 2}
+        self.rank = {
+            "genome_main": 0,
+            "gene_models_main": 1,
+            "protein": 2,
+            "protein_primaryTranscript": 2,
+        }
         self.write_me = {}
         self.passed = {}  # dictionary of passing names
         self.target_objects = {}  # store all target pairings self.get_targets
@@ -72,7 +87,9 @@ class Detector:
         self.target = Path(target)
         self.target_readme = ""
         self.target_type = self.get_target_type()
-        if self.target_type is None:  # target type returned False not recognized
+        if (
+            self.target_type is None
+        ):  # target type returned False not recognized
             logger.error(f"Target type not recognized for {self.target}")
             sys.exit(1)
         logger.info(f"Target type looks like {self.target_type}")
@@ -86,18 +103,26 @@ class Detector:
             primary = False
             for c in self.target_objects[t]["children"]:
                 logger.info(f"Child {c}")
-                if self.target_objects[t]["children"][c]["type"] == "protein_primaryTranscript":
+                if (
+                    self.target_objects[t]["children"][c]["type"]
+                    == "protein_primaryTranscript"
+                ):
                     primary = True
                 if self.target_objects[t]["children"][c]["type"] == "protein":
                     count += 1
                     set_primary = c
             if count == 1 and not primary:
-                self.target_objects[t]["children"][set_primary]["type"] = "protein_primaryTranscript"
+                self.target_objects[t]["children"][set_primary][
+                    "type"
+                ] = "protein_primaryTranscript"
                 self.target_objects[t]["children"][set_primary]["node_data"][
                     "canonical_type"
                 ] = "protein_primaryTranscript"
             if count > 1 and not primary:
-                logger.error(f"Multiple protein files found for {t}, one must be renamed to primary.")
+                logger.error(
+                    f"Multiple protein files found for {t}, one must be"
+                    " renamed to primary."
+                )
                 sys.exit(1)
         logger.info("Initialized Detector\n")
 
@@ -105,7 +130,10 @@ class Detector:
         """Determine whether target is file, organism directory, or data directory."""
         if self.target.is_file():
             target_type = "file"
-        elif len(self.target.name.split("_")) == 2 and len(self.target.name.split(".")) < 3:
+        elif (
+            len(self.target.name.split("_")) == 2
+            and len(self.target.name.split(".")) < 3
+        ):
             target_type = "organism_dir"  # will always be Genus_species
         elif len(self.target.name.split(".")) >= 3:  # standard naming minimum
             target_type = "data_dir"
@@ -123,7 +151,10 @@ class Detector:
         if self.target_type == "file":  # starting with a file
             self.add_target_object()
             return
-        elif self.target_type == "data_dir" or self.target_type == "organism_dir":
+        elif (
+            self.target_type == "data_dir"
+            or self.target_type == "organism_dir"
+        ):
             self.get_all_files()  # works for both data and organism
             return
 
@@ -155,10 +186,17 @@ class Detector:
             return
         canonical_type = target_attributes[-3]  # check content type
         if canonical_type not in self.canonical_types:  # regject
-            logger.debug(f"Type {canonical_type} not recognized in {self.canonical_types}.  Skipping")
+            logger.debug(
+                f"Type {canonical_type} not recognized in"
+                f" {self.canonical_types}.  Skipping"
+            )
             return
-        organism_dir_path = os.path.dirname(os.path.dirname(self.target))  # org dir
-        organism_dir = os.path.basename(os.path.dirname(os.path.dirname(self.target)))  # org dir
+        organism_dir_path = os.path.dirname(
+            os.path.dirname(self.target)
+        )  # org dir
+        organism_dir = os.path.basename(
+            os.path.dirname(os.path.dirname(self.target))
+        )  # org dir
         target_dir = os.path.basename(os.path.dirname(self.target))
         genus = organism_dir.split("_")[0].lower()
         species = organism_dir.split("_")[1].lower()
@@ -188,7 +226,9 @@ class Detector:
             if my_reference not in self.target_objects:  # new parent
                 parent_name = os.path.basename(my_reference)
                 file_type = self.get_target_file_type(parent_name)
-                organism_dir = os.path.basename(os.path.dirname(os.path.dirname(my_reference)))
+                organism_dir = os.path.basename(
+                    os.path.dirname(os.path.dirname(my_reference))
+                )
                 ref_dir = os.path.basename(os.path.dirname(my_reference))
                 file_url = f"{DOMAIN}/{organism_dir}/{ref_dir}/{parent_name}"
                 ref_node_object = {
@@ -221,7 +261,9 @@ class Detector:
                     parent_name = os.path.basename(my_reference)
                     target_node_object["child_of"].append(parent_name)
                     target_node_object["derived_from"].append(parent_name)
-                    self.target_objects[my_reference]["children"][self.target] = {
+                    self.target_objects[my_reference]["children"][
+                        self.target
+                    ] = {
                         "node_data": target_node_object,
                         "type": canonical_type,
                     }
@@ -231,7 +273,11 @@ class Detector:
                 sys.exit(1)
             logger.debug("Target has no Parent, it is a Reference")
             if self.target not in self.target_objects:
-                self.target_objects[target] = {"type": canonical_type, "node_data": target_node_object, "children": {}}
+                self.target_objects[target] = {
+                    "type": canonical_type,
+                    "node_data": target_node_object,
+                    "children": {},
+                }
 
     def get_reference(self, glob_target):
         """Finds the FASTA reference for some prefix"""
@@ -263,7 +309,9 @@ class Detector:
     def run_busco(self, mode, file_name):
         """Runs BUSCO using BUSCO_ENV_FILE envvar and outputs to file_name."""
         node_data = self.node_data  # get current targets nodes
-        busco_parse = re.compile(r"C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)")
+        busco_parse = re.compile(
+            r"C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)"
+        )
         output = f"{'.'.join(file_name.split('.')[:-2])}.busco"
         cmd = f"run_BUSCO.py --mode {mode} --lineage {'lineage'}"
         outdir = f"./run_{output}"  # output from BUSCO
@@ -299,21 +347,31 @@ class Detector:
         """Check consistencies in all objects."""
         targets = self.target_objects  # get objects from class init
         no_nodes = self.no_nodes  # if true, no nodes for DSCensor written
-        for reference in sorted(targets, key=lambda k: self.rank[targets[k]["type"]]):
+        for reference in sorted(
+            targets, key=lambda k: self.rank[targets[k]["type"]]
+        ):
             #            logger.info('HERE {}'.format(reference))
             if reference not in self.passed:
                 self.passed[reference] = 0
                 self.target = reference
                 ref_method = getattr(
-                    specification_checks, targets[reference]["type"]  # reads checks from spec
+                    specification_checks,
+                    targets[reference]["type"],  # reads checks from spec
                 )  # type ex genome_main
-                if not ref_method:  # if the target isnt in the hierarchy continue
-                    logger.debug(f"Check for {targets[reference]['type']} does not exist")
+                if (
+                    not ref_method
+                ):  # if the target isnt in the hierarchy continue
+                    logger.debug(
+                        f"Check for {targets[reference]['type']} does not"
+                        " exist"
+                    )
                     continue
                 logger.debug(ref_method)
                 my_detector = ref_method(self, **self.options)
                 passed = my_detector.run()
-                if passed:  # validation passed writing object node for DSCensor
+                if (
+                    passed
+                ):  # validation passed writing object node for DSCensor
                     self.passed[reference] = 1
                     self.node_data = targets[reference]["node_data"]
                     if nodes:
@@ -334,15 +392,20 @@ class Detector:
                     logger.info(f"Performing Checks for {c}")
                     self.target = c
                     child_method = getattr(
-                        specification_checks, children[c]["type"]  # check for spec
+                        specification_checks,
+                        children[c]["type"],  # check for spec
                     )  # exgene_models_main
                     if not child_method:
-                        logger.warning(f"Check for {children[c]['type']} does not exist")
+                        logger.warning(
+                            f"Check for {children[c]['type']} does not exist"
+                        )
                         continue
                     logger.debug(child_method)
                     my_detector = child_method(self, **self.options)
                     passed = my_detector.run()
-                    if passed:  # validation passed writing object node for DSCensor
+                    if (
+                        passed
+                    ):  # validation passed writing object node for DSCensor
                         self.passed[c] = 1
                         if nodes:
                             logger.info(f"Writing node object for {c}")
@@ -353,14 +416,47 @@ class Detector:
 
 @cli.command()
 @click_loguru.init_logger()
-@click.option("--busco", is_flag=True, default=True, help="""Run BUSCO checks.""")
-@click.option("--nodes", is_flag=True, default=True, help="""Generate DSCensor stats and node.""")
-@click.option("--genome_main", is_flag=True, default=True, help="""Verify genomic DNA files.""")
-@click.option("--gene_models_main", is_flag=True, default=True, help="""Verify gene model FASTA files.""")
-@click.option("--genometools", is_flag=True, help="""Run genometools checks on GFF files.""")
-@click.option("--fasta_headers", is_flag=True, help="""Check consistency of FASTA headers and GFF.""")
+@click.option(
+    "--busco", is_flag=True, default=True, help="""Run BUSCO checks."""
+)
+@click.option(
+    "--nodes",
+    is_flag=True,
+    default=True,
+    help="""Generate DSCensor stats and node.""",
+)
+@click.option(
+    "--genome_main",
+    is_flag=True,
+    default=True,
+    help="""Verify genomic DNA files.""",
+)
+@click.option(
+    "--gene_models_main",
+    is_flag=True,
+    default=True,
+    help="""Verify gene model FASTA files.""",
+)
+@click.option(
+    "--genometools",
+    is_flag=True,
+    help="""Run genometools checks on GFF files.""",
+)
+@click.option(
+    "--fasta_headers",
+    is_flag=True,
+    help="""Check consistency of FASTA headers and GFF.""",
+)
 @click.argument("target", nargs=1)
-def consistency(target, busco, nodes, genome_main, gene_models_main, genometools, fasta_headers):
+def consistency(
+    target,
+    busco,
+    nodes,
+    genome_main,
+    gene_models_main,
+    genometools,
+    fasta_headers,
+):
     """Check self-consistency and consistency with standards."""
     detector = Detector(
         target,

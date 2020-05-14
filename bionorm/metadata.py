@@ -82,7 +82,9 @@ def init_collection(data_path, title, repo_url):
         logger.info(f"Cloning repository at {repo_url} into {metadata_path}.")
         pygit2.clone_repository(repo_url, str(metadata_path))
     else:
-        logger.warning(f"Metadata repository already exists at {METADATA_HOME}.")
+        logger.warning(
+            f"Metadata repository already exists at {METADATA_HOME}."
+        )
     if not toml_path.exists():
         logger.debug(f'Initializing collection path file ".{toml_path}".')
         with toml_path.open("w") as toml_fh:
@@ -104,7 +106,11 @@ def calculate_file_metadata(filepath, filetype=None):
     relative_path = filepath.parent.resolve().relative_to(DATA_PATH)
     md5sum = hashlib.md5(filepath.open("rb").read()).hexdigest()
     file_metadata = {
-        "download_url": REPOSITORY_URL + "/" + str(relative_path) + "/" + filepath.name,
+        "download_url": REPOSITORY_URL
+        + "/"
+        + str(relative_path)
+        + "/"
+        + filepath.name,
         "mod_time": datetime.datetime.fromtimestamp(filepath.stat().st_mtime),
         "MD5": md5sum,
     }
@@ -148,13 +154,17 @@ def write_metadata(datadirlist):
             logger.error(f"File {node} has invalid attributes.")
         att_dict_list.append(dict(node.collection_attributes))
         file_metadata = calculate_file_metadata(node)
-        file_metadata_path = metadata_dirpath / (node.name + FILE_METADATA_SUFFIX)
+        file_metadata_path = metadata_dirpath / (
+            node.name + FILE_METADATA_SUFFIX
+        )
         with file_metadata_path.open("w") as file_metadata_fh:
             logger.debug(f'Writing file metadata to "{file_metadata_path}".')
             toml.dump(file_metadata, file_metadata_fh)
     att_frame = pd.DataFrame(att_dict_list)
     att_frame.to_csv(collection_path, sep="\t")
-    logger.info(f"{len(att_frame)} attribute records written to {collection_path}")
+    logger.info(
+        f"{len(att_frame)} attribute records written to {collection_path}"
+    )
     if n_invalid:
         logger.error(f"{n_invalid} invalid nodes were found.", file=sys.stderr)
         sys.exit(1)

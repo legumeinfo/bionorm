@@ -119,7 +119,12 @@ class genome_main:
                     self.detector.fasta_ids[hid] = 1
                     standard_header = true_header + "." + hid
                     if not hid.startswith(true_header):
-                        logger.warning((f"Inconsistency {hid} " + f"Should be {standard_header}"))
+                        logger.warning(
+                            (
+                                f"Inconsistency {hid} "
+                                + f"Should be {standard_header}"
+                            )
+                        )
                         passed = False
         return passed
 
@@ -265,7 +270,10 @@ class gene_models_main:
                     feature_id = get_id.search(attributes).group(1)
                     logger.debug(feature_id)
                     if not feature_id.startswith(true_id):  # check id
-                        logger.error("gene feature id, should start with " + f"{true_id} line {lines}")
+                        logger.error(
+                            "gene feature id, should start with "
+                            + f"{true_id} line {lines}"
+                        )
                         passed = False
         return passed
 
@@ -431,6 +439,11 @@ class readme_md:  # need to populate this correctly later
         logger.debug(target_sum)
         logger.debug(check_sum_target)
         if target_sum != check_sum_target:  # compare sums
-            logger.error((f"Checksum for file {check_me} {target_sum} " + f"did not match {check_sum_target}"))
+            logger.error(
+                (
+                    f"Checksum for file {check_me} {target_sum} "
+                    + f"did not match {check_sum_target}"
+                )
+            )
             sys.exit(1)
         logger.info("Checksums checked out, moving on...")
