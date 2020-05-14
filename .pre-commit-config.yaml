@@ -2,11 +2,12 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.5.0
     hooks:
-    -   id: check-yaml
-    -   id: check-toml
-    -   id: fix-encoding-pragma
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
+      - id: check-ast
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: fix-encoding-pragma
+      - id: name-tests-test
 -   repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
