@@ -7,15 +7,15 @@ import sys
 from glob import glob
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import click
-from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
 from loguru import logger
+from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
 
 # module imports
-from . import specification_checks
 from . import cli
 from . import click_loguru
+from . import specification_checks
 
 # global defs
 DOMAIN = "https://legumeinfo.org/data/public"
@@ -117,8 +117,8 @@ class Detector:
     def get_targets(self):
         """Gets and discovers target files relation to other files.
 
-           If the target is a directory, the program will discover
-           all related files that can be checked.
+        If the target is a directory, the program will discover
+        all related files that can be checked.
         """
         if self.target_type == "file":  # starting with a file
             self.add_target_object()

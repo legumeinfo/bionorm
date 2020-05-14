@@ -11,10 +11,16 @@ repos:
     rev: 19.10b0
     hooks:
     -   id: black
--   repo: https://github.com/pre-commit/mirrors-isort
-    rev: ''  # Use the revision sha / tag you want to point at
+-   repo: local
     hooks:
-    -   id: isort
+    -  id: isort
+       name: run isort
+       entry: isort
+       args: [--atomic, -yq]
+       language: python
+       additional_dependencies:
+         - isort
+         - toml
 - repo: local
   hooks:
   - id: flynt

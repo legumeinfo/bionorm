@@ -4,7 +4,7 @@ import locale
 import warnings
 from pkg_resources import iter_entry_points
 
-# third-party imports
+# first-party imports
 import click
 from click_loguru import ClickLoguru
 from click_plugins import with_plugins
@@ -12,8 +12,8 @@ from loguru import logger
 
 # module imports
 from .common import COLLECTION_HOME
-from .common import NAME
 from .common import COLLECTION_TITLE
+from .common import NAME
 from .common import __version__
 
 # global constants

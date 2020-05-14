@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-# standard library imports\
+# standard library imports
 import json
-from pathlib import Path
 
-# third-party imports
+# first-party imports
 import sh
-
 from tests.common import ANN_PATH
 from tests.common import GENOME_PATH
 

@@ -4,11 +4,11 @@
 # standard library imports
 import json as jsonlib
 
-# third-party imports
+# first-party imports
 import click
 import pandas as pd
-from loguru import logger
 from ansimarkup import ansiprint
+from loguru import logger
 
 # module imports
 from . import cli

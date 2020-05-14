@@ -5,9 +5,8 @@ import os
 import subprocess
 import sys
 
-# third-party imports
+# first-party imports
 import click
-
 from loguru import logger
 
 
@@ -111,9 +110,8 @@ def cli(target, lineage, mode, threads):
         and not mode
     ):
         logger.info(
-            "file {} was not recognized as a canonical type and mode cannot be assigned please specify --mode for BUSCO to run anyway".format(
-                target
-            )
+            "file {} was not recognized as a canonical type and mode cannot be assigned please specify --mode for BUSCO"
+            " to run anyway".format(target)
         )
         sys.exit(1)
     if file_attributes[-2].lower() in canonical_types and not mode:

@@ -2,12 +2,10 @@
 # standard library imports
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import sh
-
-# module imports
-from tests.common import GFF_PATH
 from tests.common import FASTA_PATH
+from tests.common import GFF_PATH
 
 
 def test_install_samtools(datadir_mgr):

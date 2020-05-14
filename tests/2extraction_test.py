@@ -2,9 +2,8 @@
 # standard library imports
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import sh
-
 from tests.common import ANN_PATH
 from tests.common import CDS_PATH
 from tests.common import EXTRACTION_LIST

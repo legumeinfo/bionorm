@@ -8,10 +8,11 @@ from pathlib import Path
 from pathlib import PosixPath
 
 # third-party imports
-import click
 import toml
-from addict import Dict
 
+# first-party imports
+import click
+from addict import Dict
 
 #
 # global constants

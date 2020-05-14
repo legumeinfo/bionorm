@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # standard library imports
+import gzip
 import hashlib
 import os
-import gzip
 import re
 import subprocess
 import sys
 
+# first-party imports
 from loguru import logger
 
 
@@ -53,9 +54,9 @@ class genome_main:
     def check_genome_main(self):
         """accepts a list of genome attributes split by "."
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
 
-           checks these file attributes to ensure they are correct
+        checks these file attributes to ensure they are correct
         """
         target = self.target
         attr = os.path.basename(target).split(".")  # split on delimiter
@@ -89,7 +90,7 @@ class genome_main:
     def check_genome_fasta(self):
         """Confirms that headers in fasta genome_main conform with standard
 
-           PUT SOME RULE REFERENCE HERE
+        PUT SOME RULE REFERENCE HERE
         """
         fasta = self.target  # get fasta file
         attr = os.path.basename(fasta).split(".")  # get attributes for naming
@@ -152,9 +153,9 @@ class gene_models_main:
     def check_gene_models_main(self):
         """accepts a list of annotation attributes split by "."
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
 
-           checks these file attributes to ensure they are correct
+        checks these file attributes to ensure they are correct
         """
         target = self.target
         attr = os.path.basename(target).split(".")  # split on delimiter
@@ -199,7 +200,7 @@ class gene_models_main:
     def gt_gff3_validate(self):
         """Confirms that gff3 files pass gt validation
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
         """
         gff = self.target
         gff_name = os.path.basename(gff)
@@ -215,9 +216,9 @@ class gene_models_main:
     def check_seqid_attributes(self):
         """Confirms that gff3 seqid exists in genome_main if provided
 
-           checks ID and Name from gff3 attributes field
+        checks ID and Name from gff3 attributes field
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
         """
         gff = self.target
         fasta_ids = self.fasta_ids  # list of FASTA IDS from Reference
@@ -286,9 +287,9 @@ class protein:
     def check_protein(self):
         """accepts a list of annotation attributes split by "."
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
 
-           checks these file attributes to ensure they are correct
+        checks these file attributes to ensure they are correct
         """
         target = self.target
         attr = os.path.basename(target).split(".")  # split on delimiter
@@ -348,9 +349,9 @@ class protein_primaryTranscript:
     def check_protein_primaryTranscript(self):
         """accepts a list of annotation attributes split by "."
 
-           https://github.com/LegumeFederation/datastore/issues/23
+        https://github.com/LegumeFederation/datastore/issues/23
 
-           checks these file attributes to ensure they are correct
+        checks these file attributes to ensure they are correct
         """
         target = self.target
         attr = os.path.basename(target).split(".")  # split on delimiter

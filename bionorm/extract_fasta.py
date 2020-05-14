@@ -5,11 +5,10 @@ import os
 import subprocess
 import sys
 
-# third-party imports
+# first-party imports
 import click
 from loguru import logger
 from sequencetools.helpers import sequence_helpers
-
 
 # module imports
 from . import cli

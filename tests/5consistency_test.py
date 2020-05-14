@@ -2,12 +2,11 @@
 # standard library imports
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import sh
-
 from tests.common import CDS_PATH
-from tests.common import GFF_PATH
 from tests.common import FASTA_PATH
+from tests.common import GFF_PATH
 from tests.common import MRNA_PATH
 from tests.common import TRANSCRIPT_PATH
 

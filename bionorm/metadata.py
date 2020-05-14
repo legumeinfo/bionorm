@@ -8,10 +8,12 @@ import sys
 from pathlib import Path
 
 # third-party imports
+import toml
+
+# first-party imports
 import click
 import pandas as pd
 import pygit2
-import toml
 from addict import Dict
 from loguru import logger
 
@@ -23,12 +25,12 @@ from .common import COLLECTION_DIR
 from .common import COLLECTION_HOME
 from .common import COLLECTION_TITLE
 from .common import DATA_PATH
-from .common import REPOSITORY_URL
 from .common import FILE_METADATA_SUFFIX
 from .common import METADATA_DIR_SUFFIX
 from .common import METADATA_HOME
-from .common import __version__
+from .common import REPOSITORY_URL
 from .common import CollectionPath
+from .common import __version__
 from .common import args_to_pathlist
 
 

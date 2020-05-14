@@ -61,9 +61,9 @@ pytest-cov = "^2.8.1"
 black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 pydocstyle = "^5.0.2"
-isort = {version = "^4.3.21", extras = ["pyproject"]}
 pytest-datadir-mgr = "^1.0.1"
 flynt = "^0.46"
+isort = {extras = ["pyproject"], version = "^4.3.21"}
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"

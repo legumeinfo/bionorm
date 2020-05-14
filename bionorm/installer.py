@@ -7,7 +7,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-# third-party imports
+# first-party imports
 import click
 import sh
 from packaging import version
@@ -17,7 +17,6 @@ from requests_download import download as request_download
 
 # module imports
 from . import cli
-
 
 INSTALL_ENVIRON_VAR = "BIONORM_INSTALL_DIR"  # installs go into "/bin" and other subdirs of this directory
 if INSTALL_ENVIRON_VAR in os.environ:
