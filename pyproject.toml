@@ -66,7 +66,7 @@ pytest-datadir-mgr = "^1.0.1"
 flynt = "^0.46"
 isort = {extras = ["pyproject"], version = "^4.3.21"}
 pylint = "^2.5.2"
-poetry-dynamic-versioning = "^0.7.0"
+poetry-dynamic-versioning = "^0.8.1"
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"
