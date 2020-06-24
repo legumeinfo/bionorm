@@ -4,8 +4,9 @@ import json
 
 # first-party imports
 import sh
-from tests.common import ANN_PATH
-from tests.common import GENOME_PATH
+
+# module imports
+from . import ANN_PATH
 
 FASTA_NAME = "medtr.jemalong_A17.gnm5.FAKE.genome_main.fna"
 GFF_PATH = "medtr.jemalong_A17.gnm5.ann1.FAKE.gene_models_main.gff3"

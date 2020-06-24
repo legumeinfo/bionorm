@@ -4,15 +4,17 @@ from pathlib import Path
 
 # first-party imports
 import sh
-from tests.common import ANN_PATH
-from tests.common import CDS_PATH
-from tests.common import EXTRACTION_LIST
-from tests.common import FASTA_PATH
-from tests.common import GFF_PATH
-from tests.common import PREFIXING_LIST
-from tests.common import PROTEIN_COUNT
-from tests.common import PROTEIN_PATH
-from tests.common import fasta_count
+
+# module imports
+from . import ANN_PATH
+from . import CDS_PATH
+from . import EXTRACTION_LIST
+from . import FASTA_PATH
+from . import GFF_PATH
+from . import PREFIXING_LIST
+from . import PROTEIN_COUNT
+from . import PROTEIN_PATH
+from . import fasta_count
 
 
 def test_install_gffread(datadir_mgr):

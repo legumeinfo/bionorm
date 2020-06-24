@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bionorm"
-version = "0.7.9.post3.dev0+ef67365"
+version = "0.7.10"
 description = "normalize, verify, and select genomic data"
 authors = ["Connor Cameron <ctc@ncgr.org>"]
 maintainers = ["Joel Berendzen <joelb@ncgr.org>"]
@@ -51,10 +51,8 @@ addict = "^2.2.1"
 pandas = "^1.0.3"
 pygit2 = "^1.2.0"
 toml = "^0.10.0"
-loguru = "^0.4.1"
 ansimarkup = "^1.4.0"
-click_loguru = "^0.1.0"
-pylint = "^2.5.2"
+click_loguru = "^0.3.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -63,10 +61,11 @@ black = {version = "^19.10b0", allow-prereleases = true}
 pre-commit = "^2.0.1"
 pydocstyle = "^5.0.2"
 pytest-datadir-mgr = "^1.0.1"
-flynt = "^0.46"
 isort = {extras = ["pyproject"], version = "^4.3.21"}
 pylint = "^2.5.2"
-poetry-dynamic-versioning = "^0.7.0"
+nox = "^2020.5.24"
+flynt = "^0.48.1"
+coverage = {extras = ["toml"], version = "^5.1"}
 
 [tool.poetry.scripts]
 bionorm = "bionorm:cli"
@@ -107,6 +106,18 @@ import_heading_thirdparty = "third-party imports"
 import_heading_firstparty = "first-party imports"
 import_heading_localfolder = "module imports"
 known_standard_library = "pkg_resources"
+
+[tool.coverage.run]
+parallel = true
+omit = ["tests/*", "noxfile.py", ".nox/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if self.debug:",
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+    ]
 
 [build-system]
 requires = ["poetry>=0.12"]

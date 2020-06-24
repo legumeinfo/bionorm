@@ -4,11 +4,13 @@ from pathlib import Path
 
 # first-party imports
 import sh
-from tests.common import CDS_PATH
-from tests.common import FASTA_PATH
-from tests.common import GFF_PATH
-from tests.common import MRNA_PATH
-from tests.common import TRANSCRIPT_PATH
+
+# module imports
+from . import CDS_PATH
+from . import FASTA_PATH
+from . import GFF_PATH
+from . import MRNA_PATH
+from . import TRANSCRIPT_PATH
 
 
 def test_install_genometools(datadir_mgr):

@@ -4,8 +4,10 @@ from pathlib import Path
 
 # first-party imports
 import sh
-from tests.common import FASTA_PATH
-from tests.common import GFF_PATH
+
+# module imports
+from . import FASTA_PATH
+from . import GFF_PATH
 
 
 def test_install_samtools(datadir_mgr):

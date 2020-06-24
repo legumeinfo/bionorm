@@ -5,12 +5,14 @@ from pathlib import Path
 # first-party imports
 import pytest
 import sh
-from tests.common import ANN_PATH
-from tests.common import FASTA_PATH
-from tests.common import GENOME_PATH
-from tests.common import GFF_PATH
-from tests.common import fasta_count
-from tests.common import line_count
+
+# module imports
+from . import ANN_PATH
+from . import FASTA_PATH
+from . import GENOME_PATH
+from . import GFF_PATH
+from . import fasta_count
+from . import line_count
 
 DOWNLOAD_URL = "http://generisbio.com/ncgr/"
 RAW_FASTA_FILE = "example_jemalong.fna"
