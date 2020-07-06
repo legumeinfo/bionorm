@@ -52,7 +52,7 @@ pandas = "^1.0.3"
 pygit2 = "^1.2.0"
 toml = "^0.10.0"
 ansimarkup = "^1.4.0"
-click_loguru = "^0.3.6"
+click_loguru = ">=0.3.6,<1.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
