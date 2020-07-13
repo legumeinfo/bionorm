@@ -47,11 +47,12 @@ class Detector:
     def __init__(
         self,
         target,
+        busco,
         genome_main,
         gene_models_main,
         genometools,
         fasta_headers,
-        nodes,
+        nodes
     ):
         """Check for check for gt"""
         self.checks = {}  # object that determines which checks are skipped
@@ -60,23 +61,28 @@ class Detector:
         self.checks["perform_gt"] = genometools
         self.checks["fasta_headers"] = fasta_headers
         self.nodes = nodes
+        self.busco = busco
+        self.options = {}
         self.canonical_types = [
             "genome_main",
             "protein_primaryTranscript",
             "protein",
             "gene_models_main",
+            "gwas"
         ]
         self.canonical_parents = {
             "genome_main": None,
             "gene_models_main": "genome_main",
             "protein_primaryTranscript": "gene_models_main",
             "protein": "gene_models_main",
+            "gwas": "gene_models_main"
         }
         self.rank = {
             "genome_main": 0,
             "gene_models_main": 1,
             "protein": 2,
             "protein_primaryTranscript": 2,
+            "gwas": 2
         }
         self.write_me = {}
         self.passed = {}  # dictionary of passing names
@@ -86,6 +92,7 @@ class Detector:
         self.node_data = {}  # nodes for DSCensor
         self.target = Path(target)
         self.target_readme = ""
+        self.target_name = os.path.basename(self.target)
         self.target_type = self.get_target_type()
         if (
             self.target_type is None
@@ -131,11 +138,11 @@ class Detector:
         if self.target.is_file():
             target_type = "file"
         elif (
-            len(self.target.name.split("_")) == 2
-            and len(self.target.name.split(".")) < 3
+            len(self.target_name.split("_")) == 2
+            and len(self.target_name.split(".")) < 3
         ):
             target_type = "organism_dir"  # will always be Genus_species
-        elif len(self.target.name.split(".")) >= 3:  # standard naming minimum
+        elif len(self.target_name.split(".")) >= 3:  # standard naming minimum
             target_type = "data_dir"
         else:
             target_type = None
@@ -162,9 +169,10 @@ class Detector:
         """Walk filetree and return all files."""
         for root, directories, filenames in os.walk(self.target):
             for filename in filenames:  # we only care about the files
-                my_target = root / filename
+                my_target = f"{root}/{filename}"
                 logger.debug(f"Checking file {my_target}")
                 self.target = my_target
+                self.target_name = filename
                 self.add_target_object()  # add target if canonical
 
     def get_target_file_type(self, target_file):
@@ -180,8 +188,8 @@ class Detector:
 
     def add_target_object(self):
         """Create a structure for file objects."""
-        target_attributes = self.target.name.split(".")
-        if len(target_attributes) < 3 or self.target.name[0] == "_":
+        target_attributes = self.target_name.split(".")
+        if len(target_attributes) < 3 or self.target_name[0] == "_":
             logger.debug(f"File {target} does not seem to have attributes")
             return
         canonical_type = target_attributes[-3]  # check content type
@@ -202,10 +210,10 @@ class Detector:
         species = organism_dir.split("_")[1].lower()
         target_ref_type = self.canonical_parents[canonical_type]
         logger.debug("Getting target files reference if necessary...")
-        file_type = self.get_target_file_type(self.target.name)
-        file_url = f"{DOMAIN}/{organism_dir}/{target_dir}/{self.target.name}"
+        file_type = self.get_target_file_type(self.target_name)
+        file_url = f"{DOMAIN}/{organism_dir}/{target_dir}/{self.target_name}"
         target_node_object = {
-            "filename": self.target.name,
+            "filename": self.target_name,
             "filetype": file_type,
             "canonical_type": canonical_type,
             "url": file_url,
@@ -346,10 +354,9 @@ class Detector:
     def detect_incongruencies(self):
         """Check consistencies in all objects."""
         targets = self.target_objects  # get objects from class init
-        no_nodes = self.no_nodes  # if true, no nodes for DSCensor written
-        for reference in sorted(
-            targets, key=lambda k: self.rank[targets[k]["type"]]
-        ):
+        busco = self.busco  # if true, run BUSCO
+        nodes = self.nodes  # if true, generate nodes for DSCensor
+        for reference in sorted(targets, key=lambda k: self.rank[targets[k]["type"]]):
             #            logger.info('HERE {}'.format(reference))
             if reference not in self.passed:
                 self.passed[reference] = 0
@@ -381,6 +388,7 @@ class Detector:
                         self.write_node_object()  # write node for dscensor loading
                 logger.debug(f"{targets[reference]}")
             if self.target_objects[reference]["children"]:  # process children
+                self.parent = reference
                 children = self.target_objects[reference]["children"]
                 for c in children:
                     if c in self.passed:
@@ -417,12 +425,12 @@ class Detector:
 @cli.command()
 @click_loguru.init_logger()
 @click.option(
-    "--busco", is_flag=True, default=True, help="""Run BUSCO checks."""
+    "--busco", is_flag=True, default=False, help="""Run BUSCO checks."""
 )
 @click.option(
     "--nodes",
     is_flag=True,
-    default=True,
+    default=False,
     help="""Generate DSCensor stats and node.""",
 )
 @click.option(
@@ -455,7 +463,7 @@ def consistency(
     genome_main,
     gene_models_main,
     genometools,
-    fasta_headers,
+    fasta_headers
 ):
     """Check self-consistency and consistency with standards."""
     detector = Detector(
@@ -465,6 +473,6 @@ def consistency(
         genome_main=genome_main,
         gene_models_main=gene_models_main,
         genometools=genometools,
-        fasta_headers=fasta_headers,
+        fasta_headers=fasta_headers
     )  # initialize class
     detector.detect_incongruencies()  # run all detection methods

@@ -132,6 +132,7 @@ class genome_main:
 class gene_models_main:
     def __init__(self, detector, **kwargs):
         self.detector = detector
+        self.parent = detector.parent
         self.target = detector.target
         self.fasta_ids = detector.fasta_ids
 
@@ -208,9 +209,12 @@ class gene_models_main:
         https://github.com/LegumeFederation/datastore/issues/23
         """
         gff = self.target
+        fasta = self.parent
         gff_name = os.path.basename(gff)
-        gt_report = f"./{gff_name}_gt_gff3validator_report.txt"
-        gt_cmd = f"(gt gff3validator {gff} 2>&1) > {gt_report}"
+        gt_report = f"./{gff_name}.gff_QC.report"
+        gt_stats = f"./{gff_name}.gff_QC.stats"
+#        gt_cmd = f"(gt gff3validator {gff} 2>&1) > {gt_report}"
+        gt_cmd = f"gff3_QC -g {gff} -f {fasta} -o {gt_report} -s {gt_stats}"
         logger.debug(gt_cmd)
         exit_val = subprocess.call(gt_cmd, shell=True)  # get gt exit_val
         logger.debug(exit_val)

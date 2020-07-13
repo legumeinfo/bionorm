@@ -66,24 +66,24 @@ DEPENDENCY_DICT = {
             HTSLIB_DIR + "/tabix",
             HTSLIB_DIR + "/htsfile",
         ],
-    },
-    "genometools": {
-        "binaries": ["gt"],
-        "tarball": (
-            "https://github.com/genometools/genometools/archive/v"
-            + GT_VER
-            + ".tar.gz"
-        ),
-        "dir": "genometools-" + GT_VER,
-        "version": version.parse(GT_VER),
-        "version_command": ["--version"],
-        "make": [
-            "install",
-            "prefix=" + str(INSTALL_PATH),
-            "cairo=no",
-            "useshared=no",
-        ],
-    },
+    }
+#    "genometools": {
+#        "binaries": ["gt"],
+#        "tarball": (
+#            "https://github.com/genometools/genometools/archive/v"
+#            + GT_VER
+#            + ".tar.gz"
+#        ),
+#        "dir": "genometools-" + GT_VER,
+#        "version": version.parse(GT_VER),
+#        "version_command": ["--version"],
+#        "make": [
+#            "install",
+#            "prefix=" + str(INSTALL_PATH),
+#            "cairo=no",
+#            "useshared=no",
+#        ],
+#    },
 }
 
 
