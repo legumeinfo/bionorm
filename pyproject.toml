@@ -58,7 +58,7 @@ click_loguru = "^0.3.6"
 pytest = "^5.2"
 pytest-cov = "^2.8.1"
 black = {version = "^19.10b0", allow-prereleases = true}
-pre-commit = "^2.0.1"
+pre-commit = "^2.12.1"
 pydocstyle = "^5.0.2"
 pytest-datadir-mgr = "^1.0.1"
 isort = {extras = ["pyproject"], version = "^4.3.21"}
