@@ -4,6 +4,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 from glob import glob
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from pathlib import Path
 import click
 from loguru import logger
 from sequencetools.tools.basic_fasta_stats import basic_fasta_stats
+from sequencetools.helpers.file_helpers import return_filehandle
 
 # module imports
 from . import cli
@@ -25,7 +27,7 @@ GFF_TYPES = ("gff", "gff3")
 
 def count_gff_features(gff):
     counts = {}
-    with Path(gff).open("r") as fopen:
+    with return_filehandle(Path(gff)) as fopen:
         for line in fopen:
             if (
                 not line or line.isspace() or line.startswith("#")
@@ -48,11 +50,12 @@ class Detector:
         self,
         target,
         busco,
+        nodes,
         genome_main,
         gene_models_main,
         genometools,
         fasta_headers,
-        nodes
+        disable_all
     ):
         """Check for check for gt"""
         self.checks = {}  # object that determines which checks are skipped
@@ -62,27 +65,36 @@ class Detector:
         self.checks["fasta_headers"] = fasta_headers
         self.nodes = nodes
         self.busco = busco
+        self.disable_all = disable_all
         self.options = {}
         self.canonical_types = [
             "genome_main",
             "protein_primaryTranscript",
             "protein",
             "gene_models_main",
-            "gwas"
+            "gwas",
+            "mrk",
+            "phen"
         ]
         self.canonical_parents = {
             "genome_main": None,
             "gene_models_main": "genome_main",
+            "mrk": "genome_main",
             "protein_primaryTranscript": "gene_models_main",
             "protein": "gene_models_main",
-            "gwas": "gene_models_main"
+            "gwas": "mrk",
+            "phen": "gwas",
+            "qtl": "genome_main"
         }
         self.rank = {
             "genome_main": 0,
             "gene_models_main": 1,
+            "mrk": 1,
+            "qtl": 1,
             "protein": 2,
             "protein_primaryTranscript": 2,
-            "gwas": 2
+            "gwas": 2,
+            "phen": 3
         }
         self.write_me = {}
         self.passed = {}  # dictionary of passing names
@@ -190,15 +202,20 @@ class Detector:
         """Create a structure for file objects."""
         target_attributes = self.target_name.split(".")
         if len(target_attributes) < 3 or self.target_name[0] == "_":
-            logger.debug(f"File {target} does not seem to have attributes")
+            logger.info(f"File {self.target} does not seem to have attributes")
             return
         canonical_type = target_attributes[-3]  # check content type
-        if canonical_type not in self.canonical_types:  # regject
-            logger.debug(
-                f"Type {canonical_type} not recognized in"
-                f" {self.canonical_types}.  Skipping"
-            )
-            return
+        if canonical_type not in self.canonical_types:  # check for known file types
+            if len(target_attributes) < 5:
+                logger.info(f"No type for {self.target}. skipping")
+                return
+            canonical_type = target_attributes[-5]
+            if canonical_type not in self.canonical_types: # check for mrk identifier
+                logger.info(
+                    f"Type {canonical_type} not recognized in"
+                    f" {self.canonical_types}.  Skipping"
+                )
+                return
         organism_dir_path = os.path.dirname(
             os.path.dirname(self.target)
         )  # org dir
@@ -206,6 +223,9 @@ class Detector:
             os.path.dirname(os.path.dirname(self.target))
         )  # org dir
         target_dir = os.path.basename(os.path.dirname(self.target))
+        print(target_dir, organism_dir)
+        if len(organism_dir.split("_")) != 2:
+            return
         genus = organism_dir.split("_")[0].lower()
         species = organism_dir.split("_")[1].lower()
         target_ref_type = self.canonical_parents[canonical_type]
@@ -230,7 +250,16 @@ class Detector:
             ref_glob = f"{organism_dir_path}/{ '.'.join(target_attributes[1:3])}*/*{target_ref_type}.*.gz"
             if self.rank[canonical_type] > 1:  # feature has a subtype
                 ref_glob = f"{organism_dir_path}/{'.'.join(target_attributes[1:4])}*/*{target_ref_type}.*.gz"
+                if canonical_type == 'gwas':  # mrk is parent and needs be read from PlatformName in gwas file
+                    cmd = f'zgrep PlatformName {self.target}'
+                    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+                    platformname = proc.communicate()[0].decode('utf-8').rstrip().split('\t')[1]
+                    ref_glob = f"{organism_dir_path}/*.mrk.*/*mrk.*.{platformname}.gff3.gz"
+                elif canonical_type == 'phen':  # gwas is parent
+
+                    ref_glob = 'gwas'.join(str(self.target).rsplit('phen', 1))
             my_reference = self.get_reference(ref_glob)
+            logger.info(my_reference)
             if my_reference not in self.target_objects:  # new parent
                 parent_name = os.path.basename(my_reference)
                 file_type = self.get_target_file_type(parent_name)
@@ -264,8 +293,12 @@ class Detector:
                     "node_data": target_node_object,
                     "type": canonical_type,
                 }
+                if self.rank[target_ref_type] > 0:
+                    self.target = my_reference
+                    self.target_name = os.path.basename(my_reference)
+                    self.add_target_object()  # add target if canonical
             else:  # the parent is already in the data structure add child
-                if target not in self.target_objects[my_reference]["children"]:
+                if self.target not in self.target_objects[my_reference]["children"]:
                     parent_name = os.path.basename(my_reference)
                     target_node_object["child_of"].append(parent_name)
                     target_node_object["derived_from"].append(parent_name)
@@ -281,7 +314,7 @@ class Detector:
                 sys.exit(1)
             logger.debug("Target has no Parent, it is a Reference")
             if self.target not in self.target_objects:
-                self.target_objects[target] = {
+                self.target_objects[self.target] = {
                     "type": canonical_type,
                     "node_data": target_node_object,
                     "children": {},
@@ -290,8 +323,8 @@ class Detector:
     def get_reference(self, glob_target):
         """Finds the FASTA reference for some prefix"""
         if len(glob(glob_target)) > 1:  # too many references....?
-            logger.error(f"Multiple references found {glob_target}")
-            sys.exit(1)
+            logger.error(f"Multiple references found {glob(glob_target)}")            
+#            sys.exit(1)
         reference = glob(glob_target)
         if not reference:  # if the objects parent could not be found
             logger.error(f"Could not find ref glob: {glob_target}")
@@ -307,6 +340,7 @@ class Detector:
         """Write DSCensor object node."""
         my_name = self.write_me["filename"]
         if self.write_me["canonical_type"] == "genome_main":
+            return
             self.write_me["counts"] = basic_fasta_stats(self.target, 10, False)
         elif self.write_me["canonical_type"] == "gene_models_main":
             self.write_me["counts"] = count_gff_features(self.target)
@@ -314,42 +348,45 @@ class Detector:
         my_file.write(json.dumps(self.write_me))
         my_file.close()
 
-    def run_busco(self, mode, file_name):
+    def check_busco(self):
         """Runs BUSCO using BUSCO_ENV_FILE envvar and outputs to file_name."""
+        target = self.target
         node_data = self.node_data  # get current targets nodes
         busco_parse = re.compile(
             r"C:(.+)\%\[S:(.+)\%,D:(.+)\%\],F:(.+)\%,M:(.+)\%,n:(\d+)"
         )
-        output = f"{'.'.join(file_name.split('.')[:-2])}.busco"
-        cmd = f"run_BUSCO.py --mode {mode} --lineage {'lineage'}"
-        outdir = f"./run_{output}"  # output from BUSCO
-        short_summary = glob(outdir + "/short_summary*.busco.txt")
+#        output = f"{'.'.join(file_name.split('.')[:-2])}.busco"
+        #cmd = f"run_BUSCO.py --mode {mode} --lineage {'lineage'}"
+        #outdir = f"./run_{output}"  # output from BUSCO
+        name = f'{os.path.basename(target)}_busco'
+        if node_data.get("canonical_type") == "gene_models_main":
+            name = "*.protein_primaryTranscript.*_busco"
+        print(node_data.get("canonical_type"))
+        print(f"{os.path.dirname(target)}/busco/{name}/short_summary*_busco.txt")
+        short_summary = glob(f'{os.path.dirname(target)}/busco/{name}/short_summary*_busco.txt')
         if not short_summary:
-            logger.error(f"BUSCO short summary not found for {outdir}")
-            sys.exit(1)
+            logger.debug(f"BUSCO short summary not found for {target}")
+            return
         short_summary = short_summary[0]
+        node_data["busco"] = {}
         with open(short_summary) as fopen:
             for line in fopen:
                 line = line.rstrip()
-                if line.startswith("#") or not line:
+                if line.startswith("#") or not line or len(line.split("\t")) < 3:
                     continue
-                if line.startswith("\tC:"):
-                    line = line.replace("\t", "")
-                    percentages = busco_parse.search(line)  # read summary
-                    total = int(percentages.group(6))
-                    complete = float(percentages.group(1))
-                    frag = float(percentages.group(4))
-                    single = float(percentages.group(2))
-                    duplicate = float(percentages.group(3))
-                    missing = float(percentages.group(5))
-                    node_data["busco"] = {
-                        "total_buscos": total,  # node BUSCO
-                        "complete_buscos": complete,
-                        "fragmented_buscos": frag,
-                        "single_copy_buscos": single,
-                        "duplicate_buscos": duplicate,
-                        "missing_buscos": missing,
-                    }
+                fields = line.split("\t")
+                if fields[2].startswith("Complete BUSCOs"):
+                    node_data["busco"]["complete_buscos"] = fields[1]
+                elif fields[2].startswith("Complete and single"):
+                    node_data["busco"]["single_copy_buscos"] = fields[1]
+                elif fields[2].startswith("Complete and dupli"):
+                    node_data["busco"]["duplicate_buscos"] = fields[1]
+                elif fields[2].startswith("Fragmented"):
+                    node_data["busco"]["fragmented_buscos"] = fields[1]
+                elif fields[2].startswith("Missing"):
+                    node_data["busco"]["missing_buscos"] = fields[1]
+                elif fields[2].startswith("Total"):
+                    node_data["busco"]["total_buscos"] = fields[1]
 
     def detect_incongruencies(self):
         """Check consistencies in all objects."""
@@ -375,7 +412,9 @@ class Detector:
                     continue
                 logger.debug(ref_method)
                 my_detector = ref_method(self, **self.options)
-                passed = my_detector.run()
+                passed = True
+                if not self.disable_all:
+                    passed = my_detector.run()
                 if (
                     passed
                 ):  # validation passed writing object node for DSCensor
@@ -384,6 +423,7 @@ class Detector:
                     if nodes:
                         logger.info(f"Writing node object for {reference}")
                         # dscensor node
+                        self.check_busco()
                         self.write_me = targets[reference]["node_data"]
                         self.write_node_object()  # write node for dscensor loading
                 logger.debug(f"{targets[reference]}")
@@ -410,13 +450,17 @@ class Detector:
                         continue
                     logger.debug(child_method)
                     my_detector = child_method(self, **self.options)
-                    passed = my_detector.run()
+                    passed = True
+                    if not self.disable_all:
+                        passed = my_detector.run()
                     if (
                         passed
                     ):  # validation passed writing object node for DSCensor
                         self.passed[c] = 1
+                        self.node_data = children[c]["node_data"]
                         if nodes:
                             logger.info(f"Writing node object for {c}")
+                            self.check_busco()
                             self.write_me = children[c]["node_data"]
                             self.write_node_object()
                     logger.debug(f"{c}")
@@ -425,7 +469,10 @@ class Detector:
 @cli.command()
 @click_loguru.init_logger()
 @click.option(
-    "--busco", is_flag=True, default=False, help="""Run BUSCO checks."""
+    "--busco", 
+    is_flag=True, 
+    default=False, 
+    help="""Parse BUSCO for node object."""
 )
 @click.option(
     "--nodes",
@@ -455,6 +502,11 @@ class Detector:
     is_flag=True,
     help="""Check consistency of FASTA headers and GFF.""",
 )
+@click.option(
+    "--disable_all",
+    is_flag=True,
+    help="""Disables all consistency checking.""",
+)
 @click.argument("target", nargs=1)
 def consistency(
     target,
@@ -463,9 +515,10 @@ def consistency(
     genome_main,
     gene_models_main,
     genometools,
-    fasta_headers
+    fasta_headers,
+    disable_all
 ):
-    """Check self-consistency and consistency with standards."""
+    """Perform consistency checks on target directory."""
     detector = Detector(
         target,
         busco=busco,
@@ -473,6 +526,7 @@ def consistency(
         genome_main=genome_main,
         gene_models_main=gene_models_main,
         genometools=genometools,
-        fasta_headers=fasta_headers
+        fasta_headers=fasta_headers,
+        disable_all=disable_all
     )  # initialize class
     detector.detect_incongruencies()  # run all detection methods

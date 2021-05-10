@@ -177,9 +177,9 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 
 @cli.command()
 @click_loguru.init_logger()
-@click.option("--gnm", required=True, type=int, help="Genome version number.")
+@click.option("--genver", required=True, type=int, help="Genome version number.")
 @click.option(
-    "--ann", required=True, type=int, help="""Annotation version number."""
+    "--annver", required=True, type=int, help="""Annotation version number."""
 )
 @click.option("--genus", required=True, help="Genus name of organism.")
 @click.option("--species", required=True, help="Species name of organism.")
@@ -200,16 +200,16 @@ def update_hierarchy(hierarchy, feature_type, parent_types):
 @click.argument(
     "gff3file", type=click.Path(exists=True, readable=True, dir_okay=False)
 )
-def prefix_gff(gff3file, gnm, ann, genus, species, infra_id, key, sort_only):
+def prefix_gff(gff3file, genver, annver, genus, species, infra_id, key, sort_only):
     """Prefix and sort GFF3 file to data store standards.
 
     \b
     Example:
-        bionorm prefix-gff --gnm 5 --ann 1 --species truncatula --genus medicago \\
+        bionorm prefix-gff --genver 5 --annver 1 --species truncatula --genus medicago \\
                 --infra_id jemalong_A17 --key FAKE example_jemalong.gff3
     """
-    gnm = f"gnm{gnm}"
-    ann = f"ann{ann}"
+    gnm = f"gnm{genver}"
+    ann = f"ann{annver}"
     if sort_only:
         logger.debug("sorting ONLY...")
     else:

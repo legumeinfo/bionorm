@@ -53,7 +53,7 @@ else:
 )
 @click.version_option(version=__version__, prog_name=NAME)
 def cli(warnings_as_errors, **kwargs):
-    """bionorm -- normalize, verify, and select genomic data.
+    """bionorm -- normalize, verify, and index bioinformatic data types.
 
     For more information, see the homepage at https://github.com/legumeinfo/bionorm
 
@@ -78,7 +78,7 @@ from .installer import install  # isort:skip
 from .index import index_fasta  # isort:skip
 from .index import index_gff  # isort:skip
 from .generate_readme import generate_readme  # isort:skip
-from .attributes import ls  # isort:skip
-from .metadata import init_collection  # isort:skip
-from .metadata import show_collection  # isort:skip
-from .metadata import write_metadata  # isort:skip
+#from .attributes import ls  # isort:skip
+#from .metadata import init_collection  # isort:skip
+#from .metadata import show_collection  # isort:skip
+#from .metadata import write_metadata  # isort:skip

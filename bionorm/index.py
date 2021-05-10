@@ -20,11 +20,10 @@ from .common import GFF_TYPES
 @click.option(
     "--compress",
     is_flag=True,
-    default=True,
     help="Compress with bgzip before indexing.",
 )
 @click.argument("fasta", type=click.Path(exists=True, readable=True))
-def index_fasta(fasta, compress=True):
+def index_fasta(fasta, compress):
     """Index and optionally compress a fasta file.
 
 
@@ -50,10 +49,8 @@ def index_fasta(fasta, compress=True):
         sys.exit(1)
     if compress:
         output = bgzip(["-f", "--index", str(target)])
-        print(output)
         target = Path(target.parent) / f"{target.name}.gz"
     output = samtools(["faidx", str(target)])
-    print(output)
     return target
 
 
@@ -61,11 +58,10 @@ def index_fasta(fasta, compress=True):
 @click.option(
     "--compress",
     is_flag=True,
-    default=True,
     help="Compress with bgzip before indexing.",
 )
 @click.argument("gff", type=click.Path(exists=True, readable=True))
-def index_gff(gff, compress=True):
+def index_gff(gff, compress):
     """Index and optionally compress a GFF file.
 
         \b
@@ -90,10 +86,7 @@ def index_gff(gff, compress=True):
         sys.exit(1)
     if compress:
         output = bgzip(["-f", str(target)])
-        print(output)
         target = Path(target.parent) / f"{target.name}.gz"
     output = tabix(["-p", "gff", str(target)])
-    print(output)
     output = tabix(["--csi", "-p", "gff", str(target)])
-    print(output)
     return target
