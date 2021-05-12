@@ -778,7 +778,7 @@ description = "sequencetools -- A package for FASTX stats generation and manipul
 name = "sequencetools"
 optional = false
 python-versions = "*"
-version = "0.0.5"
+version = "0.0.7"
 
 [package.dependencies]
 biopython = "*"
@@ -918,7 +918,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "018331c11bea5a5bcc36cac5f0a285bb10f2ce62251a2a25ca213cf8979923d2"
+content-hash = "eddea889169b9d33f0dcacf40f781ee8e5ba7a7b4dfd278a450c4928ce5fd915"
 python-versions = "^3.6.1"
 
 [metadata.files]
@@ -1367,10 +1367,7 @@ requests-download = [
     {file = "ruamel.yaml.clib-0.2.0.tar.gz", hash = "sha256:b66832ea8077d9b3f6e311c4a53d06273db5dc2db6e8a908550f3c14d67e718c"},
 ]
 sequencetools = [
-    {file = "sequencetools-0.0.5-py3-none-any.whl", hash = "sha256:f447ede8929db6cc9308133ada5040d63e9d76723b52f5befd2410cbeeaa99ef"},
-    {file = "sequencetools-0.0.5-py3.6.egg", hash = "sha256:2cbd2be3a652111343ef2eef35876eec33b94d8eeef8c53eb8bb338531394b95"},
-    {file = "sequencetools-0.0.5-py3.7.egg", hash = "sha256:1f89bb6e682f945eca40640426fc028e3d6e9036f5df2f362bd3b98c7450e481"},
-    {file = "sequencetools-0.0.5.tar.gz", hash = "sha256:e5cb8dca14dab0046aa17f4c0527a385bd185eff683ce395f9243203da0aef8d"},
+    {file = "sequencetools-0.0.7.tar.gz", hash = "sha256:a0876a244137754d832e544aa244ccadfaa73e90270a7ffd61247069003700de"},
 ]
 sh = [
     {file = "sh-1.13.1-py2.py3-none-any.whl", hash = "sha256:6f792e45b45d039b423081558904981e8ab49572b0c38009fcc65feaab06bcda"},
